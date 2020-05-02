@@ -61,10 +61,10 @@ def dockerBuild(ctx) {
     ctx.dockerImages << imgTagLatest
 }
 def dockerPush(ctx) {
-    def push = { img, repo -> {
+    def push = { img, repo -> 
         def dest = "${repo}/${img}"
         sh "docker tag ${img} ${dest} && docker push ${dest}"
-    }}
+    }
     def to = Closure.IDENTITY
     
     ctx.dockerImages.each {
