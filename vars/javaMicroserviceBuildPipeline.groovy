@@ -44,7 +44,7 @@ def setUpContext(body) {
 }
 
 def mavenBuild(ctx) {
-    // sh "mvn clean package -DskipTests=${ctx.skipTests}"
+    // sh "mvn clean package -DskipTests=${ctx.noUnitTests}"
     sh "echo 'maven build'"
 }
 
