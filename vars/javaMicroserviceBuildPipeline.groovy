@@ -50,7 +50,7 @@ def mavenBuild(ctx) {
 
 def dockerBuild(ctx) {
     def imgTag = ctx.service + ':' + gitRev()
-    def imgTagLatest = ${ctx.service + ':latest'}
+    def imgTagLatest = ctx.service + ':latest'
     
     // sh "docker build -t ${imgTag} ."
     sh "docker pull busybox"
