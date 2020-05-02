@@ -39,6 +39,8 @@ def setUpContext(body) {
     body()
     
     // defining more parameters for ourselves
+    ctx.blueRepo = "blue.dockerhub.alutech.local"
+    ctx.greenRepo = "green.dockerhub.alutech.local"
     ctx.dockerImages = []
     return ctx
 }
