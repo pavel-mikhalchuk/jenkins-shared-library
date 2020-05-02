@@ -39,8 +39,6 @@ def setUpContext(body) {
     body()
     
     // defining more parameters for ourselves
-    ctx.blueRepo = "blue.dockerhub.alutech.local"
-    ctx.greenRepo = "green.dockerhub.alutech.local"
     ctx.dockerImages = []
     return ctx
 }
@@ -55,21 +53,23 @@ def dockerBuild(ctx) {
     def imgTagLatest = ctx.service + ':latest'
     
     // sh "docker build -t ${imgTag} ."
+    // sh "docker tag ${imgTag} ${imgTagLatest}"
     sh "docker pull busybox"
     sh "docker tag busybox ${imgTag}"
 
-    ctx.dockerImages << ctx.blueRepo + '/' + imgTag
-    ctx.dockerImages << ctx.greenRepo + '/' + imgTag
-    ctx.dockerImages << ctx.blueRepo + '/' + imgTagLatest
-    ctx.dockerImages << ctx.greenRepo + '/' + imgTagLatest
-
-    ctx.dockerImages.each {
-        sh "docker tag ${imgTag} ${it}"
-    }
+    ctx.dockerImages << imgTag
+    ctx.dockerImages << imgTagLatest
 }
 def dockerPush(ctx) {
+    def push = { img, repo -> {
+        def dest = "${repo}/${img}"
+        sh "docker tag ${img} ${dest} && docker push ${dest}"
+    }}
+    def to = Closure.IDENTITY
+    
     ctx.dockerImages.each {
-        sh "docker push ${it}"
+        // push(it, to("blue.dockerhub.alutech.local"))
+        push(it, to("green.dockerhub.alutech.local"))
     }
 }
 
