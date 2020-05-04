@@ -62,7 +62,7 @@ def dockerPush(ctx) {
     def to = Closure.IDENTITY
     
     ctx.dockerImages.each {
-        // push(it, to("blue.dockerhub.alutech.local"))
+        push(it, to("blue.dockerhub.alutech.local"))
         push(it, to("green.dockerhub.alutech.local"))
     }
 }
