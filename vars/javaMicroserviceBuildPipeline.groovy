@@ -7,9 +7,9 @@ def call(body) {
             buildDiscarder(logRotator(numToKeepStr: '5'))
             timestamps () 
         }
-        // tools { 
-        //     maven 'Maven 3.5.0'
-        // }
+        tools { 
+            maven 'Maven 3.5.0'
+        }
         stages {
             stage('build') {
                 steps {
@@ -44,18 +44,15 @@ def setUpContext(body) {
 }
 
 def mavenBuild(ctx) {
-    // sh "mvn clean package -DskipTests=${ctx.noUnitTests}"
-    sh "echo 'maven build'"
+    sh "mvn clean package -DskipTests=${ctx.noUnitTests}"
 }
 
 def dockerBuild(ctx) {
     def imgTag = ctx.service + ':' + gitRev()
     def imgTagLatest = ctx.service + ':latest'
     
-    // sh "docker build -t ${imgTag} ."
-    // sh "docker tag ${imgTag} ${imgTagLatest}"
-    sh "docker pull busybox"
-    sh "docker tag busybox ${imgTag}"
+    sh "docker build -t ${imgTag} ."
+    sh "docker tag ${imgTag} ${imgTagLatest}"
 
     ctx.dockerImages << imgTag
     ctx.dockerImages << imgTagLatest
