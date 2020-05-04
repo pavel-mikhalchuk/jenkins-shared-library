@@ -7,9 +7,6 @@ def call(body) {
             buildDiscarder(logRotator(numToKeepStr: '5'))
             timestamps () 
         }
-        tools { 
-            maven 'Maven 3.5.0'
-        }
         stages {
             stage('build') {
                 steps {
