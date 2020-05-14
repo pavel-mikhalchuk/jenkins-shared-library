@@ -25,7 +25,7 @@ def call(body) {
                 deleteDir() /* clean up our workspace */
             }
         }
-      }
+    }
 }
 
 def setUpContext(body) {
@@ -54,6 +54,7 @@ def dockerBuild(ctx) {
     ctx.dockerImages << imgTag
     ctx.dockerImages << imgTagLatest
 }
+
 def dockerPush(ctx) {
     def push = { img, repo -> 
         def dest = "${repo}/${img}"
