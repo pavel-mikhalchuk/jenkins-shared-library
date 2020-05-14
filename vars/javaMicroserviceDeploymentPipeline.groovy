@@ -86,7 +86,7 @@ def writeHelmValuesYaml(ctx) {
           externalPort: 80
           internalPort: 8080
         jenkinsBuildNumber: ${ctx.jenkinsBuildNumber}
-        host: ${hostName()}
+        host: ${hostName(ctx)}
         ${ctx.podResources}"""
 }
 
