@@ -12,12 +12,14 @@ def call(body) {
             string(name: 'IMAGE_TAG', defaultValue: 'latest', description: 'Docker Image Tag to deploy')
             text(name: 'RESOURCES', defaultValue: ctx.podResources, description: 'Kubernetes POD resources requests and limits + JavaOpts')
         }
-        environment {
-            defineMoreContextBasedOnUserInput(ctx)
-        }
         stages {
             // https://gist.github.com/m-x-k/15d74f6b5cd1e7531b9b1130710c1546
 
+            stage('init') {
+                steps {
+                    defineMoreContextBasedOnUserInput(ctx)
+                }
+            }
             stage('notify slack: DEPLOYMENT STARTED') {
                 steps {
                     // ...
@@ -62,7 +64,8 @@ def setUpContext(body) {
 def defineMoreContextBasedOnUserInput(ctx) {
     ctx.namespace = "${params.NAMESPACE}"
     ctx.dockerImage = "${ctx.service}:${params.IMAGE_TAG ?: 'latest'}"
-    ctx.jenkinsBuildNumber = "${env.JOB_NAME}-${env.BUILD_NUMBER}"
+    ctx.jenkinsBuildNumber = "${JOB_NAME}-${BUILD_NUMBER}"
+    ctx.currentBranchName = "${BRANCH_NAME}"
     ctx.podResources = "${params.RESOURCES}"
 }
 
@@ -74,7 +77,7 @@ def writeHelmValuesYaml(ctx) {
     writeFile file: "kubernetes/helm-chart/${ctx.service}/values.yaml", text: 
         
         """replicaCount: 1
-        gitBranch: ${currentGitBranch()}
+        gitBranch: ${ctx.currentBranchName}
         image:
           repository: dockerhub-vip.alutech.local
           tag: ${ctx.dockerImage}
@@ -87,12 +90,8 @@ def writeHelmValuesYaml(ctx) {
         ${ctx.podResources}"""
 }
 
-def currentGitBranch() {
-    sh(script: 'echo $(git rev-parse --abbrev-ref HEAD)', returnStdout: true).trim()
-}
-
-def hostName() {
-    return "${APP_NAME}.${hostByNs(NAMESPACE)}.in.in.alutech24.com"
+def hostName(ctx) {
+    return "${ctx.service}.${hostByNs(NAMESPACE)}.in.in.alutech24.com"
 }
 
 def hostByNs(ns) {
