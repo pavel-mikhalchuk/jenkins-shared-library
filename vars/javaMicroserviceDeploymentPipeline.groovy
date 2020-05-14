@@ -60,10 +60,10 @@ def setUpContext(body) {
 }
 
 def defineMoreContextBasedOnUserInput(ctx) {
-    ctx.namespace = "${NAMESPACE}"
-    ctx.dockerImage = "${ctx.service}:${IMAGE_TAG ?: 'latest'}"
-    ctx.jenkinsBuildNumber = "${JOB_NAME}-${BUILD_NUMBER}"
-    ctx.podResources = "${RESOURCES}"
+    ctx.namespace = "${params.NAMESPACE}"
+    ctx.dockerImage = "${ctx.service}:${params.IMAGE_TAG ?: 'latest'}"
+    ctx.jenkinsBuildNumber = "${env.JOB_NAME}-${env.BUILD_NUMBER}"
+    ctx.podResources = "${params.RESOURCES}"
 }
 
 def copyConfigToHelmChart(ctx) {
