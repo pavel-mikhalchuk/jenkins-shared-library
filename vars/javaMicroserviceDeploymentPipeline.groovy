@@ -26,7 +26,7 @@ def call(body) {
                 script: [
                     $class: 'GroovyScript', 
                     fallbackScript: [classpath: [], sandbox: false, script: ''], 
-                    script: [classpath: [], sandbox: false, script: 'getDockerImageTags("https://blue.dockerhub.alutech.local/v2/pricing/tags/list")']
+                    script: [classpath: [], sandbox: false, script: '["123", "321"]']
                 ]
             ]
         ])
