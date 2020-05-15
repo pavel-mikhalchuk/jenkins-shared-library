@@ -89,6 +89,10 @@ def getDockerImageTags(url) {
     def myjson = getUrl(url)
     def json = jsonParse(myjson);
     def tags = json.tags
+
+    echo tags
+    echo "yeah!!!"
+
     tags
 }
 
