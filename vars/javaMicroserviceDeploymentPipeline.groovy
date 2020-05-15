@@ -27,6 +27,12 @@ def call(body) {
                     $class: 'GroovyScript', 
                     fallbackScript: [classpath: [], sandbox: true, script: '["error :("]'], 
                     script: [classpath: [], sandbox: true, script: '''
+                        import java.util.logging.Level; import java.util.logging.Logger;
+
+                        def LOGGER = Logger.getLogger("org.biouno.myscript");
+                        LOGGER.info("Hello");
+                        LOGGER.log(Level.INFO, "Hello", exception);
+                        
                         try {
                             ["123123123123", "dsa"]
                             //return getDockerImageTags("")
