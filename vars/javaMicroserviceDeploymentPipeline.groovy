@@ -26,13 +26,7 @@ def call(body) {
                 script: [
                     $class: 'GroovyScript', 
                     fallbackScript: [classpath: [], sandbox: false, script: '["fff", "aaa"]'], 
-                    script: [classpath: [], sandbox: false, script: '''
-                        try {
-                            ["123", "asd"]
-                        } catch (Exception e) {
-                            print "There was a problem fetching the artifacts" + e
-                        }
-                      ''']
+                    script: [classpath: [], sandbox: false, script: '''["123", "asd"]''']
                 ]
             ]
         ])
