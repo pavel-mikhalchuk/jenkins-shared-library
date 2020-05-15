@@ -25,8 +25,8 @@ def call(body) {
                 randomName: 'choice-parameter-18690860397501990', 
                 script: [
                     $class: 'GroovyScript', 
-                    fallbackScript: [classpath: [], sandbox: true, script: '["fff", "aaa"]'], 
-                    script: [classpath: [], sandbox: true, script: '["123", "asd"]']
+                    fallbackScript: [classpath: [], sandbox: true, script: '["error :("]'], 
+                    script: [classpath: [], sandbox: true, script: 'getDockerImageTags("23")']
                 ]
             ]
         ])
