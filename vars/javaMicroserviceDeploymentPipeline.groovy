@@ -26,7 +26,13 @@ def call(body) {
                 script: [
                     $class: 'GroovyScript', 
                     fallbackScript: [classpath: [], sandbox: true, script: '["error :("]'], 
-                    script: [classpath: [], sandbox: true, script: 'getDockerImageTags("23")']
+                    script: [classpath: [], sandbox: true, script: '''
+                        try {
+                            return getDockerImageTags("")
+                        } catch (Exception e) {
+                            print "There was a problem running the script. " + e
+                        }
+                    ''']
                 ]
             ]
         ])
