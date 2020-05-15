@@ -26,7 +26,7 @@ def call(body) {
                 script: [
                     $class: 'GroovyScript', 
                     fallbackScript: [classpath: [], sandbox: false, script: '["fff", "aaa"]'], 
-                    script: [classpath: [], sandbox: false, script: '''["123", "asd"]''']
+                    script: [classpath: [], sandbox: false, script: '["123", "asd"]']
                 ]
             ]
         ])
