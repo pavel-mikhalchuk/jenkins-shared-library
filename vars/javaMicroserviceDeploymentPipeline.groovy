@@ -14,20 +14,22 @@ def call(body) {
 
 
     properties([
-        parameters: [[
-            $class: 'ChoiceParameter', 
-            choiceType: 'PT_SINGLE_SELECT', 
-            description: '', 
-            filterLength: 1, 
-            filterable: false, 
-            name: 'DockerTags', 
-            randomName: 'choice-parameter-18690860397501990', 
-            script: [
-                $class: 'GroovyScript', 
-                fallbackScript: [classpath: [], sandbox: false, script: ''], 
-                script: [classpath: [], sandbox: false, script: 'getDockerImageTags("https://blue.dockerhub.alutech.local/v2/pricing/tags/list")']
+        parameters([
+            [
+                $class: 'ChoiceParameter', 
+                choiceType: 'PT_SINGLE_SELECT', 
+                description: '', 
+                filterLength: 1, 
+                filterable: false, 
+                name: 'DockerTags', 
+                randomName: 'choice-parameter-18690860397501990', 
+                script: [
+                    $class: 'GroovyScript', 
+                    fallbackScript: [classpath: [], sandbox: false, script: ''], 
+                    script: [classpath: [], sandbox: false, script: 'getDockerImageTags("https://blue.dockerhub.alutech.local/v2/pricing/tags/list")']
+                ]
             ]
-        ]]
+        ])
     ])
 
     pipeline {
