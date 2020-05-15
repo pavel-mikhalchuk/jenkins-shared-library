@@ -26,7 +26,7 @@ def call(body) {
                 script: [
                     $class: 'GroovyScript', 
                     fallbackScript: [classpath: [], sandbox: false, script: ''], 
-                    script: [classpath: [], sandbox: false, script: '["123", "321"]']
+                    script: [classpath: [], sandbox: false, script: 'getDockerImageTags("")']
                 ]
             ]
         ])
@@ -86,14 +86,14 @@ def sortReverse(list) {
 }
 
 def getDockerImageTags(url) {
-    def myjson = getUrl(url)
-    def json = jsonParse(myjson);
-    def tags = json.tags
+    // def myjson = getUrl(url)
+    // def json = jsonParse(myjson);
+    // def tags = json.tags
 
     echo tags
     echo "yeah!!!"
 
-    tags
+    ["asd", "dsa"]
 }
 
 def jsonParse(json) {
