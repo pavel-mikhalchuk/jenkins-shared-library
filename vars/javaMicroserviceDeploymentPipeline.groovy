@@ -28,7 +28,7 @@ def call(body) {
                     fallbackScript: [classpath: [], sandbox: false, script: ''], 
                     script: [classpath: [], sandbox: false, script: '''
                         try {
-                            getDockerImageTags("")
+                            ["123", "asd"]
                         } catch (Exception e) {
                             print "There was a problem fetching the artifacts" + e
                         }
