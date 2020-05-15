@@ -14,28 +14,20 @@ def call(body) {
 
 
     properties([
-        parameters([
-            [
-                $class: 'ChoiceParameter', 
-                choiceType: 'PT_SINGLE_SELECT', 
-                description: '', 
-                filterable: false, 
-                name: 'Release', 
-                randomName: 'choice-parameter-21337077649621572', 
-                script: [
-                    $class: 'GroovyScript', 
-                    fallbackScript: '', 
-                    script: '''// Find relevant AMIs based on their name
-                        def sout = new StringBuffer(), serr = new StringBuffer()
-                        def proc = '/usr/bin/aws --region eu-west-1 ec2 describe-images \
-                                ' --owners OWNER --filter Name=name,Values=PATTERN \
-                                ' --query Images[*].{AMI:Name} --output  text'.execute()
-                        proc.consumeProcessOutput(sout, serr)
-                        proc.waitForOrKill(10000)
-                        return sout.tokenize()'''
-                ]
+        parameters: [[
+            $class: 'ChoiceParameter', 
+            choiceType: 'PT_SINGLE_SELECT', 
+            description: '', 
+            filterLength: 1, 
+            filterable: false, 
+            name: 'DockerTags', 
+            randomName: 'choice-parameter-18690860397501990', 
+            script: [
+                $class: 'GroovyScript', 
+                fallbackScript: [classpath: [], sandbox: false, script: ''], 
+                script: [classpath: [], sandbox: false, script: 'getDockerImageTags("https://blue.dockerhub.alutech.local/v2/pricing/tags/list")']
             ]
-        ])
+        ]]
     ])
 
     pipeline {
@@ -50,11 +42,6 @@ def call(body) {
             text(name: 'RESOURCES', defaultValue: ctx.podResources, description: 'Kubernetes POD resources requests and limits + JavaOpts')
         }
         stages {
-            stage('init') {
-                steps {
-                    defineMoreContextBasedOnUserInput(ctx)
-                }
-            }
             stage('notify slack: DEPLOYMENT STARTED') {
                 steps {
                     // TODO
@@ -62,6 +49,11 @@ def call(body) {
             }
             stage('generate K8S manifests') {
               steps {
+                  // This step is very important!!! 
+                  // Please do not remove it unless you find a better way without introducing "Init" stage because it's ugly :)"
+                  // Later stages depend on it.
+                  defineMoreContextBasedOnUserInput(ctx)
+
                   copyConfigToHelmChart(ctx)
                   writeHelmValuesYaml(ctx)
               }
