@@ -25,7 +25,7 @@ def call(body) {
                 randomName: 'choice-parameter-18690860397501990', 
                 script: [
                     $class: 'GroovyScript', 
-                    fallbackScript: [classpath: [], sandbox: false, script: ''], 
+                    fallbackScript: [classpath: [], sandbox: false, script: '["fff", "aaa"]'], 
                     script: [classpath: [], sandbox: false, script: '''
                         try {
                             ["123", "asd"]
