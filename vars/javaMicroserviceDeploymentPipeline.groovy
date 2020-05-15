@@ -28,7 +28,7 @@ def call(body) {
                     fallbackScript: [classpath: [], sandbox: true, script: '["error :("]'], 
                     script: [classpath: [], sandbox: true, script: '''
                         try {
-                            ["asd", "dsa"]
+                            ["123123123123", "dsa"]
                             //return getDockerImageTags("")
                         } catch (Exception e) {
                             print "There was a problem running the script. " + e
