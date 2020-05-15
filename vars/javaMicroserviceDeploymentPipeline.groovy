@@ -1,6 +1,43 @@
 def call(body) {
     def ctx = setUpContext(body)
 
+    // def image = "IMAGE"
+    // def url = "https://blue.dockerhub.alutech.local/v2/${image}/tags/list"
+    // def list = getDockerImageTags(url)
+    // list = sortReverse(list)
+    // def versions = list.join("\n")
+    // def userInput = input(
+    //     id: 'userInput', message: 'Promote:', parameters: [
+    //         [$class: 'ChoiceParameterDefinition', choices: versions, description: 'Versions', name: 'version']
+    //     ]
+    // )        
+
+
+    properties([
+        parameters([
+            [
+                $class: 'ChoiceParameter', 
+                choiceType: 'PT_SINGLE_SELECT', 
+                description: '', 
+                filterable: false, 
+                name: 'Release', 
+                randomName: 'choice-parameter-21337077649621572', 
+                script: [
+                    $class: 'GroovyScript', 
+                    fallbackScript: '', 
+                    script: '''// Find relevant AMIs based on their name
+                        def sout = new StringBuffer(), serr = new StringBuffer()
+                        def proc = '/usr/bin/aws --region eu-west-1 ec2 describe-images \
+                                ' --owners OWNER --filter Name=name,Values=PATTERN \
+                                ' --query Images[*].{AMI:Name} --output  text'.execute()
+                        proc.consumeProcessOutput(sout, serr)
+                        proc.waitForOrKill(10000)
+                        return sout.tokenize()'''
+                ]
+            ]
+        ])
+    ])
+
     pipeline {
         agent any
         options { 
@@ -13,8 +50,6 @@ def call(body) {
             text(name: 'RESOURCES', defaultValue: ctx.podResources, description: 'Kubernetes POD resources requests and limits + JavaOpts')
         }
         stages {
-            // https://gist.github.com/m-x-k/15d74f6b5cd1e7531b9b1130710c1546
-
             stage('init') {
                 steps {
                     defineMoreContextBasedOnUserInput(ctx)
@@ -22,7 +57,7 @@ def call(body) {
             }
             stage('notify slack: DEPLOYMENT STARTED') {
                 steps {
-                    // ...
+                    // TODO
                 }
             }
             stage('generate K8S manifests') {
@@ -49,6 +84,39 @@ def call(body) {
         }
     }
 }
+
+
+@NonCPS
+def sortReverse(list) {
+    list.reverse()
+}
+
+def getDockerImageTags(url) {
+    def myjson = getUrl(url)
+    def json = jsonParse(myjson);
+    def tags = json.tags
+    tags
+}
+
+def jsonParse(json) {
+    new groovy.json.JsonSlurper().parseText(json)
+}
+
+def getUrl(url) {
+    sh(returnStdout: true, script: "curl -s ${url} 2>&1 | tee result.json")
+    def data = readFile('result.json').trim()
+    data
+}
+
+
+
+
+
+
+
+
+
+
 
 def setUpContext(body) {
     // client-defined parameters in the body block
