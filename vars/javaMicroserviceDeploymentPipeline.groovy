@@ -26,7 +26,13 @@ def call(body) {
                 script: [
                     $class: 'GroovyScript', 
                     fallbackScript: [classpath: [], sandbox: false, script: ''], 
-                    script: [classpath: [], sandbox: false, script: 'getDockerImageTags("")']
+                    script: [classpath: [], sandbox: false, script: '''
+                        try {
+                            getDockerImageTags("")
+                        } catch (Exception e) {
+                            print "There was a problem fetching the artifacts" + e
+                        }
+                      ''']
                 ]
             ]
         ])
