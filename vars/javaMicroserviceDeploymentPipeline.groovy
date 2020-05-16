@@ -27,17 +27,24 @@ def call(body) {
                     $class: 'GroovyScript', 
                     fallbackScript: [classpath: [], sandbox: true, script: '["error :("]'], 
                     script: [classpath: [], sandbox: true, script: '''
-                        import java.util.logging.Level; import java.util.logging.Logger;
-
-                        def LOGGER = Logger.getLogger("org.biouno.myscript");
-                        LOGGER.info("Hello");
-                        LOGGER.log(Level.INFO, "Hello", exception);
                         
+                        def getDockerImageTags() {
+                            // def myjson = getUrl(url)
+                            // def json = jsonParse(myjson);
+                            // def tags = json.tags
+
+                            echo tags
+                            echo "yeah!!!"
+
+                            ["asd", "dsa"]
+                        }
+
                         try {
-                            ["123123123123", "dsa"]
-                            //return getDockerImageTags("")
+                            // ["123123123123", "dsa"]
+                            return getDockerImageTags()
                         } catch (Exception e) {
-                            print "There was a problem running the script. " + e
+                            println "There was a problem running the script. " + e
+                            echo "There was a problem running the script. " + e
                         }
                     ''']
                 ]
@@ -96,17 +103,6 @@ def call(body) {
 @NonCPS
 def sortReverse(list) {
     list.reverse()
-}
-
-def getDockerImageTags(url) {
-    // def myjson = getUrl(url)
-    // def json = jsonParse(myjson);
-    // def tags = json.tags
-
-    echo tags
-    echo "yeah!!!"
-
-    ["asd", "dsa"]
 }
 
 def jsonParse(json) {
