@@ -55,8 +55,13 @@ def call(body) {
                             def tags = []
                             log.info("Fetching...");
                             fetchTags().each { tag -> 
-                                log.info("Adding tag: " + tag);
-                                tags.add(tag) 
+                                if (tag == "latest") {
+                                    tags.plus(0, tag)
+                                    log.info("Added 'latest' tag to the beginning of the list!);
+                                } else {
+                                    tags.add(tag)
+                                    log.info("Added tag: " + tag);
+                                }
                             }
                             log.info("Fetched!");
                             return tags.sort()
