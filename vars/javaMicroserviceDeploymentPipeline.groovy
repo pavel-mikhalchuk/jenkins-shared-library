@@ -18,11 +18,10 @@ def call(body) {
             [
                 $class: 'ChoiceParameter', 
                 choiceType: 'PT_SINGLE_SELECT', 
-                description: '', 
-                filterLength: 1, 
-                filterable: false, 
+                description: 'To Be Done...', 
+                filterLength: 1,
+                filterable: true,
                 name: 'DockerTags', 
-                randomName: 'choice-parameter-18690860397501990', 
                 script: [
                     $class: 'GroovyScript', 
                     fallbackScript: [classpath: [], sandbox: true, script: '["error :("]'], 
