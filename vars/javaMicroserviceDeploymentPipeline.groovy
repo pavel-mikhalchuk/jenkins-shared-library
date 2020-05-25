@@ -41,7 +41,7 @@ def call(body) {
                         try {      
                             def log = Logger.getLogger("com.alutech.activechoice.dockerhub");
                             log.info("Hello");
-                            log.error("Test error");
+                            log.log(Level.ERROR, "Test error");
                   
                             def tags = []
                             log.info("Fetching...");
