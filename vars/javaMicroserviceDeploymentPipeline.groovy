@@ -62,7 +62,7 @@ def call(body) {
         stages {
             stage('notify slack: DEPLOYMENT STARTED') {
                 steps {
-                    notifySlack()
+                    notifySlack(ctx)
                 }
             }
             stage('generate K8S manifests') {
