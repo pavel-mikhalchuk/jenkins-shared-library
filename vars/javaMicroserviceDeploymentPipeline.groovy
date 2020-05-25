@@ -21,24 +21,29 @@ def call(body) {
 
                         def log = Logger.getLogger("com.alutech.activechoice.dockerhub");
 
-                        def fetch = {
-                            // def url = "https://blue.dockerhub.alutech.local/v2/pricing/tags/list"
-                            def url = "https://10.100.20.33/v2/pricing/tags/list"
-                            log.info("Openning connection...")
-                            def httpClient = new URL(url).openConnection() as HttpURLConnection
-                            log.info("Connection opened!")
-                            httpClient.setRequestMethod('GET')
-                            log.info("Method GET!")
-                            httpClient.connect()
-                            log.info("Connected!")
+                        // def fetch = {
+                        //     // def url = "https://blue.dockerhub.alutech.local/v2/pricing/tags/list"
+                        //     def url = "https://10.100.20.33/v2/pricing/tags/list"
+                        //     log.info("Openning connection...")
+                        //     def httpClient = new URL(url).openConnection() as HttpURLConnection
+                        //     log.info("Connection opened!")
+                        //     httpClient.setRequestMethod('GET')
+                        //     log.info("Method GET!")
+                        //     httpClient.connect()
+                        //     log.info("Connected!")
                             
-                            if (httpClient.responseCode == 200) {
-                                log.info("200!")
-                                return new JsonSlurper().parseText(httpClient.inputStream.getText('UTF-8'))
-                            } else {
-                                log.info("Error non-200");
-                                throw new Exception("Non 200 response: " + httpClient.responseCode)
-                            }
+                        //     if (httpClient.responseCode == 200) {
+                        //         log.info("200!")
+                        //         return new JsonSlurper().parseText(httpClient.inputStream.getText('UTF-8'))
+                        //     } else {
+                        //         log.info("Error non-200");
+                        //         throw new Exception("Non 200 response: " + httpClient.responseCode)
+                        //     }
+                        // }
+
+                        def fetch = {
+                          def response = ["curl", "-H \"Host: blue.dockerhub.alutech.local\"", "-k", "https://10.100.20.33/v2/pricing/tags/list"].execute().text
+                          new JsonSlurper().parseText(response)
                         }
 
                         try {      
@@ -54,6 +59,7 @@ def call(body) {
                             return tags.sort()
                         } catch (Exception e) {
                             log.info("Error")
+                            log.info("Error: " + e)
                             println(e)
                         }
                     ''']
