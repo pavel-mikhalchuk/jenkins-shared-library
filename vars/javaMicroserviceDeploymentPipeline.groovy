@@ -56,7 +56,7 @@ def call(body) {
                             log.info("Fetching...");
                             fetchTags().each { tag -> 
                                 log.info("Adding tag: " + tag);
-                                tags.add(tag.name) 
+                                tags.add(tag) 
                             }
                             log.info("Fetched!");
                             return tags.sort()
