@@ -16,7 +16,6 @@ def call(body) {
                     script: [classpath: [], sandbox: false, script: '''
                         import java.util.logging.Level 
                         import java.util.logging.Logger
-                        import org.codehaus.groovy.runtime.StackTraceUtils
 
                         import groovy.json.JsonSlurper
 
@@ -49,7 +48,7 @@ def call(body) {
                             log.info("Google - " + text)
                             println("Google - " + text)
                             
-                            def response = ["curl", "-H 'Host: blue.dockerhub.alutech.local'", "-k", "https://10.100.20.33/v2/pricing/tags/list"].execute().text
+                            def response = ["curl", "-H", "Host: blue.dockerhub.alutech.local", "-k", "https://10.100.20.33/v2/pricing/tags/list"].execute().text
                             log.info("Fetched!");
                             log.info("About to parse response: " + response);
                             new JsonSlurper().parseText(response)
@@ -69,7 +68,6 @@ def call(body) {
                             return tags.sort()
                         } catch (Exception e) {
                             log.info("Error: " + e)
-                            StackTraceUtils.sanitize(e).printStackTrace()
                             e.printStackTrace()
                         }
                     ''']
