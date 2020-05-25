@@ -64,7 +64,7 @@ def call(body) {
                                 }
                             }
                             log.info("Fetched!");
-                            return tags.sort()
+                            return tags
                         } catch (Exception e) {
                             log.info("Error: " + e)
                             e.printStackTrace()
