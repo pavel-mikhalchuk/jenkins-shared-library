@@ -42,7 +42,7 @@ def call(body) {
                         // }
 
                         def fetch = {
-                          def response = ["curl", "-H \"Host: blue.dockerhub.alutech.local\"", "-k", "https://10.100.20.33/v2/pricing/tags/list"].execute().text
+                          def response = ["curl", "-H 'Host: blue.dockerhub.alutech.local'", "-k", "https://10.100.20.33/v2/pricing/tags/list"].execute().text
                           new JsonSlurper().parseText(response)
                         }
 
