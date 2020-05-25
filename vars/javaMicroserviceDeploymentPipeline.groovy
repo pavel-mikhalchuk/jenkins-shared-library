@@ -62,7 +62,7 @@ def call(body) {
         stages {
             stage('notify slack: DEPLOYMENT STARTED') {
                 steps {
-                    // TODO
+                    notifySlack()
                 }
             }
             stage('generate K8S manifests') {
@@ -112,6 +112,13 @@ def defineMoreContextBasedOnUserInput(ctx) {
     ctx.jenkinsBuildNumber = "${JOB_NAME}-${BUILD_NUMBER}"
     ctx.currentBranchName = "${BRANCH_NAME}"
     ctx.podResources = "${params.RESOURCES}"
+}
+
+def notifySlack(ctx) {
+    def causeJson = sh(script: '$(curl -u krakhotkin:11607d902e7c73644a54ab39a83743db95 --silent ${BUILD_URL}/api/json | tr "{}" "\n" | grep "Started by")', returnStdout: true).trim()
+    def cause = new groovy.json.JsonSlurper().parseText(causeJson)
+    
+    sh(script: "curl -X POST --data-urlencode 'payload={\"channel\": \"#java_services\", \"username\": \"Jenkins\", \"text\": \"*${{cause.userName}}* накатывает ветку *${{ctx.currentBranchName}}* на *${{ctx.service}} ${{ctx.namespace}}*.\n${{ctx.dockerImage}}\nСохраняйте спокойствие 😌\", \"icon_emoji\": \":jenkins:\"}' https://hooks.slack.com/services/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", , returnStdout: true).trim()
 }
 
 def copyConfigToHelmChart(ctx) {
