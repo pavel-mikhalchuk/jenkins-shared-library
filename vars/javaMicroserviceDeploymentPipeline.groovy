@@ -9,7 +9,7 @@ def call(body) {
                 description: 'Docker image tags', 
                 filterLength: 1,
                 filterable: true,
-                name: 'DockerTags', 
+                name: 'IMAGE_TAG', 
                 script: [
                     $class: 'GroovyScript', 
                     fallbackScript: [classpath: [], sandbox: true, script: '["error :("]'], 
@@ -19,54 +19,37 @@ def call(body) {
 
                         import groovy.json.JsonSlurper
 
-                        def log = Logger.getLogger("com.alutech.activechoice.dockerhub");
+                        def log = Logger.getLogger("com.alutech.activechoice.dockerhub")
 
-                        // def fetch = {
-                        //     // def url = "https://blue.dockerhub.alutech.local/v2/pricing/tags/list"
-                        //     def url = "https://10.100.20.33/v2/pricing/tags/list"
-                        //     log.info("Openning connection...")
-                        //     def httpClient = new URL(url).openConnection() as HttpURLConnection
-                        //     log.info("Connection opened!")
-                        //     httpClient.setRequestMethod('GET')
-                        //     log.info("Method GET!")
-                        //     httpClient.connect()
-                        //     log.info("Connected!")
+                        def parse = { tags ->
+                            log.info("Parsing response...")
+
+                            response?.trim() ? new JsonSlurper().parseText(responseText).tags : []
                             
-                        //     if (httpClient.responseCode == 200) {
-                        //         log.info("200!")
-                        //         return new JsonSlurper().parseText(httpClient.inputStream.getText('UTF-8'))
-                        //     } else {
-                        //         log.info("Error non-200");
-                        //         throw new Exception("Non 200 response: " + httpClient.responseCode)
-                        //     }
-                        // }
-
-                        def fetchTags = {
-                            log.info("About to fetch!");
-                            def response = ["curl", "-H", "Host: blue.dockerhub.alutech.local", "-k", "https://10.100.20.33/v2/pricing/tags/list"].execute().text
-                            log.info("Fetched!");
-                            log.info("About to parse response: " + response);
-                            response?.trim() ? new JsonSlurper().parseText(response).tags : []
-                        }
-
-                        try {      
-                            log.info("Hello")
-
                             def tags = []
-                            log.info("Fetching...");
+                            
                             fetchTags().each { tag -> 
                                 if (tag == "latest") {
                                     tags = tags.plus(0, tag)
-                                    log.info("Added 'latest' tag to the beginning of the list!");
+                                    log.info("Added 'latest' tag to the beginning of the list!")
                                 } else {
                                     tags.add(tag)
-                                    log.info("Added tag: " + tag);
+                                    log.info("Added tag: " + tag)
                                 }
                             }
-                            log.info("Fetched!");
-                            return tags
+                            
+                            log.info("Parsed!")
+                        }
+
+                        try {      
+                            log.info("Start fetching tags...")
+                            
+                            def response = ["curl", "-H", "Host: dockerhub-vip.alutech.local", "-k", "https://10.100.20.33/v2/pricing/tags/list"].execute().text
+                            
+                            log.info("Response from docker hub: " + response)
+
+                            return parse response                            
                         } catch (Exception e) {
-                            log.info("Error: " + e)
                             e.printStackTrace()
                         }
                     ''']
@@ -83,7 +66,6 @@ def call(body) {
         }
         parameters { 
             choice(name: 'NAMESPACE', choices: ctx.namespaces, description: 'Kubernetes Namespace') 
-            string(name: 'IMAGE_TAG', defaultValue: 'latest', description: 'Docker Image Tag to deploy')
             text(name: 'RESOURCES', defaultValue: ctx.podResources, description: 'Kubernetes POD resources requests and limits + JavaOpts')
         }
         stages {
