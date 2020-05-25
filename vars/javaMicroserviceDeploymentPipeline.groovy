@@ -14,23 +14,23 @@ def call(body) {
                     $class: 'GroovyScript', 
                     fallbackScript: [classpath: [], sandbox: true, script: '["error :("]'], 
                     script: [classpath: [], sandbox: false, script: '''
-                        import java.util.logging.Level; 
-                        import java.util.logging.Logger;
+                        import java.util.logging.Level 
+                        import java.util.logging.Logger
                         
                         import groovy.json.JsonSlurper
 
                         def fetchTags = {
                             def url = "https://blue.dockerhub.alutech.local/v2/pricing/tags/list"
-                            log.info("Openning connection...");
+                            log.info("Openning connection...")
                             def httpClient = new URL(url).openConnection() as HttpURLConnection
-                            log.info("Connection opened!");
+                            log.info("Connection opened!")
                             httpClient.setRequestMethod('GET')
-                            log.info("Method GET!");
+                            log.info("Method GET!")
                             httpClient.connect()
-                            log.info("Connected!");
+                            log.info("Connected!")
                             
                             if (httpClient.responseCode == 200) {
-                                log.info("200!");
+                                log.info("200!")
                                 return new JsonSlurper().parseText(httpClient.inputStream.getText('UTF-8'))
                             } else {
                                 log.info("Error non-200");
@@ -40,8 +40,7 @@ def call(body) {
 
                         try {      
                             def log = Logger.getLogger("com.alutech.activechoice.dockerhub");
-                            log.info("Hello");
-                            log.log(Level.ERROR, "Test error");
+                            log.info("Hello")
                   
                             def tags = []
                             log.info("Fetching...");
@@ -52,9 +51,9 @@ def call(body) {
                             log.info("Fetched!");
                             return tags.sort()
                         } catch (Exception e) {
-                            log.log(Level.INFO, "Hello", e);
-                            log.log(Level.ERROR, "Error", e);
+                            log.info("Error")
                             println(e)
+                            throw e
                         }
                     ''']
                 ]
