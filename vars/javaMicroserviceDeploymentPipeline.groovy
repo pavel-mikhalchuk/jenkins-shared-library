@@ -16,10 +16,12 @@ def call(body) {
                     script: [classpath: [], sandbox: false, script: '''
                         import java.util.logging.Level 
                         import java.util.logging.Logger
-                        
+
                         import groovy.json.JsonSlurper
 
-                        def fetchTags = {
+                        def log = Logger.getLogger("com.alutech.activechoice.dockerhub");
+
+                        def fetch = {
                             def url = "https://blue.dockerhub.alutech.local/v2/pricing/tags/list"
                             log.info("Openning connection...")
                             def httpClient = new URL(url).openConnection() as HttpURLConnection
@@ -39,12 +41,11 @@ def call(body) {
                         }
 
                         try {      
-                            def log = Logger.getLogger("com.alutech.activechoice.dockerhub");
                             log.info("Hello")
-                  
+
                             def tags = []
                             log.info("Fetching...");
-                            fetchTags().results.each { tag -> 
+                            fetch().tags.each { tag -> 
                                 log.info("Adding tag: " + tag);
                                 tags.add(tag.name) 
                             }
