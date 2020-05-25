@@ -1,24 +1,12 @@
 def call(body) {
     def ctx = setUpContext(body)
 
-    // def image = "IMAGE"
-    // def url = "https://blue.dockerhub.alutech.local/v2/${image}/tags/list"
-    // def list = getDockerImageTags(url)
-    // list = sortReverse(list)
-    // def versions = list.join("\n")
-    // def userInput = input(
-    //     id: 'userInput', message: 'Promote:', parameters: [
-    //         [$class: 'ChoiceParameterDefinition', choices: versions, description: 'Versions', name: 'version']
-    //     ]
-    // )        
-
-
     properties([
         parameters([
             [
                 $class: 'ChoiceParameter', 
                 choiceType: 'PT_SINGLE_SELECT', 
-                description: 'To Be Done...', 
+                description: 'Docker image tags', 
                 filterLength: 1,
                 filterable: true,
                 name: 'DockerTags', 
@@ -26,24 +14,28 @@ def call(body) {
                     $class: 'GroovyScript', 
                     fallbackScript: [classpath: [], sandbox: true, script: '["error :("]'], 
                     script: [classpath: [], sandbox: true, script: '''
-                        
-                        def getSuperMethod() {
-                            // def myjson = getUrl(url)
-                            // def json = jsonParse(myjson);
-                            // def tags = json.tags
+                        import groovy.json.JsonSlurper
 
-                            echo tags
-                            echo "yeah!!!"
-
-                            ["asd", "dsa"]
+                        def fetchTags = {
+                            def url = "https://blue.dockerhub.alutech.local/v2/pricing/tags/list"
+                            def httpClient = new URL(url).openConnection() as HttpURLConnection
+                            httpClient.setRequestMethod('GET')
+                            httpClient.connect()
+                            
+                            if (httpClient.responseCode == 200) {
+                                return new JsonSlurper().parseText(httpClient.inputStream.getText('UTF-8'))
+                            } else {
+                                println("HTTP response error")
+                                System.exit(0)
+                            }
                         }
 
-                        try {
-                            // ["123123123123", "dsa"]
-                            return getSuperMethod()
+                        try {                        
+                            def tags = []
+                            fetchTags().results.each { tag -> tags.add(tag.name) }
+                            return tags.sort()
                         } catch (Exception e) {
-                            println "There was a problem running the script. " + e
-                            echo "There was a problem running the script. " + e
+                            println(e)
                         }
                     ''']
                 ]
@@ -97,32 +89,6 @@ def call(body) {
         }
     }
 }
-
-
-@NonCPS
-def sortReverse(list) {
-    list.reverse()
-}
-
-def jsonParse(json) {
-    new groovy.json.JsonSlurper().parseText(json)
-}
-
-def getUrl(url) {
-    sh(returnStdout: true, script: "curl -s ${url} 2>&1 | tee result.json")
-    def data = readFile('result.json').trim()
-    data
-}
-
-
-
-
-
-
-
-
-
-
 
 def setUpContext(body) {
     // client-defined parameters in the body block
