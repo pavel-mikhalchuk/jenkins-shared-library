@@ -57,7 +57,7 @@ def call(body) {
                             fetchTags().each { tag -> 
                                 if (tag == "latest") {
                                     tags.plus(0, tag)
-                                    log.info("Added 'latest' tag to the beginning of the list!);
+                                    log.info("Added 'latest' tag to the beginning of the list!");
                                 } else {
                                     tags.add(tag)
                                     log.info("Added tag: " + tag);
