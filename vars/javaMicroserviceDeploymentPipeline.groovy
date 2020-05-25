@@ -37,7 +37,9 @@ def call(body) {
                             log.info("Hello");
                   
                             def tags = []
+                            log.info("Fetching...");
                             fetchTags().results.each { tag -> tags.add(tag.name) }
+                            log.info("Fetched!");
                             return tags.sort()
                         } catch (Exception e) {
                             log.log(Level.INFO, "Hello", e);
