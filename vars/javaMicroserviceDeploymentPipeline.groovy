@@ -21,24 +21,14 @@ def call(body) {
 
                         def log = Logger.getLogger("com.alutech.activechoice.dockerhub")
 
-                        def parse = { tags ->
+                        def parse = { response ->
                             log.info("Parsing response...")
 
-                            response?.trim() ? new JsonSlurper().parseText(responseText).tags : []
-                            
-                            def tags = []
-                            
-                            fetchTags().each { tag -> 
-                                if (tag == "latest") {
-                                    tags = tags.plus(0, tag)
-                                    log.info("Added 'latest' tag to the beginning of the list!")
-                                } else {
-                                    tags.add(tag)
-                                    log.info("Added tag: " + tag)
-                                }
-                            }
+                            def tags = response?.trim() ? new JsonSlurper().parseText(response).tags : []
                             
                             log.info("Parsed!")
+                            
+                            return tags
                         }
 
                         try {      
@@ -48,7 +38,7 @@ def call(body) {
                             
                             log.info("Response from docker hub: " + response)
 
-                            return parse response                            
+                            return parse(response)
                         } catch (Exception e) {
                             e.printStackTrace()
                         }
