@@ -27,7 +27,7 @@ def call(body) {
                     fallbackScript: [classpath: [], sandbox: true, script: '["error :("]'], 
                     script: [classpath: [], sandbox: true, script: '''
                         
-                        def getDockerImageTags() {
+                        def getSuperMethod() {
                             // def myjson = getUrl(url)
                             // def json = jsonParse(myjson);
                             // def tags = json.tags
@@ -40,7 +40,7 @@ def call(body) {
 
                         try {
                             // ["123123123123", "dsa"]
-                            return getDockerImageTags()
+                            return getSuperMethod()
                         } catch (Exception e) {
                             println "There was a problem running the script. " + e
                             echo "There was a problem running the script. " + e
