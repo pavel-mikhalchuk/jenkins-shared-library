@@ -22,7 +22,8 @@ def call(body) {
                         def log = Logger.getLogger("com.alutech.activechoice.dockerhub");
 
                         def fetch = {
-                            def url = "https://blue.dockerhub.alutech.local/v2/pricing/tags/list"
+                            // def url = "https://blue.dockerhub.alutech.local/v2/pricing/tags/list"
+                            def url = "https://10.100.20.33/v2/pricing/tags/list"
                             log.info("Openning connection...")
                             def httpClient = new URL(url).openConnection() as HttpURLConnection
                             log.info("Connection opened!")
