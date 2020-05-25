@@ -41,18 +41,12 @@ def call(body) {
                         //     }
                         // }
 
-                        def fetch = {
+                        def fetchTags = {
                             log.info("About to fetch!");
-                            
-                            def text = ["curl", "https://google.com"].execute().text
-                            log.info("Google - " + text)
-                            println("Google - " + text)
-                            
                             def response = ["curl", "-H", "Host: blue.dockerhub.alutech.local", "-k", "https://10.100.20.33/v2/pricing/tags/list"].execute().text
                             log.info("Fetched!");
                             log.info("About to parse response: " + response);
-                            new JsonSlurper().parseText(response)
-                            log.info("Parsed!");
+                            response?.trim() ? new JsonSlurper().parseText(response).tags : []
                         }
 
                         try {      
@@ -60,7 +54,7 @@ def call(body) {
 
                             def tags = []
                             log.info("Fetching...");
-                            fetch().tags.each { tag -> 
+                            fetchTags().each { tag -> 
                                 log.info("Adding tag: " + tag);
                                 tags.add(tag.name) 
                             }
