@@ -53,6 +53,7 @@ def call(body) {
                             return tags.sort()
                         } catch (Exception e) {
                             log.info("Error")
+                            log.error("Error", e)
                             println(e)
                             throw e
                         }
