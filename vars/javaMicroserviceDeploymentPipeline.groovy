@@ -14,6 +14,9 @@ def call(body) {
                     $class: 'GroovyScript', 
                     fallbackScript: [classpath: [], sandbox: true, script: '["error :("]'], 
                     script: [classpath: [], sandbox: true, script: '''
+                        import java.util.logging.Level; 
+                        import java.util.logging.Logger;
+                        
                         import groovy.json.JsonSlurper
 
                         def fetchTags = {
@@ -25,16 +28,20 @@ def call(body) {
                             if (httpClient.responseCode == 200) {
                                 return new JsonSlurper().parseText(httpClient.inputStream.getText('UTF-8'))
                             } else {
-                                println("HTTP response error")
-                                System.exit(0)
+                                throw new Exception("Non 200 response: " + httpClient.responseCode)
                             }
                         }
 
-                        try {                        
+                        try {      
+                            def log = Logger.getLogger("com.alutech.activechoice.dockerhub");
+                            log.info("Hello");
+                  
                             def tags = []
                             fetchTags().results.each { tag -> tags.add(tag.name) }
                             return tags.sort()
                         } catch (Exception e) {
+                            log.log(Level.INFO, "Hello", e);
+                            log.log(Level.ERROR, "Error", e);
                             println(e)
                         }
                     ''']
