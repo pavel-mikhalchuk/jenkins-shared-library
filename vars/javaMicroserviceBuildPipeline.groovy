@@ -2,7 +2,7 @@ def call(body) {
     def ctx = setUpContext(body)
 
     pipeline {
-        agent node
+        agent none
         options { 
             buildDiscarder(logRotator(numToKeepStr: '5'))
             timestamps () 
