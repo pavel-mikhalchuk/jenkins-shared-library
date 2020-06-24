@@ -2,20 +2,22 @@ def call(body) {
     def ctx = setUpContext(body)
 
     pipeline {
-        agent { label 'maven' }
+        agent node
         options { 
             buildDiscarder(logRotator(numToKeepStr: '5'))
             timestamps () 
         }
         stages {
-            stage('build') {
+            stage('maven') {
+                agent { label 'maven' }
                 steps {
                     mavenBuild(ctx)
-                    dockerBuild(ctx)
                 }
             }
-            stage('publish artifacts') {
+            stage('docker') {
+                agent { label 'docker' }
                 steps {
+                    dockerBuild(ctx)
                     dockerPush(ctx)
                 }
             }
