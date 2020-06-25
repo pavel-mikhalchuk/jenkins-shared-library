@@ -8,12 +8,12 @@ def call(body) {
             timestamps () 
         }
         stages {
-            stage('maven') {
-                agent { label 'maven' }
-                steps {
-                    mavenBuild(ctx)
-                }
-            }
+            // stage('maven') {
+            //     agent { label 'maven' }
+            //     steps {
+            //         // mavenBuild(ctx)
+            //     }
+            // }
             stage('docker') {
                 agent { label 'docker' }
                 steps {
