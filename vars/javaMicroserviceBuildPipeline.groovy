@@ -8,16 +8,16 @@ def call(body) {
             timestamps () 
         }
         stages {
-            container('maven') {
-                stage('maven') {
+            stage('maven') {
+                container('maven') {
                     steps {
                         mavenBuild(ctx)
                     }
                 }
             }
-            container('docker') {
-                stage('docker') {
-                    steps {
+            stage('docker') {
+                steps {
+                    container('docker') {
                         dockerBuild(ctx)
                         dockerPush(ctx)
                     }
