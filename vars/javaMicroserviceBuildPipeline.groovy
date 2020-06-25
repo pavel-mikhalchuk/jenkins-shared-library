@@ -17,7 +17,8 @@ def call(body) {
             stage('docker') {
                 agent { label 'docker' }
                 steps {
-                    sh 'whoami'
+                    sh 'ls -al'
+                    sh 'ls -al target'
                     dockerBuild(ctx)
                     dockerPush(ctx)
                 }
