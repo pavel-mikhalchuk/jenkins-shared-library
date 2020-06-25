@@ -17,14 +17,10 @@ def call(body) {
             stage('docker') {
                 agent { label 'docker' }
                 steps {
+                    sh 'whoami'
                     dockerBuild(ctx)
                     dockerPush(ctx)
                 }
-            }
-        }
-        post {
-            always {
-                deleteDir() /* clean up our workspace */
             }
         }
     }
