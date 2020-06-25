@@ -2,25 +2,25 @@ def call(body) {
     def ctx = setUpContext(body)
 
     pipeline {
-        agent none
+        agent { label 'java-build' }
         options { 
             buildDiscarder(logRotator(numToKeepStr: '5'))
             timestamps () 
         }
         stages {
             stage('maven') {
-                agent { label 'maven' }
-                steps {
-                    mavenBuild(ctx)
+                container('maven') {
+                    steps {
+                        mavenBuild(ctx)
+                    }
                 }
             }
             stage('docker') {
-                agent { label 'docker' }
-                steps {
-                    sh 'ls -al'
-                    sh 'ls -al target'
-                    dockerBuild(ctx)
-                    dockerPush(ctx)
+                container('docker') {
+                    steps {
+                        dockerBuild(ctx)
+                        dockerPush(ctx)
+                    }
                 }
             }
         }
