@@ -9,8 +9,8 @@ def call(body) {
         }
         stages {
             stage('maven') {
-                container('maven') {
-                    steps {
+                steps {
+                    container('maven') {
                         mavenBuild(ctx)
                     }
                 }
