@@ -13,7 +13,7 @@ def call(body) {
                 script: [
                     $class: 'GroovyScript', 
                     fallbackScript: [classpath: [], sandbox: true, script: '["error :("]'], 
-                    script: [classpath: [], sandbox: false, script: '''
+                    script: [classpath: [], sandbox: true, script: '''
                         import java.util.logging.Level 
                         import java.util.logging.Logger
 
