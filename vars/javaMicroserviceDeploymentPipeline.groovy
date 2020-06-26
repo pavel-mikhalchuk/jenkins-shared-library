@@ -78,12 +78,12 @@ def call(body) {
             }
             stage('push K8S manifests to git') {
               steps {
-                  // ...
+                  echo 'push K8S manifests to git'
               }
             }
             stage('notify ARGOCD') {
               steps {
-                  // ...
+                  echo 'notify ARGOCD'
               }
             }
         }
