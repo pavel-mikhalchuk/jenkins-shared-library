@@ -29,7 +29,7 @@ def call(body) {
                             log.info("Parsed!")
                             
                             def hasLatest = tags.remove("latest")
-                            return hasLatest ? tags.plus(0, "latest") : tags
+                            return hasLatest ? tags.plus(0, ["latest"]) : tags
                         }
 
                         try {      
