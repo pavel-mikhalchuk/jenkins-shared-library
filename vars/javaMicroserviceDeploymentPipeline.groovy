@@ -50,7 +50,7 @@ def call(body) {
     ])
 
     pipeline {
-        agent any
+        agent { label 'java-deploy' }
         options { 
             buildDiscarder(logRotator(numToKeepStr: '5'))
             timestamps () 
@@ -115,10 +115,11 @@ def defineMoreContextBasedOnUserInput(ctx) {
 }
 
 def notifySlack(ctx) {
-    def causeJson = sh(script: 'echo $(curl -u krakhotkin:11607d902e7c73644a54ab39a83743db95 --silent ${BUILD_URL}/api/json | tr "{}" "\n" | grep "Started by")', returnStdout: true).trim()
-    def cause = new groovy.json.JsonSlurper().parseText("{" + causeJson + "}")
+    echo 'Slack'
+    // def causeJson = sh(script: 'echo $(curl -u krakhotkin:11607d902e7c73644a54ab39a83743db95 --silent ${BUILD_URL}/api/json | tr "{}" "\n" | grep "Started by")', returnStdout: true).trim()
+    // def cause = new groovy.json.JsonSlurper().parseText("{" + causeJson + "}")
     
-    sh(script: "curl -X POST --data-urlencode 'payload={\"channel\": \"#java_services\", \"username\": \"Jenkins\", \"text\": \"*{{cause.userName}}* накатывает ветку *{{ctx.currentBranchName}}* на *{{ctx.service}} {{ctx.namespace}}*.\n{{ctx.dockerImage}}\nСохраняйте спокойствие 😌\", \"icon_emoji\": \":jenkins:\"}' https://hooks.slack.com/services/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", , returnStdout: true).trim()
+    // sh(script: "curl -X POST --data-urlencode 'payload={\"channel\": \"#java_services\", \"username\": \"Jenkins\", \"text\": \"*{{cause.userName}}* накатывает ветку *{{ctx.currentBranchName}}* на *{{ctx.service}} {{ctx.namespace}}*.\n{{ctx.dockerImage}}\nСохраняйте спокойствие 😌\", \"icon_emoji\": \":jenkins:\"}' https://hooks.slack.com/services/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", , returnStdout: true).trim()
 }
 
 def copyConfigToHelmChart(ctx) {
