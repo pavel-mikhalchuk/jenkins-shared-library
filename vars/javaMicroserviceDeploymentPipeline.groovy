@@ -35,6 +35,7 @@ def call(body) {
                     git credentialsId: 'jenkins', url: 'http://bb.alutech-mc.com:8080/scm/as/infra.git'
                     
                     sh 'ls -al'
+                    sh 'ls -al ../'
 
                     // withCredentials([usernamePassword(credentialsId: 'jenkins', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
                     //     sh('git push https://${GIT_USERNAME}:${GIT_PASSWORD}@<REPO> --tags')
