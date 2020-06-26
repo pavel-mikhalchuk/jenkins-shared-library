@@ -1,6 +1,56 @@
 def call(body) {
     def ctx = setUpContext(body)
 
+    initDockerImageChoiceParameter()
+
+    pipeline {
+        agent { label 'java-deploy' }
+        options { 
+            buildDiscarder(logRotator(numToKeepStr: '5'))
+            timestamps () 
+        }
+        parameters { 
+            choice(name: 'NAMESPACE', choices: ctx.namespaces, description: 'Kubernetes Namespace') 
+            text(name: 'RESOURCES', defaultValue: ctx.podResources, description: 'Kubernetes POD resources requests and limits + JavaOpts')
+        }
+        stages {
+            stage('notify slack: DEPLOYMENT STARTED') {
+                steps {
+                    notifySlack(ctx)
+                }
+            }
+            stage('generate K8S manifests') {
+                steps {
+                    // This step is very important!!! 
+                    // Please do not remove it unless you find a better way without introducing "Init" stage because it's ugly :)"
+                    // Later stages depend on it.
+                    defineMoreContextBasedOnUserInput(ctx)
+
+                    copyConfigToHelmChart(ctx)
+                    writeHelmValuesYaml(ctx)
+                }
+            }
+            stage('push K8S manifests to git') {
+                steps {
+                    git credentialsId: 'jenkins', url: 'http://bb.alutech-mc.com:8080/scm/as/infra.git'
+                    echo 'push K8S manifests to git'
+                }
+            }
+            stage('notify ARGOCD') {
+                steps {
+                    echo 'notify ARGOCD'
+                }
+            }
+        }
+        post {
+            always {
+                deleteDir() /* clean up our workspace */
+            }
+        }
+    }
+}
+
+def initDockerImageChoiceParameter() {
     properties([
         parameters([
             [
@@ -48,51 +98,6 @@ def call(body) {
             ]
         ])
     ])
-
-    pipeline {
-        agent { label 'java-deploy' }
-        options { 
-            buildDiscarder(logRotator(numToKeepStr: '5'))
-            timestamps () 
-        }
-        parameters { 
-            choice(name: 'NAMESPACE', choices: ctx.namespaces, description: 'Kubernetes Namespace') 
-            text(name: 'RESOURCES', defaultValue: ctx.podResources, description: 'Kubernetes POD resources requests and limits + JavaOpts')
-        }
-        stages {
-            stage('notify slack: DEPLOYMENT STARTED') {
-                steps {
-                    notifySlack(ctx)
-                }
-            }
-            stage('generate K8S manifests') {
-              steps {
-                  // This step is very important!!! 
-                  // Please do not remove it unless you find a better way without introducing "Init" stage because it's ugly :)"
-                  // Later stages depend on it.
-                  defineMoreContextBasedOnUserInput(ctx)
-
-                  copyConfigToHelmChart(ctx)
-                  writeHelmValuesYaml(ctx)
-              }
-            }
-            stage('push K8S manifests to git') {
-              steps {
-                  echo 'push K8S manifests to git'
-              }
-            }
-            stage('notify ARGOCD') {
-              steps {
-                  echo 'notify ARGOCD'
-              }
-            }
-        }
-        post {
-            always {
-                deleteDir() /* clean up our workspace */
-            }
-        }
-    }
 }
 
 def setUpContext(body) {
