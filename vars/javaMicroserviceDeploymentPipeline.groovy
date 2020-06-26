@@ -33,7 +33,12 @@ def call(body) {
             stage('push K8S manifests to git') {
                 steps {
                     git credentialsId: 'jenkins', url: 'http://bb.alutech-mc.com:8080/scm/as/infra.git'
-                    echo 'push K8S manifests to git'
+                    
+                    sh 'ls -al'
+
+                    // withCredentials([usernamePassword(credentialsId: 'jenkins', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+                    //     sh('git push https://${GIT_USERNAME}:${GIT_PASSWORD}@<REPO> --tags')
+                    // }
                 }
             }
             stage('notify ARGOCD') {
