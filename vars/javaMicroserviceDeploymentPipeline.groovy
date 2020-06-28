@@ -30,6 +30,9 @@ def call(body) {
                     sh "mkdir ${ctx.infraFolder}"
                     sh "ls -al"
 
+                    dir("${ctx.infraFolder}") {
+                        git credentialsId: 'jenkins', url: 'http://bb.alutech-mc.com:8080/scm/as/infra.git'
+                    }
 
                 }
             }
@@ -141,7 +144,7 @@ def defineMoreContextBasedOnUserInput(ctx) {
     ctx.currentBranchName = "${BRANCH_NAME}"
     ctx.podResources = "${params.RESOURCES}"
 
-    ctx.infraFolder = sh(script: 'infra-$(date +"%d-%m-%Y_%H-%M-%S")', returnStdout: true).trim()
+    ctx.infraFolder = sh(script: 'echo infra-$(date +"%d-%m-%Y_%H-%M-%S")', returnStdout: true).trim()
     ctx.kubeStateFolder = "${ctx.infraFolder}/kube-dev/cluster-state/alutech-services/${ctx.namespace}/${ctx.service}/raw-manifests"
     ctx.helmRelease = "${ctx.service}-${ctx.namespace}"
 }
