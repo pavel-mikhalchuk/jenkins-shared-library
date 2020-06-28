@@ -53,8 +53,9 @@ def call(body) {
                     sh 'echo "before helm"'
 
                     sh 'ls -al /usr/bin'
+                    sh 'ls -al /usr/local/bin'
 
-                    sh "/usr/bin/helm template --namespace ${ctx.namespace} --name ${ctx.helmRelease} ./kubernetes/helm-chart/pricing > '${ctx.kubeStateFolder}/kube-state.yaml'"
+                    sh "helm template --namespace ${ctx.namespace} --name ${ctx.helmRelease} ./kubernetes/helm-chart/pricing > '${ctx.kubeStateFolder}/kube-state.yaml'"
                 }
             }
             stage('push K8S manifests to infra repo') {
