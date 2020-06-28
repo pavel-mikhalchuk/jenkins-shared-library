@@ -52,7 +52,7 @@ def call(body) {
 
                     sh 'echo "before helm"'
                     dir ('kubernetes/helm-chart/pricing') {
-                        sh 'helm template --namespace ${ctx.namespace} --name ${ctx.helmRelease} . > "${ctx.kubeStateFolder}/kube-state.yaml"'
+                        sh "helm template --namespace ${ctx.namespace} --name ${ctx.helmRelease} . > '${ctx.kubeStateFolder}/kube-state.yaml'"
                     }
                 }
             }
