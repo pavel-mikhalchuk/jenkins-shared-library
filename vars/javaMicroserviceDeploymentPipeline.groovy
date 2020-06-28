@@ -32,6 +32,9 @@ def call(body) {
             }
             stage('push K8S manifests to git') {
                 steps {
+                    sh 'ls -al'
+                    sh 'ls -al ../'
+
                     git credentialsId: 'jenkins', url: 'http://bb.alutech-mc.com:8080/scm/as/infra.git'
                     
                     sh 'ls -al'
