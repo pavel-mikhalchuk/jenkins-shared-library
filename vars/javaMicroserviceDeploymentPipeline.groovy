@@ -30,9 +30,6 @@ def call(body) {
                     sh "mkdir ${ctx.infraFolder}"
                     sh "ls -al"
 
-                    dir("${ctx.infraFolder}") {
-                        git credentialsId: 'jenkins', url: 'http://bb.alutech-mc.com:8080/scm/as/infra.git'
-                    }
 
                 }
             }
