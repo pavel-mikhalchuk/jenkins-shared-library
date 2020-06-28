@@ -26,6 +26,8 @@ def call(body) {
                     // Later stages depend on it.
                     defineMoreContextBasedOnUserInput(ctx)
 
+                    sh "mkdir ${ctx.infraFolder}"
+
                     dir("${ctx.infraFolder}") {
                         git credentialsId: 'jenkins', url: 'http://bb.alutech-mc.com:8080/scm/as/infra.git'
 
