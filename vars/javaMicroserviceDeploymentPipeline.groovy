@@ -14,6 +14,11 @@ def call(body) {
             text(name: 'RESOURCES', defaultValue: ctx.podResources, description: 'Kubernetes POD resources requests and limits + JavaOpts')
         }
         stages {
+            // stage('Checkout Infra repo') {
+            //     tempDir = sh(script: '$(date +"%d-%m-%Y_%H-%M-%S")', returnStdout: true).trim()
+            //     sh "mkdir ${tempDir}"
+
+            // }
             stage('notify slack: DEPLOYMENT STARTED') {
                 steps {
                     notifySlack(ctx)
@@ -35,7 +40,9 @@ def call(body) {
                     sh 'ls -al'
                     sh 'ls -al ../'
 
-                    git credentialsId: 'jenkins', url: 'http://bb.alutech-mc.com:8080/scm/as/infra.git'
+                    dir('unique-111') {
+                        git credentialsId: 'jenkins', url: 'http://bb.alutech-mc.com:8080/scm/as/infra.git'
+                    }
                     
                     sh 'ls -al'
                     sh 'ls -al ../'
