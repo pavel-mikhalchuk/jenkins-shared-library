@@ -52,6 +52,8 @@ def call(body) {
 
                     sh 'echo "before helm"'
 
+                    sh 'whoami'
+
                     sh 'ls -al /usr/bin'
                     sh 'ls -al /usr/local/bin'
 
