@@ -32,15 +32,6 @@ def call(body) {
 
                     dir("${ctx.infraFolder}") {
                         git credentialsId: 'jenkins', url: 'http://bb.alutech-mc.com:8080/scm/as/infra.git'
-
-                        withCredentials([usernamePassword(credentialsId: 'jenkins', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-                            sh 'git config user.email "jenkins@kube.com"'
-                            sh 'git config user.name "Jenkins"'
-
-                            sh 'git add *'
-                            sh 'git commit -m "[jenkins]: ${JOB_NAME} - ${BUILD_NUMBER}"'
-                            sh 'git push http://${GIT_USERNAME}:${GIT_PASSWORD}@bb.alutech-mc.com:8080/scm/as/infra.git HEAD:master'
-                        }                        
                     }
 
                 }
