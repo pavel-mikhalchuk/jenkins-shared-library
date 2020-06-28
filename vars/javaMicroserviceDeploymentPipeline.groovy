@@ -26,9 +26,7 @@ def call(body) {
                     // Later stages depend on it.
                     defineMoreContextBasedOnUserInput(ctx)
 
-                    sh "ls -al"
                     sh "mkdir ${ctx.infraFolder}"
-                    sh "ls -al"
 
                     dir("${ctx.infraFolder}") {
                         git credentialsId: 'jenkins', url: 'http://bb.alutech-mc.com:8080/scm/as/infra.git'
@@ -38,11 +36,19 @@ def call(body) {
             }
             stage('generate K8S manifests') {
                 steps {
+                    sh 'pwd'
+                    sh 'ls -al'
+                    
                     copyConfigToHelmChart(ctx)
                     writeHelmValuesYaml(ctx)
                     
+                    sh 'echo "done!"'
+                    sh 'ls -al'
+
                     sh 'rm -rf ${ctx.kubeStateFolder}'
                     sh 'mkdir -p ${ctx.kubeStateFolder}'
+
+                    sh 'echo "before helm"'
                     dir ('kubernetes/helm-chart/pricing') {
                         sh 'helm template --namespace ${ctx.namespace} --name ${ctx.helmRelease} . > "${ctx.kubeStateFolder}/kube-state.yaml"'
                     }
