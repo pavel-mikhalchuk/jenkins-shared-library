@@ -55,7 +55,7 @@ def call(body) {
                     }
                 }
             }
-            stage('push K8S manifests to git') {
+            stage('push K8S manifests to infra repo') {
                 steps {
                     dir("${ctx.infraFolder}") {
                         withCredentials([usernamePassword(credentialsId: 'jenkins', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
