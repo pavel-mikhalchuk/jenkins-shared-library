@@ -14,42 +14,57 @@ def call(body) {
             text(name: 'RESOURCES', defaultValue: ctx.podResources, description: 'Kubernetes POD resources requests and limits + JavaOpts')
         }
         stages {
-            // stage('Checkout Infra repo') {
-            //     tempDir = sh(script: '$(date +"%d-%m-%Y_%H-%M-%S")', returnStdout: true).trim()
-            //     sh "mkdir ${tempDir}"
-
-            // }
             stage('notify slack: DEPLOYMENT STARTED') {
                 steps {
                     notifySlack(ctx)
                 }
             }
-            stage('generate K8S manifests') {
+            stage('Checkout infra repo') {
                 steps {
                     // This step is very important!!! 
                     // Please do not remove it unless you find a better way without introducing "Init" stage because it's ugly :)"
                     // Later stages depend on it.
                     defineMoreContextBasedOnUserInput(ctx)
 
+                    dir("${ctx.infraFolder}") {
+                        git credentialsId: 'jenkins', url: 'http://bb.alutech-mc.com:8080/scm/as/infra.git'
+
+                        withCredentials([usernamePassword(credentialsId: 'jenkins', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+                            sh 'git config user.email "jenkins@kube.com"'
+                            sh 'git config user.name "Jenkins"'
+
+                            sh 'git add *'
+                            sh 'git commit -m "[jenkins]: ${JOB_NAME} - ${BUILD_NUMBER}"'
+                            sh 'git push http://${GIT_USERNAME}:${GIT_PASSWORD}@bb.alutech-mc.com:8080/scm/as/infra.git HEAD:master'
+                        }                        
+                    }
+
+                }
+            }
+            stage('generate K8S manifests') {
+                steps {
                     copyConfigToHelmChart(ctx)
                     writeHelmValuesYaml(ctx)
+                    
+                    sh 'rm -rf ${ctx.kubeStateFolder}'
+                    sh 'mkdir -p ${ctx.kubeStateFolder}'
+                    dir ('kubernetes/helm-chart/pricing') {
+                        sh 'helm template --namespace ${ctx.namespace} --name ${ctx.helmRelease} . > "${ctx.kubeStateFolder}/kube-state.yaml"'
+                    }
                 }
             }
             stage('push K8S manifests to git') {
                 steps {
-                    sh 'ls -al'
-                    sh 'ls -al ../'
+                    dir("${ctx.infraFolder}") {
+                        withCredentials([usernamePassword(credentialsId: 'jenkins', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+                            sh 'git config user.email "jenkins@kube.com"'
+                            sh 'git config user.name "Jenkins"'
 
-                    dir('unique-111') {
-                        git credentialsId: 'jenkins', url: 'http://bb.alutech-mc.com:8080/scm/as/infra.git'
+                            sh 'git add *'
+                            sh 'git commit -m "[jenkins]: ${JOB_NAME} - ${BUILD_NUMBER}"'
+                            sh 'git push http://${GIT_USERNAME}:${GIT_PASSWORD}@bb.alutech-mc.com:8080/scm/as/infra.git HEAD:master'
+                        }                        
                     }
-                    
-                    sh 'ls -al'
-                    sh 'ls -al ../'
-
-                    // withCredentials([usernamePassword(credentialsId: 'jenkins', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-                    //     sh('git push https://${GIT_USERNAME}:${GIT_PASSWORD}@<REPO> --tags')
-                    // }
                 }
             }
             stage('notify ARGOCD') {
@@ -133,6 +148,10 @@ def defineMoreContextBasedOnUserInput(ctx) {
     ctx.jenkinsBuildNumber = "${JOB_NAME}-${BUILD_NUMBER}"
     ctx.currentBranchName = "${BRANCH_NAME}"
     ctx.podResources = "${params.RESOURCES}"
+
+    ctx.infraFolder = sh(script: 'infra-$(date +"%d-%m-%Y_%H-%M-%S")', returnStdout: true).trim()
+    ctx.kubeStateFolder = "${ctx.infraFolder}/kube-dev/cluster-state/alutech-services/${ctx.namespace}/${ctx.service}/raw-manifests"
+    ctx.helmRelease = "${ctx.service}-${ctx.namespace}"
 }
 
 def notifySlack(ctx) {
