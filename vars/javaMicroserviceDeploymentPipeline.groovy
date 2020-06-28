@@ -44,9 +44,11 @@ def call(body) {
                     
                     sh 'echo "done!"'
                     sh 'ls -al'
+                    sh "echo ${ctx.infraFolder}"
+                    sh "echo ${ctx.kubeStateFolder}"
 
-                    sh 'rm -rf ${ctx.kubeStateFolder}'
-                    sh 'mkdir -p ${ctx.kubeStateFolder}'
+                    sh "rm -rf ${ctx.kubeStateFolder}"
+                    sh "mkdir -p ${ctx.kubeStateFolder}"
 
                     sh 'echo "before helm"'
                     dir ('kubernetes/helm-chart/pricing') {
