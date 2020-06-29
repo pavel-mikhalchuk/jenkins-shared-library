@@ -176,17 +176,17 @@ def writeHelmValuesYaml(ctx) {
     writeFile file: "kubernetes/helm-chart/${ctx.service}/values.yaml", text: 
         
         """replicaCount: 1
-        gitBranch: ${ctx.currentBranchName}
-        image:
-          repository: dockerhub-vip.alutech.local
-          tag: ${ctx.dockerImage}
-          pullPolicy: IfNotPresent
-        service:
-          externalPort: 80
-          internalPort: 8080
-        jenkinsBuildNumber: ${ctx.jenkinsBuildNumber}
-        host: ${hostName(ctx)}
-        ${ctx.podResources}"""
+gitBranch: ${ctx.currentBranchName}
+image:
+  repository: dockerhub-vip.alutech.local
+  tag: ${ctx.dockerImage}
+  pullPolicy: IfNotPresent
+service:
+  externalPort: 80
+  internalPort: 8080
+jenkinsBuildNumber: ${ctx.jenkinsBuildNumber}
+host: ${hostName(ctx)}
+${ctx.podResources}"""
 }
 
 def hostName(ctx) {
