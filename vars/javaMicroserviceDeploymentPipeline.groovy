@@ -58,6 +58,8 @@ def call(body) {
                         sh 'ls -al /usr/bin'
                         sh 'ls -al /usr/local/bin'
 
+                        sh 'cat ./kubernetes/helm-chart/pricing/values.yaml'
+
                         sh "helm template --namespace ${ctx.namespace} --name ${ctx.helmRelease} ./kubernetes/helm-chart/pricing > '${ctx.kubeStateFolder}/kube-state.yaml'"
                     }
                 }
@@ -80,11 +82,6 @@ def call(body) {
                 steps {
                     echo 'notify ARGOCD'
                 }
-            }
-        }
-        post {
-            always {
-                deleteDir() /* clean up our workspace */
             }
         }
     }
