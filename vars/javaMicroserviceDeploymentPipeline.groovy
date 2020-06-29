@@ -36,28 +36,30 @@ def call(body) {
             }
             stage('generate K8S manifests') {
                 steps {
-                    sh 'pwd'
-                    sh 'ls -al'
-                    
-                    copyConfigToHelmChart(ctx)
-                    writeHelmValuesYaml(ctx)
-                    
-                    sh 'echo "done!"'
-                    sh 'ls -al'
-                    sh "echo ${ctx.infraFolder}"
-                    sh "echo ${ctx.kubeStateFolder}"
+                    container('helm') {
+                        sh 'pwd'
+                        sh 'ls -al'
+                        
+                        copyConfigToHelmChart(ctx)
+                        writeHelmValuesYaml(ctx)
+                        
+                        sh 'echo "done!"'
+                        sh 'ls -al'
+                        sh "echo ${ctx.infraFolder}"
+                        sh "echo ${ctx.kubeStateFolder}"
 
-                    sh "rm -rf ${ctx.kubeStateFolder}"
-                    sh "mkdir -p ${ctx.kubeStateFolder}"
+                        sh "rm -rf ${ctx.kubeStateFolder}"
+                        sh "mkdir -p ${ctx.kubeStateFolder}"
 
-                    sh 'echo "before helm"'
+                        sh 'echo "before helm"'
 
-                    sh 'whoami'
+                        sh 'whoami'
 
-                    sh 'ls -al /usr/bin'
-                    sh 'ls -al /usr/local/bin'
+                        sh 'ls -al /usr/bin'
+                        sh 'ls -al /usr/local/bin'
 
-                    sh "helm template --namespace ${ctx.namespace} --name ${ctx.helmRelease} ./kubernetes/helm-chart/pricing > '${ctx.kubeStateFolder}/kube-state.yaml'"
+                        sh "helm template --namespace ${ctx.namespace} --name ${ctx.helmRelease} ./kubernetes/helm-chart/pricing > '${ctx.kubeStateFolder}/kube-state.yaml'"
+                    }
                 }
             }
             stage('push K8S manifests to infra repo') {
