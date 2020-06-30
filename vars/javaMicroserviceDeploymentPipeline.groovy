@@ -14,18 +14,18 @@ def call(body) {
             text(name: 'RESOURCES', defaultValue: ctx.podResources, description: 'Kubernetes POD resources requests and limits + JavaOpts')
         }
         stages {
-            stage('notify slack: DEPLOYMENT STARTED') {
-                steps {
-                    notifySlack(ctx)
-                }
-            }
-            stage('Checkout infra repo') {
+            stage('notify slack') {
                 steps {
                     // This step is very important!!! 
                     // Please do not remove it unless you find a better way without introducing "Init" stage because it's ugly :)"
                     // Later stages depend on it.
                     defineMoreContextBasedOnUserInput(ctx)
 
+                    notifySlack(ctx)
+                }
+            }
+            stage('checkout infra repo') {
+                steps {
                     checkoutInfraRepo(ctx)
                 }
             }
@@ -40,10 +40,11 @@ def call(body) {
             }
             stage('push K8S manifests to infra repo') {
                 steps {
-                    pushK8SManifests(ctx)
+                    echo 'Pushed!!!'
+                    // pushK8SManifests(ctx)
                 }
             }
-            stage('notify ARGOCD') {
+            stage('notify ArgoCD') {
                 steps {
                     notifyArgoCD(ctx)
                 }
