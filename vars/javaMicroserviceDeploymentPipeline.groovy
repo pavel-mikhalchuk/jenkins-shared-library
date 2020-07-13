@@ -130,6 +130,18 @@ def defineMoreContextBasedOnUserInput(ctx) {
 def notifySlack(ctx) {
     script {
         wrap([$class: 'BuildUser']) {
+            echo "BUILD_USER=${BUILD_USER}"
+            echo "BUILD_USER_FIRST_NAME=${BUILD_USER_FIRST_NAME}"
+            echo "BUILD_USER_LAST_NAME=${BUILD_USER_LAST_NAME}"
+            echo "BUILD_USER_ID=${BUILD_USER_ID}"
+            echo "BUILD_USER_EMAIL=${BUILD_USER_EMAIL}"
+            echo "---"
+            echo "env.BUILD_USER=${env.BUILD_USER}"
+            echo "env.BUILD_USER_FIRST_NAME=${env.BUILD_USER_FIRST_NAME}"
+            echo "env.BUILD_USER_LAST_NAME=${env.BUILD_USER_LAST_NAME}"
+            echo "env.BUILD_USER_ID=${env.BUILD_USER_ID}"
+            echo "env.BUILD_USER_EMAIL=${env.BUILD_USER_EMAIL}"
+            
             slackSend channel: "stuff", color: "good", message: "${BUILD_USER_FIRST_NAME} ${BUILD_USER_LAST_NAME} накатывает ветку *{{ctx.currentBranchName}}* на *{{ctx.service}} {{ctx.namespace}}*.\n{{ctx.dockerImage}}\nСохраняйте спокойствие 😌"
         }
     }
