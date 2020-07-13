@@ -40,8 +40,7 @@ def call(body) {
             }
             stage('push K8S manifests to infra repo') {
                 steps {
-                    echo 'Pushed!!!'
-                    // pushK8SManifests(ctx)
+                    pushK8SManifests(ctx)
                 }
             }
             stage('notify ArgoCD') {
