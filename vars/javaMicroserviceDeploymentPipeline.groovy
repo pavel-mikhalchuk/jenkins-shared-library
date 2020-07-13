@@ -130,26 +130,9 @@ def defineMoreContextBasedOnUserInput(ctx) {
 def notifySlack(ctx) {
     script {
         wrap([$class: 'BuildUser']) {
-            echo "BUILD_USER=${BUILD_USER}"
-            echo "BUILD_USER_FIRST_NAME=${BUILD_USER_FIRST_NAME}"
-            echo "BUILD_USER_LAST_NAME=${BUILD_USER_LAST_NAME}"
-            echo "BUILD_USER_ID=${BUILD_USER_ID}"
-            echo "BUILD_USER_EMAIL=${BUILD_USER_EMAIL}"
-            echo "---"
-            echo "env.BUILD_USER=${env.BUILD_USER}"
-            echo "env.BUILD_USER_FIRST_NAME=${env.BUILD_USER_FIRST_NAME}"
-            echo "env.BUILD_USER_LAST_NAME=${env.BUILD_USER_LAST_NAME}"
-            echo "env.BUILD_USER_ID=${env.BUILD_USER_ID}"
-            echo "env.BUILD_USER_EMAIL=${env.BUILD_USER_EMAIL}"
-            
-            slackSend channel: "stuff", color: "good", message: "${BUILD_USER_FIRST_NAME} ${BUILD_USER_LAST_NAME} накатывает ветку *{{ctx.currentBranchName}}* на *{{ctx.service}} {{ctx.namespace}}*.\n{{ctx.dockerImage}}\nСохраняйте спокойствие 😌"
+            slackSend channel: "stuff", color: "good", message: "${BUILD_USER} накатывает ветку *{{ctx.currentBranchName}}* на *{{ctx.service}} {{ctx.namespace}}*.\n{{ctx.dockerImage}}\nСохраняйте спокойствие 😌"
         }
     }
-
-    // def causeJson = sh(script: 'echo $(curl -u krakhotkin:11607d902e7c73644a54ab39a83743db95 --silent ${BUILD_URL}/api/json | tr "{}" "\n" | grep "Started by")', returnStdout: true).trim()
-    // def cause = new groovy.json.JsonSlurper().parseText("{" + causeJson + "}")
-    
-    // sh(script: "curl -X POST --data-urlencode 'payload={\"channel\": \"#java_services\", \"username\": \"Jenkins\", \"text\": \"*{{cause.userName}}* накатывает ветку *{{ctx.currentBranchName}}* на *{{ctx.service}} {{ctx.namespace}}*.\n{{ctx.dockerImage}}\nСохраняйте спокойствие 😌\", \"icon_emoji\": \":jenkins:\"}' https://hooks.slack.com/services/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", , returnStdout: true).trim()
 }
 
 def checkoutInfraRepo(ctx) {
