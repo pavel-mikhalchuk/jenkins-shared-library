@@ -128,7 +128,11 @@ def defineMoreContextBasedOnUserInput(ctx) {
 }
 
 def notifySlack(ctx) {
-    slackSend channel: "stuff", color: "good", message: "Message from Jenkins Pipeline"
+    script {
+        wrap([$class: 'BuildUser']) {
+            slackSend channel: "stuff", color: "good", message: "${BUILD_USER_FIRST_NAME} ${BUILD_USER_LAST_NAME} накатывает ветку *{{ctx.currentBranchName}}* на *{{ctx.service}} {{ctx.namespace}}*.\n{{ctx.dockerImage}}\nСохраняйте спокойствие 😌"
+        }
+    }
 
     // def causeJson = sh(script: 'echo $(curl -u krakhotkin:11607d902e7c73644a54ab39a83743db95 --silent ${BUILD_URL}/api/json | tr "{}" "\n" | grep "Started by")', returnStdout: true).trim()
     // def cause = new groovy.json.JsonSlurper().parseText("{" + causeJson + "}")
