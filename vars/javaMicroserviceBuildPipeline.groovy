@@ -11,6 +11,11 @@ def call(body) {
             stage('maven') {
                 steps {
                     container('maven') {
+                        // This step is very important!!! 
+                        // Please do not remove it unless you find a better way without introducing "Init" stage because it's ugly :)"
+                        // Later stages depend on it.
+                        defineMoreContextBasedOnUserInput(ctx)
+
                         mavenBuild(ctx)
                     }
                 }
@@ -39,19 +44,24 @@ def setUpContext(body) {
     return ctx
 }
 
+def defineMoreContextBasedOnUserInput(ctx) {
+    ctx.currentBranchName = "${BRANCH_NAME}"
+    ctx.gitRev = gitRev()
+}
+
 def mavenBuild(ctx) {
     sh "mvn clean package -DskipTests=${ctx.noUnitTests}"
 }
 
 def dockerBuild(ctx) {
-    def imgTag = ctx.service + ':' + gitRev()
-    def imgTagLatest = ctx.service + ':latest'
+    def img = ctx.service + ':' + dockerImgTag(ctx)
+    def imgLatest = ctx.service + ':latest'
     
-    sh "docker build -t ${imgTag} ."
-    sh "docker tag ${imgTag} ${imgTagLatest}"
+    sh "docker build -t ${img} ."
+    sh "docker tag ${img} ${imgLatest}"
 
-    ctx.dockerImages << imgTag
-    ctx.dockerImages << imgTagLatest
+    ctx.dockerImages << img
+    ctx.dockerImages << imgLatest
 }
 
 def dockerPush(ctx) {
@@ -69,4 +79,14 @@ def dockerPush(ctx) {
 
 def gitRev() {
     sh(script: 'echo $(git rev-parse HEAD)', returnStdout: true).trim()
+}
+
+def dockerImgTag(ctx) {
+    "${currentTimestamp()}__${ctx.currentBranchName}__${ctx.gitRev}"
+}
+
+def currentTimestamp() {
+    java.time.ZonedDateTime
+        .now(java.time.ZoneId.of("UTC+3"))
+        .format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss"))
 }
