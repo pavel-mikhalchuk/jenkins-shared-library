@@ -129,7 +129,7 @@ def defineMoreContextBasedOnUserInput(ctx) {
 def notifySlack(ctx) {
     script {
         wrap([$class: 'BuildUser']) {
-            slackSend channel: "stuff", color: "good", message: "*${BUILD_USER}* накатывает ветку *${ctx.currentBranchName}* на *${ctx.service} ${ctx.namespace}*.\n${ctx.dockerImage}\nСохраняйте спокойствие 😌"
+            slackSend channel: "java_services", color: "good", message: "*${BUILD_USER}* накатывает ветку *${ctx.currentBranchName}* на *${ctx.service} ${ctx.namespace}*.\n${ctx.dockerImage}\nСохраняйте спокойствие 😌"
         }
     }
 }
