@@ -52,6 +52,105 @@ def call(body) {
     }
 }
 
+def setUpContext(body) {
+    // client-defined parameters in the body block
+    def ctx = [:]
+    body.resolveStrategy = Closure.DELEGATE_FIRST
+    body.delegate = ctx
+    body()
+    
+    // defining more parameters for ourselves
+    return ctx
+}
+
+def defineMoreContextBasedOnUserInput(ctx) {
+    ctx.namespace = "${params.NAMESPACE}"
+    ctx.dockerImage = "${ctx.service}:${params.IMAGE_TAG ?: 'latest'}"
+    ctx.jenkinsBuildNumber = "${JOB_NAME}-${BUILD_NUMBER}"
+    ctx.currentBranchName = "${BRANCH_NAME}"
+    ctx.podResources = "${params.RESOURCES}"
+
+    ctx.infraFolder = sh(script: 'echo infra-$(date +"%d-%m-%Y_%H-%M-%S")', returnStdout: true).trim()
+    ctx.helmChartFolder = "kubernetes/helm-chart/${ctx.service}"
+    ctx.helmRelease = "${ctx.service}-${ctx.namespace}"
+    
+    //// env-specific (dev VS prod)
+    ctx.env = ctx.namespace == 'prod' ?: 'dev'
+    ////  ////  //// //// //// //// ////  ////  //// //// //// ////
+    ctx.kubeStateFolder = "${ctx.infraFolder}/kube-${ctx.env}cluster-state/alutech-services/${ctx.namespace}/${ctx.service}/raw-manifests"
+    ctx.envSpecificHelmValues = ctx.env == 'prod' ? "environment: ${ctx.env}" : "host: ${hostName(ctx)}"
+    ////  ////  //// //// //// ////////  ////  //// //// //// ////
+}
+
+def notifySlack(ctx) {
+    script {
+        wrap([$class: 'BuildUser']) {
+            slackSend channel: "java_services", color: "good", message: "*${BUILD_USER}* накатывает ветку *${ctx.currentBranchName}* на *${ctx.service} ${ctx.namespace}*.\n${ctx.dockerImage}\nСохраняйте спокойствие 😌"
+        }
+    }
+}
+
+def checkoutInfraRepo(ctx) {
+    sh "mkdir ${ctx.infraFolder}"
+
+    dir("${ctx.infraFolder}") {
+        git credentialsId: 'jenkins', url: 'http://bb.alutech-mc.com:8080/scm/as/infra.git'
+    }
+}
+
+def copyConfigToHelmChart(ctx) {
+    sh "cp src/main/resources/application.${ctx.namespace}.properties ${ctx.helmChartFolder}/application.properties"
+}
+
+def writeHelmValuesYaml(ctx) {
+    writeFile file: "${ctx.helmChartFolder}/values.yaml", text: 
+        
+        """replicaCount: 1
+gitBranch: ${ctx.currentBranchName}
+image:
+  repository: dockerhub-vip.alutech.local
+  tag: ${ctx.dockerImage}
+  pullPolicy: IfNotPresent
+service:
+  externalPort: 80
+  internalPort: 8080
+jenkinsBuildNumber: ${ctx.jenkinsBuildNumber}
+${ctx.envSpecificHelmValues}
+${ctx.podResources}"""
+}
+
+def generateK8SManifests(ctx) {
+    sh "rm -rf ${ctx.kubeStateFolder}"
+    sh "mkdir -p ${ctx.kubeStateFolder}"
+
+    sh "helm template --namespace ${ctx.namespace} --name ${ctx.helmRelease} ${ctx.helmChartFolder} > '${ctx.kubeStateFolder}/kube-state.yaml'"
+}
+
+def pushK8SManifests(ctx) {
+    dir("${ctx.infraFolder}") {
+        withCredentials([usernamePassword(credentialsId: 'jenkins', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+            sh 'git config user.email "jenkins@infra.tower"'
+            sh 'git config user.name "Jenkins"'
+
+            sh 'git add *'
+            sh 'git commit -m "[jenkins]: ${JOB_NAME} - ${BUILD_NUMBER}"'
+            sh 'git push http://${GIT_USERNAME}:${GIT_PASSWORD}@bb.alutech-mc.com:8080/scm/as/infra.git HEAD:master'
+        }                        
+    }
+}
+
+def notifyArgoCD(ctx) {
+    sh 'curl -k -X POST https://git-events-publisher.in.in.alutech24.com/push'
+}
+
+def hostName(ctx) {
+    return "${ctx.service}.${hostByNs(NAMESPACE)}.in.in.alutech24.com"
+}
+
+def hostByNs(ns) {
+    return ns.contains('-') ? "${ns.split('-')[1]}.${ns.split('-')[0]}" : ns
+}
+
 def initDockerImageChoiceParameter() {
     properties([
         parameters([
@@ -100,97 +199,4 @@ def initDockerImageChoiceParameter() {
             ]
         ])
     ])
-}
-
-def setUpContext(body) {
-    // client-defined parameters in the body block
-    def ctx = [:]
-    body.resolveStrategy = Closure.DELEGATE_FIRST
-    body.delegate = ctx
-    body()
-    
-    // defining more parameters for ourselves
-    return ctx
-}
-
-def defineMoreContextBasedOnUserInput(ctx) {
-    ctx.namespace = "${params.NAMESPACE}"
-    ctx.dockerImage = "${ctx.service}:${params.IMAGE_TAG ?: 'latest'}"
-    ctx.jenkinsBuildNumber = "${JOB_NAME}-${BUILD_NUMBER}"
-    ctx.currentBranchName = "${BRANCH_NAME}"
-    ctx.podResources = "${params.RESOURCES}"
-
-    ctx.infraFolder = sh(script: 'echo infra-$(date +"%d-%m-%Y_%H-%M-%S")', returnStdout: true).trim()
-    ctx.kubeStateFolder = "${ctx.infraFolder}/kube-dev/cluster-state/alutech-services/${ctx.namespace}/${ctx.service}/raw-manifests"
-    ctx.helmChartFolder = "kubernetes/helm-chart/${ctx.service}"
-    ctx.helmRelease = "${ctx.service}-${ctx.namespace}"
-}
-
-def notifySlack(ctx) {
-    script {
-        wrap([$class: 'BuildUser']) {
-            slackSend channel: "java_services", color: "good", message: "*${BUILD_USER}* накатывает ветку *${ctx.currentBranchName}* на *${ctx.service} ${ctx.namespace}*.\n${ctx.dockerImage}\nСохраняйте спокойствие 😌"
-        }
-    }
-}
-
-def checkoutInfraRepo(ctx) {
-    sh "mkdir ${ctx.infraFolder}"
-
-    dir("${ctx.infraFolder}") {
-        git credentialsId: 'jenkins', url: 'http://bb.alutech-mc.com:8080/scm/as/infra.git'
-    }
-}
-
-def copyConfigToHelmChart(ctx) {
-    sh "cp src/main/resources/application.${ctx.namespace}.properties ${ctx.helmChartFolder}/application.properties"
-}
-
-def writeHelmValuesYaml(ctx) {
-    writeFile file: "${ctx.helmChartFolder}/values.yaml", text: 
-        
-        """replicaCount: 1
-gitBranch: ${ctx.currentBranchName}
-image:
-  repository: dockerhub-vip.alutech.local
-  tag: ${ctx.dockerImage}
-  pullPolicy: IfNotPresent
-service:
-  externalPort: 80
-  internalPort: 8080
-jenkinsBuildNumber: ${ctx.jenkinsBuildNumber}
-host: ${hostName(ctx)}
-${ctx.podResources}"""
-}
-
-def generateK8SManifests(ctx) {
-    sh "rm -rf ${ctx.kubeStateFolder}"
-    sh "mkdir -p ${ctx.kubeStateFolder}"
-
-    sh "helm template --namespace ${ctx.namespace} --name ${ctx.helmRelease} ${ctx.helmChartFolder} > '${ctx.kubeStateFolder}/kube-state.yaml'"
-}
-
-def pushK8SManifests(ctx) {
-    dir("${ctx.infraFolder}") {
-        withCredentials([usernamePassword(credentialsId: 'jenkins', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-            sh 'git config user.email "jenkins@infra.tower"'
-            sh 'git config user.name "Jenkins"'
-
-            sh 'git add *'
-            sh 'git commit -m "[jenkins]: ${JOB_NAME} - ${BUILD_NUMBER}"'
-            sh 'git push http://${GIT_USERNAME}:${GIT_PASSWORD}@bb.alutech-mc.com:8080/scm/as/infra.git HEAD:master'
-        }                        
-    }
-}
-
-def notifyArgoCD(ctx) {
-    sh 'curl -k -X POST https://git-events-publisher.in.in.alutech24.com/push'
-}
-
-def hostName(ctx) {
-    return "${ctx.service}.${hostByNs(NAMESPACE)}.in.in.alutech24.com"
-}
-
-def hostByNs(ns) {
-    return ns.contains('-') ? "${ns.split('-')[1]}.${ns.split('-')[0]}" : ns
 }
