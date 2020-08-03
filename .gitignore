@@ -2,3 +2,6 @@
 .history
 /generated
 commit.sh
+.idea
+.gradle
+build
