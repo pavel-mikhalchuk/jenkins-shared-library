@@ -75,7 +75,7 @@ def defineMoreContextBasedOnUserInput(ctx) {
     ctx.helmRelease = "${ctx.service}-${ctx.namespace}"
     
     //// env-specific (dev VS prod)
-    ctx.env = ctx.namespace = 'prod' ?: 'dev'
+    ctx.env = ctx.namespace == 'prod' ? 'prod' : 'dev'
     ////  ////  //// //// //// //// ////  ////  //// //// //// ////
     ctx.kubeStateFolder = "${ctx.infraFolder}/kube-${ctx.env}/cluster-state/alutech-services/${ctx.namespace}/${ctx.service}/raw-manifests"
     ctx.envSpecificHelmValues = ctx.env == 'prod' ? "environment: ${ctx.env}" : "host: ${hostName(ctx)}"
