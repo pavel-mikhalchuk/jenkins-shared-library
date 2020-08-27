@@ -2,6 +2,7 @@ apply plugin:   'groovy'
 
 repositories {
     mavenCentral()
+    maven { url 'https://repo.jenkins-ci.org/releases/' }
 }
 
 dependencies {
@@ -11,7 +12,7 @@ dependencies {
      * JenkinsPipelineUnit for testing pipelines from:
      * https://github.com/lesfurets/JenkinsPipelineUnit
      */
-    testCompile 'com.lesfurets:jenkins-pipeline-unit:1.1'
+    testImplementation "com.lesfurets:jenkins-pipeline-unit:1.7"
 
     /**
      * For Spock unit tests

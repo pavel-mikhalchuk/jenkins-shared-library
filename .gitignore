@@ -5,3 +5,7 @@ commit.sh
 .idea
 .gradle
 build
+bin
+.project
+.classpath
+.settings

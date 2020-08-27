@@ -19,7 +19,7 @@ class PipelineSpockTestBase extends Specification  implements RegressionTest {
     def setup() {
 
         // Set callstacks path for RegressionTest
-        callStackPath = 'pipelineTests/groovy/tests/callstacks/'
+        callStackPath = 'test/com/mikhalchuk/tests/callstacks/'
 
         // Create and config the helper
         pipelineTestHelper = new PipelineTestHelper()

@@ -45,7 +45,7 @@ def call(body) {
             }
             stage('notify ArgoCD') {
                 steps {
-                    notifyArgoCD(ctx)
+                    notifyArgoCD()
                 }
             }
         }
@@ -139,12 +139,12 @@ def pushK8SManifests(ctx) {
     }
 }
 
-def notifyArgoCD(ctx) {
+def notifyArgoCD() {
     sh 'curl -k -X POST https://git-events-publisher.in.in.alutech24.com/push'
 }
 
 def hostName(ctx) {
-    return "${ctx.service}.${hostByNs(NAMESPACE)}.in.in.alutech24.com"
+    return "${ctx.service}.${hostByNs(ctx.namespace)}.in.in.alutech24.com"
 }
 
 def hostByNs(ns) {

@@ -316,20 +316,6 @@ class PipelineTestHelper extends BasePipelineTest {
     }
 
     /**
-     * Helper for adding a params value in tests
-     */
-    void addParam(String name, Object val, Boolean overWrite = false) {
-        Map params = binding.getVariable('params') as Map
-        if (params == null) {
-            params = [:]
-            binding.setVariable('params', params)
-        }
-        if ( (val != null) && (params[name] == null || overWrite)) {
-            params[name] = val
-        }
-    }
-
-    /**
      * Helper for adding a environment value in tests
      */
     void addEnvVar(String name, String val) {
