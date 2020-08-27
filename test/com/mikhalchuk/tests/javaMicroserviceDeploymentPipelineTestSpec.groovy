@@ -15,12 +15,12 @@ class javaMicroserviceDeploymentPipelineTestSpec extends PipelineSpockTestBase {
         mockInfraFolderName(this)
     }
 
-    def "test pricing ms deploy pipeline"() {
+    def "test pricing ms deploy dev pipeline"() {
         given:
         def script = loadScript('vars/javaMicroserviceDeploymentPipeline.groovy')
 
         and:
-        script.getBinding().setVariable('JOB_NAME', 'pricing')
+        script.getBinding().setVariable('JOB_NAME', 'pricing-deploy-dev')
         script.getBinding().setVariable('BUILD_NUMBER', '666')
         script.getBinding().setVariable('BRANCH_NAME', 'develop')
         script.getBinding().setVariable('BUILD_USER', 'mikhalchuk')
@@ -29,11 +29,33 @@ class javaMicroserviceDeploymentPipelineTestSpec extends PipelineSpockTestBase {
         script.call({
             service = 'pricing'
             namespaces = ['dev-dev']
-            podResources = PodResources.PRICING_DEV_DEV
+            podResources = PodResources.PRICING_DEV
         })
 
         then:
-        testNonRegression()
+        testNonRegression("pricing")
+        assertJobStatusSuccess()
+    }
+
+    def "test calculation ms deploy dev pipeline"() {
+        given:
+        def script = loadScript('vars/javaMicroserviceDeploymentPipeline.groovy')
+
+        and:
+        script.getBinding().setVariable('JOB_NAME', 'calculation-deploy-dev')
+        script.getBinding().setVariable('BUILD_NUMBER', '666')
+        script.getBinding().setVariable('BRANCH_NAME', 'develop')
+        script.getBinding().setVariable('BUILD_USER', 'mikhalchuk')
+
+        when:
+        script.call({
+            service = 'calculation'
+            namespaces = ['dev-dev']
+            podResources = PodResources.CALCULATION_DEV
+        })
+
+        then:
+        testNonRegression("calculation")
         assertJobStatusSuccess()
     }
 }

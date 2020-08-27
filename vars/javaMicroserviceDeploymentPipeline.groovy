@@ -1,7 +1,7 @@
 def call(body) {
     def ctx = setUpContext(body)
 
-    initDockerImageChoiceParameter()
+    initDockerImageChoiceParameter(ctx)
 
     pipeline {
         agent { label 'java-deploy' }
@@ -151,7 +151,7 @@ def hostByNs(ns) {
     return ns.contains('-') ? "${ns.split('-')[1]}.${ns.split('-')[0]}" : ns
 }
 
-def initDockerImageChoiceParameter() {
+def initDockerImageChoiceParameter(ctx) {
     properties([
         parameters([
             [
@@ -164,7 +164,7 @@ def initDockerImageChoiceParameter() {
                 script: [
                     $class: 'GroovyScript', 
                     fallbackScript: [classpath: [], sandbox: true, script: '["error :("]'], 
-                    script: [classpath: [], sandbox: true, script: '''
+                    script: [classpath: [], sandbox: true, script: """
                         import java.util.logging.Level 
                         import java.util.logging.Logger
 
@@ -186,7 +186,7 @@ def initDockerImageChoiceParameter() {
                         try {      
                             log.info("Start fetching tags...")
                             
-                            def response = ["curl", "-H", "Host: dockerhub-vip.alutech.local", "-k", "https://10.100.20.33/v2/pricing/tags/list"].execute().text
+                            def response = ["curl", "-k", "https://dockerhub-vip.alutech.local/v2/${ctx.service}/tags/list"].execute().text
                             
                             log.info("Response from docker hub: " + response)
 
@@ -194,7 +194,7 @@ def initDockerImageChoiceParameter() {
                         } catch (Exception e) {
                             e.printStackTrace()
                         }
-                    ''']
+                    """]
                 ]
             ]
         ])

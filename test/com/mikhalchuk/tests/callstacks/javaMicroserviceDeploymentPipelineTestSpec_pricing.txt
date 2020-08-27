@@ -25,7 +25,7 @@
                         try {      
                             log.info("Start fetching tags...")
                             
-                            def response = ["curl", "-H", "Host: dockerhub-vip.alutech.local", "-k", "https://10.100.20.33/v2/pricing/tags/list"].execute().text
+                            def response = ["curl", "-k", "https://dockerhub-vip.alutech.local/v2/pricing/tags/list"].execute().text
                             
                             log.info("Response from docker hub: " + response)
 
@@ -80,7 +80,7 @@ image:
 service:
   externalPort: 80
   internalPort: 8080
-jenkinsBuildNumber: pricing-666
+jenkinsBuildNumber: pricing-deploy-dev-666
 host: pricing.dev.dev.in.in.alutech24.com
 resources:
   resources:
