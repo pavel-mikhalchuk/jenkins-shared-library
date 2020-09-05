@@ -75,10 +75,17 @@ def defineMoreContextBasedOnUserInput(ctx) {
     ctx.helmRelease = "${ctx.service}-${ctx.namespace}"
     
     //// env-specific (dev VS prod)
-    ctx.env = ctx.namespace == 'prod' ? 'prod' : 'dev'
-    ////  ////  //// //// //// //// ////  ////  //// //// //// ////
+    if (!ctx.env) {
+        ctx.env = ctx.namespace == 'prod' ? 'prod' : 'dev'
+    }
     ctx.kubeStateFolder = "${ctx.infraFolder}/kube-${ctx.env}/cluster-state/alutech-services/${ctx.namespace}/${ctx.service}/raw-manifests"
-    ctx.envSpecificHelmValues = ctx.env == 'prod' ? "environment: ${ctx.env}" : "host: ${hostName(ctx)}"
+    if (!ctx.ingress) {
+        ctx.ingress = defaultIngress(ctx)
+    }
+    ctx.envSpecificHelmValues = [
+        environment: ctx.env == 'prod' ? "environment: ${ctx.env}" : "",
+        host: ctx.ingress.enabled ? "host: ${resolveIngressHost(ctx)}" : ""
+    ]
     ////  ////  //// //// //// ////////  ////  //// //// //// ////
 }
 
@@ -115,7 +122,8 @@ service:
   externalPort: 80
   internalPort: 8080
 jenkinsBuildNumber: ${ctx.jenkinsBuildNumber}
-${ctx.envSpecificHelmValues}
+${ctx.envSpecificHelmValues.host}
+${ctx.envSpecificHelmValues.environment}
 ${ctx.podResources}"""
 }
 
@@ -143,12 +151,24 @@ def notifyArgoCD() {
     sh 'curl -k -X POST https://git-events-publisher.in.in.alutech24.com/push'
 }
 
-def hostName(ctx) {
-    return "${ctx.service}.${hostByNs(ctx.namespace)}.in.in.alutech24.com"
-}
+def resolveIngressHost(ctx) {
+    if (ctx.ingress.host instanceof Closure) {
+        def hostByNs = { ns->
+            return ns.contains('-') ? "${ns.split('-')[1]}.${ns.split('-')[0]}" : ns
+        }
 
-def hostByNs(ns) {
-    return ns.contains('-') ? "${ns.split('-')[1]}.${ns.split('-')[0]}" : ns
+        def ingUtils = [
+            svc_ns_inin: {
+                return "${ctx.service}.${hostByNs(ctx.namespace)}.in.in.alutech24.com"
+            },
+            svc_prod: {
+                return "${ctx.service}.alutech24.com"
+            }
+        ]
+        return ctx.ingress.host.call(ingUtils)
+    } else {
+        return ctx.ingress.host
+    }
 }
 
 def initDockerImageChoiceParameter(ctx) {
@@ -199,4 +219,10 @@ def initDockerImageChoiceParameter(ctx) {
             ]
         ])
     ])
+}
+
+def defaultIngress(ctx) {
+    return ctx.env == 'dev'
+            ? [ enabled: true, host: { ingUtils-> "${ingUtils.svc_ns_inin()}" } ]
+            : [ enabled: false ]
 }

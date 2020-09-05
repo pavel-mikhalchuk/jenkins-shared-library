@@ -39,4 +39,9 @@ class MockUtils {
         test.helper.addShMock('echo infra-$(date +"%d-%m-%Y_%H-%M-%S")',
                 'infra-06-06-2020_06-06-06', 0)
     }
+
+    static void mockGitRevParse(PipelineSpockTestBase test) {
+        test.helper.addShMock('echo $(git rev-parse HEAD)',
+                'bbfcd9f9632d4d8d7a9b7b4f0f155f16c78660eb', 0)
+    }
 }

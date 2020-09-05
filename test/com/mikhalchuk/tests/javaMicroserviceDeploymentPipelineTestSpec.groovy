@@ -15,47 +15,64 @@ class javaMicroserviceDeploymentPipelineTestSpec extends PipelineSpockTestBase {
         mockInfraFolderName(this)
     }
 
-    def "test pricing ms deploy dev pipeline"() {
+    def "test java ms deploy pipeline 1.0"() {
         given:
-        def script = loadScript('vars/javaMicroserviceDeploymentPipeline.groovy')
+        def pipeline = loadScript('vars/javaMicroserviceDeploymentPipeline.groovy')
 
         and:
-        script.getBinding().setVariable('JOB_NAME', 'pricing-deploy-dev')
-        script.getBinding().setVariable('BUILD_NUMBER', '666')
-        script.getBinding().setVariable('BRANCH_NAME', 'develop')
-        script.getBinding().setVariable('BUILD_USER', 'mikhalchuk')
+        pipeline.getBinding().setVariable('JOB_NAME', "${P_SERVICE}-deploy-${P_ENV}")
+        pipeline.getBinding().setVariable('BUILD_NUMBER', '666')
+        pipeline.getBinding().setVariable('BRANCH_NAME', P_BRANCH)
+        pipeline.getBinding().setVariable('BUILD_USER', 'mikhalchuk')
 
         when:
-        script.call({
-            service = 'pricing'
-            namespaces = ['dev-dev']
-            podResources = PodResources.PRICING_DEV
+        pipeline.call({
+            service = P_SERVICE
+            namespaces = [P_NAMESPACE]
+            podResources = P_POD_RESOURCES
         })
 
         then:
-        testNonRegression("pricing")
+        testNonRegression("${P_SERVICE}_${P_ENV}_${P_NAMESPACE}")
         assertJobStatusSuccess()
+
+        where:
+        P_SERVICE     | P_BRANCH   | P_ENV  | P_NAMESPACE | P_POD_RESOURCES
+        "pricing"     | "develop"  | "dev"  | "dev-dev"   | PodResources.PRICING_DEV
+        "pricing"     | "develop"  | "dev"  | "tst-test"  | PodResources.PRICING_DEV
+        "pricing"     | "master"   | "prod" | "prod"      | PodResources.PRICING_DEV
     }
 
-    def "test calculation ms deploy dev pipeline"() {
+    def "test java ms deploy pipeline 1.1"() {
         given:
-        def script = loadScript('vars/javaMicroserviceDeploymentPipeline.groovy')
+        def pipeline = loadScript('vars/javaMicroserviceDeploymentPipeline.groovy')
 
         and:
-        script.getBinding().setVariable('JOB_NAME', 'calculation-deploy-dev')
-        script.getBinding().setVariable('BUILD_NUMBER', '666')
-        script.getBinding().setVariable('BRANCH_NAME', 'develop')
-        script.getBinding().setVariable('BUILD_USER', 'mikhalchuk')
+        pipeline.getBinding().setVariable('JOB_NAME', "${P_SERVICE}-deploy-${P_ENV}")
+        pipeline.getBinding().setVariable('BUILD_NUMBER', '666')
+        pipeline.getBinding().setVariable('BRANCH_NAME', P_BRANCH)
+        pipeline.getBinding().setVariable('BUILD_USER', 'mikhalchuk')
 
         when:
-        script.call({
-            service = 'calculation'
-            namespaces = ['dev-dev']
-            podResources = PodResources.CALCULATION_DEV
+        pipeline.call({
+            service = P_SERVICE
+            env = P_ENV
+            namespaces = [P_NAMESPACE]
+            ingress = P_INGRESS
+            podResources = P_POD_RESOURCES
         })
 
         then:
-        testNonRegression("calculation")
+        testNonRegression("${P_SERVICE}_${P_ENV}_${P_NAMESPACE}")
         assertJobStatusSuccess()
+
+        where:
+        P_SERVICE     | P_BRANCH   | P_ENV  | P_NAMESPACE | P_INGRESS              | P_POD_RESOURCES
+        "pricing"     | "develop"  | "dev"  | "dev-dev"   | Ingresses.SVC_NS_IN_IN | PodResources.PRICING_DEV
+        "pricing"     | "develop"  | "dev"  | "tst-test"  | Ingresses.SVC_NS_IN_IN | PodResources.PRICING_DEV
+        "pricing"     | "master"   | "prod" | "prod"      | Ingresses.DISABLED     | PodResources.PRICING_DEV
+        "calculation" | "develop"  | "dev"  | "dev-dev"   | Ingresses.SVC_NS_IN_IN | PodResources.CALCULATION_DEV
+        "calculation" | "develop"  | "dev"  | "tst-test"  | Ingresses.SVC_NS_IN_IN | PodResources.CALCULATION_DEV
+        "calculation" | "master"   | "prod" | "prod"      | Ingresses.SVC_PROD     | PodResources.CALCULATION_PROD
     }
 }

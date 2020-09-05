@@ -50,7 +50,7 @@ def defineMoreContextBasedOnUserInput(ctx) {
 }
 
 def mavenBuild(ctx) {
-    sh "mvn clean package -DskipTests=${ctx.noUnitTests}"
+    sh "mvn clean package ${ctx.noUnitTests ? '-DskipTests=true' : ''}"
 }
 
 def dockerBuild(ctx) {
