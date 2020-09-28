@@ -1,4 +1,5 @@
    javaMicroserviceBuildPipeline.getBinding()
+   javaMicroserviceBuildPipeline.getBinding()
    javaMicroserviceBuildPipeline.call(groovy.lang.Closure)
       javaMicroserviceBuildPipeline.pipeline(groovy.lang.Closure)
          javaMicroserviceBuildPipeline.agent(groovy.lang.Closure)

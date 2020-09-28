@@ -50,7 +50,7 @@ def defineMoreContextBasedOnUserInput(ctx) {
 }
 
 def mavenBuild(ctx) {
-    sh "mvn clean package ${ctx.noUnitTests ? '-DskipTests=true' : ''}"
+    sh "mvn clean package${ctx.noUnitTests ? ' -DskipTests=true' : ''}"
 }
 
 def dockerBuild(ctx) {
@@ -86,7 +86,11 @@ def dockerImgTag(ctx) {
 }
 
 def currentTimestamp() {
+    def clock = env.IS_CLOCK_MOCKED == 'true'
+            ? MOCKED_CLOCK
+            : java.time.Clock.system(java.time.ZoneId.of("UTC+3"))
+
     java.time.ZonedDateTime
-        .now(java.time.ZoneId.of("UTC+3"))
+        .now(clock)
         .format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss"))
 }
