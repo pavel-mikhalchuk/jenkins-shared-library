@@ -2,27 +2,20 @@ def call(body) {
     def ctx = setUpContext(body)
 
     pipeline {
-        agent { label 'java-build' }
+        agent { label 'docker-build' }
         options { 
             buildDiscarder(logRotator(numToKeepStr: '5'))
             timestamps () 
         }
         stages {
-            stage('maven') {
+            stage('docker') {
                 steps {
-                    container('maven') {
-                        // This step is very important!!! 
+                    container('docker') {
+                        // This step is very important!!!
                         // Please do not remove it unless you find a better way without introducing "Init" stage because it's ugly :)"
                         // Later stages depend on it.
                         defineMoreContextBasedOnUserInput(ctx)
 
-                        mavenBuild(ctx)
-                    }
-                }
-            }
-            stage('docker') {
-                steps {
-                    container('docker') {
                         dockerBuild(ctx)
                         dockerPush(ctx)
                     }
