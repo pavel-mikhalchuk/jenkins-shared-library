@@ -9,7 +9,12 @@ def call(body) {
             buildDiscarder(logRotator(numToKeepStr: '5'))
             timestamps () 
         }
-        userDefinedParameters(ctx)
+        if (ctx.params) {
+            parameters {
+                ctx.params.delegate = this
+                ctx.params()
+            }
+        }
         stages {
             stage('maven') {
                 steps {
@@ -42,15 +47,6 @@ def setUpContext(body) {
     // defining more parameters for ourselves
     ctx.dockerImages = []
     return ctx
-}
-
-def userDefinedParameters(ctx) {
-    if (ctx.params) {
-        parameters {
-            ctx.params.delegate = this
-            ctx.params()
-        }
-    }
 }
 
 def defineMoreContextBasedOnUserInput(ctx) {
