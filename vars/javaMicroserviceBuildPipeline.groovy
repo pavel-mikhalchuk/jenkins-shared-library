@@ -1,3 +1,5 @@
+import com.mikhalchuk.*
+
 def call(body) {
     def ctx = setUpContext(body)
 
@@ -7,6 +9,7 @@ def call(body) {
             buildDiscarder(logRotator(numToKeepStr: '5'))
             timestamps () 
         }
+        userDefinedParameters(ctx)
         stages {
             stage('maven') {
                 steps {
@@ -34,41 +37,18 @@ def call(body) {
 
 def setUpContext(body) {
     // client-defined parameters in the body block
-    def ctx = [:]
-    body.resolveStrategy = Closure.DELEGATE_FIRST
-    body.delegate = ctx
-    body()
-
-    checkBodyBlockParameters(body)
+    def ctx = JavaMicroserviceBuildPipelineContracts.resolve(ObjUtils.closureToMap(body))
 
     // defining more parameters for ourselves
     ctx.dockerImages = []
     return ctx
 }
 
-// This method makes sure that all required parameters are set
-// the reason why those parameters may not be set is because of
-// evolution of this pipeline.
-//
-// For example in v1.0 "containerImages" was not available.
-// Later in v1.1 it was introduced
-//
-// See "javaMicroserviceBuildPipelineTestSpec" test
-// for api contract evolution details. It has tests for all versions of the pipeline.
-//
-// Maybe this is not the best strategy to support all possible
-// API contracts within the single version of the pipeline.
-// However having all clients looking at the same master version
-// makes it possible to deploy changes to everyone in one shot
-// (since I'm responsible to support pipelines of all java services it is super handy :)).
-// And we don't need to create tags/branches for specific versions of this pipeline.
-// Try googling Jenkins Shared Library versioning.
-def checkBodyBlockParameters(ctx) {
-    if (!ctx.containerImages) {
-        if (ctx.service) {
-            ctx.containerImages = [
-                [ source: '.', name: ctx.service ]
-            ]
+def userDefinedParameters(ctx) {
+    if (ctx.params) {
+        parameters {
+            ctx.params.delegate = this
+            ctx.params()
         }
     }
 }
@@ -79,7 +59,9 @@ def defineMoreContextBasedOnUserInput(ctx) {
 }
 
 def mavenBuild(ctx) {
-    sh "mvn clean package${ctx.noUnitTests ? ' -DskipTests=true' : ''}"
+    def mvnParams = ObjUtils.closureToMap(ctx.maven, [params: params])
+
+    sh "mvn clean package${mvnParams.skipTests ? ' -DskipTests=true' : ''}${mvnParams.args ? ' ' + mvnParams.args : ''}"
 }
 
 def dockerBuild(ctx) {

@@ -25,10 +25,10 @@ class javaMicroserviceBuildPipelineTestSpec extends PipelineSpockTestBase {
         mockClock(pipeline)
 
         when:
-        pipeline.call({
+        pipeline {
             service = P_SERVICE
             noUnitTests = P_NO_UNIT_TESTS
-        })
+        }
 
         then:
         testNonRegression("${P_SERVICE}_no_unit_tests_${P_NO_UNIT_TESTS}")
@@ -49,13 +49,13 @@ class javaMicroserviceBuildPipelineTestSpec extends PipelineSpockTestBase {
         mockClock(pipeline)
 
         when:
-        pipeline.call({
+        pipeline {
             noUnitTests = P_NO_UNIT_TESTS
             containerImages = [
                 [ source: './image-1', name: "${P_SERVICE}_1" ],
                 [ source: './image-2', name: "${P_SERVICE}_2" ],
             ]
-        })
+        }
 
         then:
         testNonRegression("${P_SERVICE}_no_unit_tests_${P_NO_UNIT_TESTS}")
@@ -65,6 +65,38 @@ class javaMicroserviceBuildPipelineTestSpec extends PipelineSpockTestBase {
         P_SERVICE | P_NO_UNIT_TESTS
         "multi-container-service" | false
         "multi-container-service" | true
+    }
+
+    def "test java ms build pipeline 1.2"() {
+        given:
+        def pipeline = loadScript('vars/javaMicroserviceBuildPipeline.groovy')
+
+        and:
+        pipeline.getBinding().setVariable('BRANCH_NAME', "master")
+        mockClock(pipeline)
+
+        when:
+        pipeline {
+            params = {
+                string(name: 'SOME_PARAMETER', defaultValue: "someValue")
+            }
+            maven = {
+                skipTests = P_SKIP_TESTS
+                args = "-DsomeParameter=${params.SOME_PARAMETER}"
+            }
+            containerImages = [
+                [ source: '.', name: "${P_SERVICE}" ]
+            ]
+        }
+
+        then:
+        testNonRegression("${P_SERVICE}_skip_tests_${P_SKIP_TESTS}")
+        assertJobStatusSuccess()
+
+        where:
+        P_SERVICE                        | P_SKIP_TESTS
+        "service_with_custom_mvn_params" | false
+        "service_with_custom_mvn_params" | true
     }
 
     def mockClock(pipeline) {
