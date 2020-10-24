@@ -47,8 +47,14 @@ def setUpContext(body) {
 
 def initUserDefinedParameters(ctx) {
     if (ctx.params) {
-        ctx.params.delegate = this
-        properties([parameters(ctx.params())])
+        def interceptor = new ParamsInterceptor(this)
+        interceptor.delegate = this
+
+        ctx.params.resolveStrategy = Closure.DELEGATE_ONLY
+        ctx.params.delegate = interceptor
+        ctx.params()
+
+        properties([parameters(interceptor.params)])
     }
 }
 
