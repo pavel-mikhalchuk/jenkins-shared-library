@@ -3,7 +3,7 @@ import com.mikhalchuk.*
 def call(body) {
     def ctx = setUpContext(body)
 
-    initUserDefinecdParameters(ctx)
+    initUserDefinedParameters(ctx)
 
     pipeline {
         agent { label 'java-build' }
