@@ -3,13 +3,14 @@ import com.mikhalchuk.*
 def call(body) {
     def ctx = setUpContext(body)
 
-    initUserDefinedParameters(ctx)
-
     pipeline {
         agent { label 'java-build' }
         options { 
             buildDiscarder(logRotator(numToKeepStr: '5'))
             timestamps () 
+        }
+        script {
+            initUserDefinedParameters(ctx)
         }
         stages {
             stage('maven') {
