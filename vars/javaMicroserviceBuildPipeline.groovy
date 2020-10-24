@@ -3,14 +3,13 @@ import com.mikhalchuk.*
 def call(body) {
     def ctx = setUpContext(body)
 
+    initUserDefinedParameters(ctx)
+
     pipeline {
         agent { label 'java-build' }
         options { 
             buildDiscarder(logRotator(numToKeepStr: '5'))
             timestamps () 
-        }
-        script {
-            initUserDefinedParameters(ctx)
         }
         stages {
             stage('maven') {
@@ -47,15 +46,9 @@ def setUpContext(body) {
 }
 
 def initUserDefinedParameters(ctx) {
-    println ctx.params
     if (ctx.params) {
-        println 'in params'
-        parameters {
-            ctx.params.delegate = this
-            println 'calling params'
-            ctx.params()
-            println 'done calling params'
-        }
+        ctx.params.delegate = this
+        properties([parameters(ctx.params())])
     }
 }
 
