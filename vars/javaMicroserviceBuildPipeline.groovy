@@ -3,17 +3,13 @@ import com.mikhalchuk.*
 def call(body) {
     def ctx = setUpContext(body)
 
+    initUserDefinecdParameters(ctx)
+
     pipeline {
         agent { label 'java-build' }
         options { 
             buildDiscarder(logRotator(numToKeepStr: '5'))
             timestamps () 
-        }
-        if (ctx.params) {
-            parameters {
-                ctx.params.delegate = this
-                ctx.params()
-            }
         }
         stages {
             stage('maven') {
@@ -47,6 +43,15 @@ def setUpContext(body) {
     // defining more parameters for ourselves
     ctx.dockerImages = []
     return ctx
+}
+
+def initUserDefinedParameters(ctx) {
+    if (ctx.params) {
+        parameters {
+            ctx.params.delegate = this
+            ctx.params()
+        }
+    }
 }
 
 def defineMoreContextBasedOnUserInput(ctx) {
