@@ -10,6 +10,6 @@ class ParamsInterceptor {
     }
 
     def invokeMethod(String name, Object args) {
-        params.add(delegate."${name}"(args))
+        params.add(delegate."${name}"(*:args))
     }
 }
