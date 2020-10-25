@@ -21,7 +21,7 @@ class dockerBuildPipelineTestSpec extends PipelineSpockTestBase {
         def pipeline = loadScript('vars/dockerBuildPipeline.groovy')
 
         and:
-        pipeline.getBinding().setVariable('BRANCH_NAME', "master")
+        pipeline.getBinding().setVariable('BRANCH_NAME', "super/master")
         mockClock(pipeline)
 
         when:

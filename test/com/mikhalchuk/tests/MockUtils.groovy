@@ -4,7 +4,7 @@ package com.mikhalchuk.tests
 import com.mikhalchuk.testSupport.PipelineSpockTestBase
 
 class MockUtils {
-    static void mockDockerImgTagParam(PipelineSpockTestBase test) {
+    static void mockParameters(PipelineSpockTestBase test) {
         def isDockerImgTagChoiceParam = { params ->
             params.get(0) instanceof Map && params.get(0)?.name == "IMAGE_TAG"
         }

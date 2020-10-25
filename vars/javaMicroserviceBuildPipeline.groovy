@@ -71,8 +71,8 @@ def mavenBuild(ctx) {
 
 def dockerBuild(ctx) {
     ctx.containerImages.each {
-        def img = it.name + ':' + dockerImgTag(ctx)
-        def imgLatest = it.name + ':latest'
+        def img = (it.name + ':' + dockerImgTag(ctx)).toLowerCase()
+        def imgLatest = (it.name + ':latest').toLowerCase()
 
         sh "docker build -t ${img} ${it.source}"
         sh "docker tag ${img} ${imgLatest}"
@@ -100,7 +100,7 @@ def gitRev() {
 }
 
 def dockerImgTag(ctx) {
-    "${currentTimestamp()}__${ctx.currentBranchName}__${ctx.gitRev}"
+    "${currentTimestamp()}__${ctx.currentBranchName.replace('/', '_')}__${ctx.gitRev}"
 }
 
 def currentTimestamp() {

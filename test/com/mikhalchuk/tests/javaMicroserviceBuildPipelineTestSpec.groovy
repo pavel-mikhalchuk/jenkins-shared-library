@@ -8,10 +8,12 @@ import java.time.ZoneId
 
 import static com.mikhalchuk.tests.MockUtils.mockContainer
 import static com.mikhalchuk.tests.MockUtils.mockGitRevParse
+import static com.mikhalchuk.tests.MockUtils.mockParameters
 
 class javaMicroserviceBuildPipelineTestSpec extends PipelineSpockTestBase {
 
     def setup() {
+        mockParameters(this)
         mockContainer(this)
         mockGitRevParse(this)
     }
@@ -21,7 +23,7 @@ class javaMicroserviceBuildPipelineTestSpec extends PipelineSpockTestBase {
         def pipeline = loadScript('vars/javaMicroserviceBuildPipeline.groovy')
 
         and:
-        pipeline.getBinding().setVariable('BRANCH_NAME', "master")
+        pipeline.getBinding().setVariable('BRANCH_NAME', "super/master")
         mockClock(pipeline)
 
         when:
@@ -45,7 +47,7 @@ class javaMicroserviceBuildPipelineTestSpec extends PipelineSpockTestBase {
         def pipeline = loadScript('vars/javaMicroserviceBuildPipeline.groovy')
 
         and:
-        pipeline.getBinding().setVariable('BRANCH_NAME', "master")
+        pipeline.getBinding().setVariable('BRANCH_NAME', "super/master")
         mockClock(pipeline)
 
         when:
@@ -72,7 +74,7 @@ class javaMicroserviceBuildPipelineTestSpec extends PipelineSpockTestBase {
         def pipeline = loadScript('vars/javaMicroserviceBuildPipeline.groovy')
 
         and:
-        pipeline.getBinding().setVariable('BRANCH_NAME', "master")
+        pipeline.getBinding().setVariable('BRANCH_NAME', "super/master")
         mockClock(pipeline)
 
         when:

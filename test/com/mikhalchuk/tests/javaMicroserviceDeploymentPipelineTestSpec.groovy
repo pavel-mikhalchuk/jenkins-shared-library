@@ -7,7 +7,7 @@ import static com.mikhalchuk.tests.MockUtils.*
 class javaMicroserviceDeploymentPipelineTestSpec extends PipelineSpockTestBase {
 
     def setup() {
-        mockDockerImgTagParam(this)
+        mockParameters(this)
         mockBuildUser(this)
         mockSlack(this)
         mockGit(this)
