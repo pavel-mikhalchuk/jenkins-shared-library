@@ -43,7 +43,7 @@ class PipelineTestHelper extends BasePipelineTest {
         helper.registerAllowedMethod('pipeline', [Closure.class], null)
         helper.registerAllowedMethod('options', [Closure.class], null)
 
-        // Handle endvironment section adding the env vars
+        // Handle environment section adding the env vars
         helper.registerAllowedMethod('environment', [Closure.class], { Closure c ->
 
             def envBefore = [env: binding.getVariable('env')]
@@ -63,33 +63,29 @@ class PipelineTestHelper extends BasePipelineTest {
             binding.setVariable('env', envNew)
         })
 
+        // Register the contained elements
+        helper.registerAllowedMethod('string', [Map.class], { Map stringParam ->
+            // Add the param default for a string
+            addParam(stringParam.name, stringParam.defaultValue)
+        })
+        helper.registerAllowedMethod('text', [Map.class], { Map textParam ->
+            // Add the param default for a text
+            addParam(textParam.name, textParam.defaultValue)
+        })
+        helper.registerAllowedMethod('booleanParam', [Map.class], { Map boolParam ->
+            // Add the param default for a booleanParam
+            addParam(boolParam.name, boolParam.defaultValue.toString().toBoolean())
+        })
+        helper.registerAllowedMethod('choice', [Map.class], { Map choiceParam ->
+            // Add the param default for a choice
+            addParam(choiceParam.name, choiceParam.choices.first())
+        })
+
         // Handle parameters section adding the default params
         helper.registerAllowedMethod('parameters', [Closure.class], { Closure parametersBody ->
 
-            // Register the contained elements
-            helper.registerAllowedMethod('string', [Map.class], { Map stringParam ->
-                // Add the param default for a string
-                addParam(stringParam.name, stringParam.defaultValue)
-            })
-            helper.registerAllowedMethod('text', [Map.class], { Map textParam ->
-                // Add the param default for a string
-                addParam(textParam.name, textParam.defaultValue)
-            })
-            helper.registerAllowedMethod('booleanParam', [Map.class], { Map boolParam ->
-                // Add the param default for a string
-                addParam(boolParam.name, boolParam.defaultValue.toString().toBoolean())
-            })
-            helper.registerAllowedMethod('choice', [Map.class], { Map choiceParam ->
-                // Add the param default for a string
-                addParam(choiceParam.name, choiceParam.choices.first())
-            })
-
             // Run the body closure
             def paramsResult = parametersBody()
-
-            // Unregister the contained elements
-            helper.unRegisterAllowedMethod('string', [Map.class])
-            helper.unRegisterAllowedMethod('booleanParam', [Map.class])
 
             // Result to higher level. Is this needed?
             return paramsResult
