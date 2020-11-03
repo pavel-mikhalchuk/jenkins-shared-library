@@ -1,3 +1,5 @@
+import com.mikhalchuk.*
+
 def call(body) {
     def ctx = setUpContext(body)
 
@@ -5,18 +7,18 @@ def call(body) {
 
     pipeline {
         agent { label 'helm-deploy' }
-        options { 
+        options {
             buildDiscarder(logRotator(numToKeepStr: '5'))
-            timestamps () 
+            timestamps ()
         }
-        parameters { 
-            choice(name: 'NAMESPACE', choices: ctx.namespaces, description: 'Kubernetes Namespace') 
-            text(name: 'RESOURCES', defaultValue: ctx.podResources, description: 'Kubernetes POD resources requests and limits + JavaOpts')
+        parameters {
+            choice(name: 'NAMESPACE', choices: ctx.namespaces, description: 'Kubernetes Namespace')
+            text(name: 'RESOURCES', defaultValue: Yaml.write([resources: ctx.helmValues.resources]), description: 'Kubernetes POD resources requests and limits + JavaOpts')
         }
         stages {
             stage('notify slack') {
                 steps {
-                    // This step is very important!!! 
+                    // This step is very important!!!
                     // Please do not remove it unless you find a better way without introducing "Init" stage because it's ugly :)"
                     // Later stages depend on it.
                     defineMoreContextBasedOnUserInput(ctx)
@@ -53,11 +55,8 @@ def call(body) {
 
 def setUpContext(body) {
     // client-defined parameters in the body block
-    def ctx = [:]
-    body.resolveStrategy = Closure.DELEGATE_FIRST
-    body.delegate = ctx
-    body()
-    
+    def ctx = HelmChartDeployPipelineContracts.resolve(ObjUtils.closureToMap(body))
+
     // defining more parameters for ourselves
     return ctx
 }
@@ -67,24 +66,13 @@ def defineMoreContextBasedOnUserInput(ctx) {
     ctx.dockerImage = "${ctx.service}:${params.IMAGE_TAG ?: 'latest'}"
     ctx.jenkinsBuildNumber = "${JOB_NAME}-${BUILD_NUMBER}"
     ctx.currentBranchName = "${BRANCH_NAME}"
-    ctx.podResources = "${params.RESOURCES}"
 
     ctx.infraFolder = sh(script: 'echo infra-$(date +"%d-%m-%Y_%H-%M-%S")', returnStdout: true).trim()
     ctx.helmChartFolder = "kubernetes/helm-chart/${ctx.service}"
     ctx.helmRelease = "${ctx.service}-${ctx.namespace}"
-    
+
     //// env-specific (dev VS prod)
-    if (!ctx.env) {
-        ctx.env = ctx.namespace == 'prod' ? 'prod' : 'dev'
-    }
     ctx.kubeStateFolder = "${ctx.infraFolder}/kube-${ctx.env}/cluster-state/alutech-services/${ctx.namespace}/${ctx.service}/raw-manifests"
-    if (!ctx.ingress) {
-        ctx.ingress = defaultIngress(ctx)
-    }
-    ctx.envSpecificHelmValues = [
-        environment: ctx.env == 'prod' ? "environment: ${ctx.env}" : "",
-        host: ctx.ingress.enabled ? "host: ${resolveIngressHost(ctx)}" : ""
-    ]
     ////  ////  //// //// //// ////////  ////  //// //// //// ////
 }
 
@@ -105,21 +93,46 @@ def checkoutInfraRepo(ctx) {
 }
 
 def writeHelmValuesYaml(ctx) {
-    writeFile file: "${ctx.helmChartFolder}/values.yaml", text: 
-        
-        """replicaCount: 1
-gitBranch: ${ctx.currentBranchName}
-image:
-  repository: dockerhub-vip.alutech.local
-  tag: ${ctx.dockerImage}
-  pullPolicy: IfNotPresent
-service:
-  externalPort: 80
-  internalPort: 8080
-jenkinsBuildNumber: ${ctx.jenkinsBuildNumber}
-${ctx.envSpecificHelmValues.host}
-${ctx.envSpecificHelmValues.environment}
-${ctx.podResources}"""
+    writeFile file: "${ctx.helmChartFolder}/values.yaml", text: helmValues(ctx)
+}
+
+def helmValues(ctx) {
+    def result = merge(defaultValues(ctx), ctx.helmValues)
+    if (result.host) {
+        result.host = resolveIngressHost(result.host, ctx)
+    }
+    Yaml.write(result, this).trim()
+}
+
+def static defaultValues(ctx) {
+    [
+        replicaCount: 1,
+        gitBranch: ctx.currentBranchName,
+        image: [
+            repository: 'dockerhub-vip.alutech.local',
+            tag: ctx.dockerImage,
+            pullPolicy: 'IfNotPresent'
+        ],
+        service: [
+            externalPort: 80,
+            internalPort: 8080
+        ],
+        jenkinsBuildNumber: ctx.jenkinsBuildNumber,
+        environment: ctx.env == 'prod' ? "${ctx.env}" : ""
+    ]
+}
+
+def merge(Map lhs, Map rhs) {
+    return rhs.inject(lhs.clone()) { map, entry ->
+        if (map[entry.key] instanceof Map && entry.value instanceof Map) {
+            map[entry.key] = merge(map[entry.key], entry.value)
+        } else if (map[entry.key] instanceof Collection && entry.value instanceof Collection) {
+            map[entry.key] += entry.value
+        } else {
+            map[entry.key] = entry.value
+        }
+        return map
+    }
 }
 
 def generateK8SManifests(ctx) {
@@ -138,7 +151,7 @@ def pushK8SManifests(ctx) {
             sh 'git add *'
             sh 'git commit -m "[jenkins]: ${JOB_NAME} - ${BUILD_NUMBER}"'
             sh 'git push http://${GIT_USERNAME}:${GIT_PASSWORD}@bb.alutech-mc.com:8080/scm/as/infra.git HEAD:master'
-        }                        
+        }
     }
 }
 
@@ -146,8 +159,8 @@ def notifyArgoCD() {
     sh 'curl -k -X POST https://git-events-publisher.in.in.alutech24.com/push'
 }
 
-def resolveIngressHost(ctx) {
-    if (ctx.ingress.host instanceof Closure) {
+def static resolveIngressHost(host, ctx) {
+    if (host instanceof Closure) {
         def hostByNs = { ns->
             return ns.contains('-') ? "${ns.split('-')[1]}.${ns.split('-')[0]}" : ns
         }
@@ -160,9 +173,9 @@ def resolveIngressHost(ctx) {
                 return "${ctx.service}.alutech24.com"
             }
         ]
-        return ctx.ingress.host.call(ingUtils)
+        return host.call(ingUtils)
     } else {
-        return ctx.ingress.host
+        return host
     }
 }
 
@@ -170,15 +183,15 @@ def initDockerImageChoiceParameter(ctx) {
     properties([
         parameters([
             [
-                $class: 'ChoiceParameter', 
-                choiceType: 'PT_SINGLE_SELECT', 
-                description: 'Docker image tags', 
+                $class: 'ChoiceParameter',
+                choiceType: 'PT_SINGLE_SELECT',
+                description: 'Docker image tags',
                 filterLength: 1,
                 filterable: true,
-                name: 'IMAGE_TAG', 
+                name: 'IMAGE_TAG',
                 script: [
-                    $class: 'GroovyScript', 
-                    fallbackScript: [classpath: [], sandbox: true, script: '["error :("]'], 
+                    $class: 'GroovyScript',
+                    fallbackScript: [classpath: [], sandbox: true, script: '["error :("]'],
                     script: [classpath: [], sandbox: true, script: """
                         import java.util.logging.Level 
                         import java.util.logging.Logger
@@ -214,10 +227,4 @@ def initDockerImageChoiceParameter(ctx) {
             ]
         ])
     ])
-}
-
-def defaultIngress(ctx) {
-    return ctx.env == 'dev'
-            ? [ enabled: true, host: { ingUtils-> "${ingUtils.svc_ns_inin()}" } ]
-            : [ enabled: false ]
 }

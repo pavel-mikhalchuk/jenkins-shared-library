@@ -70,4 +70,26 @@ class HelmValues {
             ],
             javaOpts: '-Xms1024m -Xmx1024m -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.port=9012 -Dcom.sun.management.jmxremote.rmi.port=9012 -Djava.rmi.server.hostname=127.0.0.1'
     ]
+
+    static def SUPER_SERVICE = [
+            image: [
+                additionalProperty: 'super-service-image-additional-property'
+            ],
+            superServiceDatabase: [
+                password: { sh (script: '$(super-service-get-password-shell-command)', returnStdout: true) }
+            ],
+            host: Ingresses.SVC_PROD.host,
+            resources: [
+                resources: [
+                    requests: [
+                        memory: '1Gi',
+                        cpu: '1'
+                    ],
+                    limits: [
+                        memory: '1Gi',
+                        cpu: '1'
+                    ]
+                ]
+            ],
+    ]
 }

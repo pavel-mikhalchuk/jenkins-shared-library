@@ -58,13 +58,18 @@ class Yaml {
         return map
     }
 
-    static def write(values, indent = '') {
+    static def write(values, delegateForClosureValues = this) {
+        doWrite(values, '', delegateForClosureValues)
+    }
+
+    private static def doWrite(values, indent = '', delegate = this) {
         def result = ''
         values.each {
             if (it.value instanceof Map) {
                 result += "${indent}${it.key}:\n"
-                result += write(it.value, indent + '  ')
+                result += doWrite(it.value, indent + '  ', delegate)
             } else if (it.value instanceof Closure) {
+                it.value.delegate = delegate
                 result += "${indent}${it.key}: ${it.value()}\n"
             } else if (it.value instanceof String) {
                 if (it.value?.trim()) {
