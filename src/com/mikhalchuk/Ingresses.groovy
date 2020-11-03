@@ -1,4 +1,4 @@
-package com.mikhalchuk.tests
+package com.mikhalchuk
 
 class Ingresses {
 

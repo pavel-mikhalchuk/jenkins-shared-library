@@ -1,5 +1,6 @@
 package com.mikhalchuk.tests
 
+import com.mikhalchuk.Ingresses
 import com.mikhalchuk.testSupport.PipelineSpockTestBase
 
 import static com.mikhalchuk.tests.MockUtils.*
@@ -26,11 +27,11 @@ class javaMicroserviceDeploymentPipelineTestSpec extends PipelineSpockTestBase {
         pipeline.getBinding().setVariable('BUILD_USER', 'mikhalchuk')
 
         when:
-        pipeline.call({
+        pipeline {
             service = P_SERVICE
             namespaces = [P_NAMESPACE]
             podResources = P_POD_RESOURCES
-        })
+        }
 
         then:
         testNonRegression("${P_SERVICE}_${P_ENV}_${P_NAMESPACE}")
@@ -70,9 +71,41 @@ class javaMicroserviceDeploymentPipelineTestSpec extends PipelineSpockTestBase {
         P_SERVICE     | P_BRANCH   | P_ENV  | P_NAMESPACE | P_INGRESS              | P_POD_RESOURCES
         "pricing"     | "develop"  | "dev"  | "dev-dev"   | Ingresses.SVC_NS_IN_IN | PodResources.PRICING_DEV
         "pricing"     | "develop"  | "dev"  | "tst-test"  | Ingresses.SVC_NS_IN_IN | PodResources.PRICING_DEV
-        "pricing"     | "master"   | "prod" | "prod"      | Ingresses.DISABLED     | PodResources.PRICING_DEV
+        "pricing"     | "master"   | "prod" | "prod"      | Ingresses.DISABLED     | PodResources.PRICING_PROD
         "calculation" | "develop"  | "dev"  | "dev-dev"   | Ingresses.SVC_NS_IN_IN | PodResources.CALCULATION_DEV
         "calculation" | "develop"  | "dev"  | "tst-test"  | Ingresses.SVC_NS_IN_IN | PodResources.CALCULATION_DEV
         "calculation" | "master"   | "prod" | "prod"      | Ingresses.SVC_PROD     | PodResources.CALCULATION_PROD
+    }
+
+    def "test java ms deploy pipeline 1.2"() {
+        given:
+        def pipeline = loadScript('vars/javaMicroserviceDeploymentPipeline.groovy')
+
+        and:
+        pipeline.getBinding().setVariable('JOB_NAME', "${P_SERVICE}-deploy-${P_ENV}")
+        pipeline.getBinding().setVariable('BUILD_NUMBER', '666')
+        pipeline.getBinding().setVariable('BRANCH_NAME', P_BRANCH)
+        pipeline.getBinding().setVariable('BUILD_USER', 'mikhalchuk')
+
+        when:
+        pipeline.call {
+            service = P_SERVICE
+            env = P_ENV
+            namespaces = [P_NAMESPACE]
+            helmValues = P_HELM_VALUES
+        }
+
+        then:
+        testNonRegression("${P_SERVICE}_${P_ENV}_${P_NAMESPACE}")
+        assertJobStatusSuccess()
+
+        where:
+        P_SERVICE     | P_BRANCH   | P_ENV  | P_NAMESPACE | P_HELM_VALUES
+        "pricing"     | "develop"  | "dev"  | "dev-dev"   | HelmValues.PRICING_DEV
+        "pricing"     | "develop"  | "dev"  | "tst-test"  | HelmValues.PRICING_DEV
+        "pricing"     | "master"   | "prod" | "prod"      | HelmValues.PRICING_PROD
+        "calculation" | "develop"  | "dev"  | "dev-dev"   | HelmValues.CALCULATION_DEV
+        "calculation" | "develop"  | "dev"  | "tst-test"  | HelmValues.CALCULATION_DEV
+        "calculation" | "master"   | "prod" | "prod"      | HelmValues.CALCULATION_PROD
     }
 }

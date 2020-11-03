@@ -37,7 +37,7 @@
       javaMicroserviceDeploymentPipeline.properties([null])
       javaMicroserviceDeploymentPipeline.pipeline(groovy.lang.Closure)
          javaMicroserviceDeploymentPipeline.agent(groovy.lang.Closure)
-            javaMicroserviceDeploymentPipeline.label(java-deploy)
+            javaMicroserviceDeploymentPipeline.label(helm-deploy)
          javaMicroserviceDeploymentPipeline.options(groovy.lang.Closure)
             javaMicroserviceDeploymentPipeline.logRotator({numToKeepStr=5})
             javaMicroserviceDeploymentPipeline.buildDiscarder(null)
@@ -71,18 +71,17 @@ calculation:latest
                javaMicroserviceDeploymentPipeline.steps(groovy.lang.Closure)
                   javaMicroserviceDeploymentPipeline.container(helm, groovy.lang.Closure)
                      javaMicroserviceDeploymentPipeline.sh(cp src/main/resources/application.tst-test.properties kubernetes/helm-chart/calculation/application.properties)
-                     javaMicroserviceDeploymentPipeline.writeFile({file=kubernetes/helm-chart/calculation/values.yaml, text=replicaCount: 1
-gitBranch: develop
+                     javaMicroserviceDeploymentPipeline.writeFile({file=kubernetes/helm-chart/calculation/values.yaml, text=replicaCount: "1"
+gitBranch: "develop"
 image:
-  repository: dockerhub-vip.alutech.local
-  tag: calculation:latest
-  pullPolicy: IfNotPresent
+  repository: "dockerhub-vip.alutech.local"
+  tag: "calculation:latest"
+  pullPolicy: "IfNotPresent"
 service:
-  externalPort: 80
-  internalPort: 8080
-jenkinsBuildNumber: calculation-deploy-dev-666
-host: calculation.test.tst.in.in.alutech24.com
-
+  externalPort: "80"
+  internalPort: "8080"
+jenkinsBuildNumber: "calculation-deploy-dev-666"
+host: "calculation.test.tst.in.in.alutech24.com"
 resources:
   resources:
     requests:
