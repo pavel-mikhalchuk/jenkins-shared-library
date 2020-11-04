@@ -15,18 +15,18 @@
                             log.info("Parsing response...")
 
                             def tags = response?.trim() ? new JsonSlurper().parseText(response).tags : []
-                            
+
                             log.info("Parsed!")
-                            
+
                             def hasLatest = tags.remove("latest")
                             return hasLatest ? tags.plus(0, ["latest"]) : tags
                         }
 
                         try {      
                             log.info("Start fetching tags...")
-                            
+
                             def response = ["curl", "-k", "https://dockerhub-vip.alutech.local/v2/calculation/tags/list"].execute().text
-                            
+
                             log.info("Response from docker hub: " + response)
 
                             return parse(response)
