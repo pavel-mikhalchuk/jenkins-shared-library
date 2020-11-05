@@ -36,7 +36,11 @@ def call(body) {
             stage('generate K8S manifests') {
                 steps {
                     container('helm') {
-                        helper.copyConfigToHelmChart(ctx)
+                        if (ctx.preDeploy) {
+                            helper.preDeploy(ctx)
+                        } else {
+                            helper.copyConfigToHelmChart(ctx)
+                        }
                         helper.writeHelmValuesYaml(ctx)
                         helper.generateK8SManifests(ctx)
                     }

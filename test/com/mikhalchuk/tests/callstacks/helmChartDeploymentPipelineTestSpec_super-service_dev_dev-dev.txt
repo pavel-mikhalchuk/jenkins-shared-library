@@ -82,7 +82,7 @@ service:
   internalPort: "8080"
 jenkinsBuildNumber: "super-service-deploy-dev-666"
 superServiceDatabase:
-  password: alex111
+  password: "alex111"
 host: "super-service.alutech24.com"
 resources:
   resources:

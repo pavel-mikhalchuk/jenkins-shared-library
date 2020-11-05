@@ -85,6 +85,13 @@ class JavaMicroserviceDeployPipelineContracts {
                 keys.contains('namespaces') &&
                 keys.contains('helmValues')) return true;
 
+        if (keys.size() == 5 &&
+                keys.contains('service') &&
+                keys.contains('env') &&
+                keys.contains('namespaces') &&
+                keys.contains('preDeploy') &&
+                keys.contains('helmValues')) return true;
+
         return false;
     }
 

@@ -296,6 +296,37 @@ javaOpts: -Xms500m -Xmx4g -Djava.rmi.server.hostname=127.0.0.1'''
         assertThat(conformsToContract).isEqualTo(true)
     }
 
+    def "test v 1.2 contract - conforms 3"() {
+        given:
+        def contract = [
+            service: 'aservice',
+            env: 'dev',
+            namespaces: ['dev-dev', 'tst-test'],
+            preDeploy: {
+                sh 'pre-deploy-script.sh'
+            },
+            helmValues: [
+                host: { ingUtils-> "${ingUtils.svc_ns_inin()}" },
+                resources: [
+                    requests: [
+                        memory: '1500Mi',
+                        cpu: '100m'
+                    ],
+                    limits: [
+                        memory: '5Gi',
+                        cpu: '2'
+                    ]
+                ],
+            ]
+        ]
+
+        when:
+        def conformsToContract = JavaMicroserviceDeployPipelineContracts.is_v_1_2(contract)
+
+        then:
+        assertThat(conformsToContract).isEqualTo(true)
+    }
+
     def "test v 1.2 contract - does not conform"() {
         given:
         def contract = [

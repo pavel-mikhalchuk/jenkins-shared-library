@@ -48,11 +48,27 @@ class DeploymentPipelineHelper {
     }
 
     def helmValues(ctx) {
-        def result = merge(defaultValues(ctx), ctx.helmValues)
-        if (result.host) {
-            result.host = resolveIngressHost(result.host, ctx)
+        Yaml.write(
+                resolveClosureValues(ctx, merge(defaultValues(ctx), ctx.helmValues))
+        ).trim()
+    }
+
+    def resolveClosureValues(ctx, helmValues) {
+        ObjUtils.walk(helmValues, { res, key, value ->
+            if (value instanceof Closure) {
+                res[key] = resolveClosureValue(ctx, value)
+            } else {
+                res[key] = value
+            }
+        })
+    }
+
+    def resolveClosureValue(ctx, value) {
+        try {
+            resolveIngressHost(value, ctx)
+        } catch (Exception e) {
+            ClosureUtils.invoke(value, pipeline)
         }
-        Yaml.write(result, pipeline).trim()
     }
 
     def static defaultValues(ctx) {
@@ -84,6 +100,10 @@ class DeploymentPipelineHelper {
             }
             return map
         }
+    }
+
+    def preDeploy(ctx) {
+        ClosureUtils.invoke(ctx.preDeploy, pipeline)
     }
 
     def generateK8SManifests(ctx) {
@@ -119,6 +139,9 @@ class DeploymentPipelineHelper {
             def ingUtils = [
                 svc_ns_inin: {
                     return "${ctx.service}.${hostByNs(ctx.namespace)}.in.in.alutech24.com"
+                },
+                str_ns_inin: { str ->
+                    return "${str}.${hostByNs(ctx.namespace)}.in.in.alutech24.com"
                 },
                 svc_prod: {
                     return "${ctx.service}.alutech24.com"

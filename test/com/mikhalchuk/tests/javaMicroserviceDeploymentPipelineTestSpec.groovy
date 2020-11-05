@@ -1,6 +1,7 @@
 package com.mikhalchuk.tests
 
 import com.mikhalchuk.Ingresses
+import com.mikhalchuk.Scripts
 import com.mikhalchuk.testSupport.PipelineSpockTestBase
 
 import static com.mikhalchuk.tests.MockUtils.*
@@ -92,6 +93,7 @@ class javaMicroserviceDeploymentPipelineTestSpec extends PipelineSpockTestBase {
             service = P_SERVICE
             env = P_ENV
             namespaces = [P_NAMESPACE]
+            preDeploy = P_PRE_DEPLOY
             helmValues = P_HELM_VALUES
         }
 
@@ -100,12 +102,13 @@ class javaMicroserviceDeploymentPipelineTestSpec extends PipelineSpockTestBase {
         assertJobStatusSuccess()
 
         where:
-        P_SERVICE     | P_BRANCH   | P_ENV  | P_NAMESPACE | P_HELM_VALUES
-        "pricing"     | "develop"  | "dev"  | "dev-dev"   | HelmValues.PRICING_DEV
-        "pricing"     | "develop"  | "dev"  | "tst-test"  | HelmValues.PRICING_DEV
-        "pricing"     | "master"   | "prod" | "prod"      | HelmValues.PRICING_PROD
-        "calculation" | "develop"  | "dev"  | "dev-dev"   | HelmValues.CALCULATION_DEV
-        "calculation" | "develop"  | "dev"  | "tst-test"  | HelmValues.CALCULATION_DEV
-        "calculation" | "master"   | "prod" | "prod"      | HelmValues.CALCULATION_PROD
+        P_SERVICE     | P_BRANCH   | P_ENV  | P_NAMESPACE | P_PRE_DEPLOY                | P_HELM_VALUES
+        "pricing"     | "develop"  | "dev"  | "dev-dev"   | null                        | HelmValues.PRICING_DEV
+        "pricing"     | "develop"  | "dev"  | "tst-test"  | null                        | HelmValues.PRICING_DEV
+        "pricing"     | "master"   | "prod" | "prod"      | null                        | HelmValues.PRICING_PROD
+        "calculation" | "develop"  | "dev"  | "dev-dev"   | null                        | HelmValues.CALCULATION_DEV
+        "calculation" | "develop"  | "dev"  | "tst-test"  | null                        | HelmValues.CALCULATION_DEV
+        "calculation" | "master"   | "prod" | "prod"      | null                        | HelmValues.CALCULATION_PROD
+        "aservice"    | "master"   | "dev"  | "dev-dev"   | Scripts.ASERVICE_PRE_DEPLOY | HelmValues.ASERVICE_DEV
     }
 }
