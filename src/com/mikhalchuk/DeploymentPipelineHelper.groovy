@@ -145,7 +145,10 @@ class DeploymentPipelineHelper {
                 },
                 svc_prod: {
                     return "${ctx.service}.alutech24.com"
-                }
+                },
+                str_prod: { str ->
+                    return "${str}.alutech24.com"
+                },
             ]
             return host.call(ingUtils)
         } else {
