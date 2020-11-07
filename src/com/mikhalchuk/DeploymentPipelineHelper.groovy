@@ -189,7 +189,7 @@ class DeploymentPipelineHelper {
                         }
 
                         try {      
-                            log.info("Start fetching tags...")
+                            log.info("Start fetching tags from 'https://dockerhub-vip.alutech.local/v2/${ctx.service}/tags/list'")
 
                             def response = ["curl", "-k", "https://dockerhub-vip.alutech.local/v2/${ctx.service}/tags/list"].execute().text
 
