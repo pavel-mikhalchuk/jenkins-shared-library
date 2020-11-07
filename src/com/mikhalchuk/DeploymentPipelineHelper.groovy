@@ -205,6 +205,7 @@ class DeploymentPipelineHelper {
 
                             if (!error.toString().equals(""))
                                 log.info("Error al ejecutar el comando")
+                                log.info(error.toString())
                             else{
                                 log.info("Ejecutado correctamente")
                                 log.info(resultado)
