@@ -20,35 +20,45 @@ def call(body) {
         stages {
             stage('notify slack') {
                 steps {
-                    // This step is very important!!!
-                    // Please do not remove it unless you find a better way without introducing "Init" stage because it's ugly :)"
-                    // Later stages depend on it.
-                    helper.defineMoreContextBasedOnUserInput(ctx)
+                    script {
+                        // This step is very important!!!
+                        // Please do not remove it unless you find a better way without introducing "Init" stage because it's ugly :)"
+                        // Later stages depend on it.
+                        helper.defineMoreContextBasedOnUserInput(ctx)
 
-                    helper.notifySlack(ctx)
+                        helper.notifySlack(ctx)
+                    }
                 }
             }
             stage('checkout infra repo') {
                 steps {
-                    helper.checkoutInfraRepo(ctx)
+                    script {
+                        helper.checkoutInfraRepo(ctx)
+                    }
                 }
             }
             stage('generate K8S manifests') {
                 steps {
                     container('helm') {
-                        helper.writeHelmValuesYaml(ctx)
-                        helper.generateK8SManifests(ctx)
+                        script {
+                            helper.writeHelmValuesYaml(ctx)
+                            helper.generateK8SManifests(ctx)
+                        }
                     }
                 }
             }
             stage('push K8S manifests to infra repo') {
                 steps {
-                    helper.pushK8SManifests(ctx)
+                    script {
+                        helper.pushK8SManifests(ctx)
+                    }
                 }
             }
             stage('notify ArgoCD') {
                 steps {
-                    helper.notifyArgoCD()
+                    script {
+                        helper.notifyArgoCD()
+                    }
                 }
             }
         }
