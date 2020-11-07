@@ -15,7 +15,7 @@ def call(body) {
         }
         parameters {
             choice(name: 'NAMESPACE', choices: ctx.namespaces, description: 'Kubernetes Namespace')
-            text(name: 'RESOURCES', defaultValue: Yaml.write([resources: ctx.helmValues.resources]), description: 'Kubernetes POD resources requests and limits + JavaOpts')
+            text(name: 'RESOURCES', defaultValue: ctx.resources, description: 'Kubernetes POD resources requests and limits')
         }
         stages {
             stage('notify slack') {
@@ -68,6 +68,8 @@ def call(body) {
 def setUpContext(body) {
     // client-defined parameters in the body block
     def ctx = HelmChartDeployPipelineContracts.resolve(ObjUtils.closureToMap(body))
+
+    ctx.resources = Yaml.write([resources: ctx.helmValues.resources])
 
     // defining more parameters for ourselves
     return ctx
