@@ -15,18 +15,18 @@ def call(body) {
         }
         parameters { 
             choice(name: 'NAMESPACE', choices: ctx.namespaces, description: 'Kubernetes Namespace') 
-            text(name: 'RESOURCES', defaultValue: Yaml.write([resources: ctx.helmValues.resources, javaOpts: ctx.helmValues.javaOpts]), description: 'Kubernetes POD resources requests and limits + JavaOpts')
+            text(name: 'RESOURCES', defaultValue: ctx.resourcesAndJavaOpts, description: 'Kubernetes POD resources requests and limits + JavaOpts')
         }
         stages {
             stage('notify slack') {
                 steps {
                     script {
-                      // This step is very important!!! 
-                      // Please do not remove it unless you find a better way without introducing "Init" stage because it's ugly :)"
-                      // Later stages depend on it.
-                      helper.defineMoreContextBasedOnUserInput(ctx)
+                        // This step is very important!!! 
+                        // Please do not remove it unless you find a better way without introducing "Init" stage because it's ugly :)"
+                        // Later stages depend on it.
+                        helper.defineMoreContextBasedOnUserInput(ctx)
 
-                      helper.notifySlack(ctx)
+                        helper.notifySlack(ctx)
                     }
                 }
             }
@@ -73,6 +73,8 @@ def call(body) {
 def setUpContext(body) {
     // client-defined parameters in the body block
     def ctx = JavaMicroserviceDeployPipelineContracts.resolve(ObjUtils.closureToMap(body))
+
+    ctx.resourcesAndJavaOpts = Yaml.write([resources: ctx.helmValues.resources, javaOpts: ctx.helmValues.javaOpts])
 
     // defining more parameters for ourselves
     return ctx
