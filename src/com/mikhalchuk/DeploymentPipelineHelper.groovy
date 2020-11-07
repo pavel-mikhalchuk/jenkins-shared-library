@@ -195,6 +195,23 @@ class DeploymentPipelineHelper {
 
                             log.info("Response from docker hub: " + response)
 
+
+                            def resultado = new StringBuilder()
+                            def error     = new StringBuilder()
+
+                            def comando = ["curl", "-k", "https://dockerhub-vip.alutech.local/v2/${ctx.service}/tags/list"].execute()
+                            comando.consumeProcessOutput(resultado, error)
+                            comando.waitForOrKill(1000)
+
+                            if (!error.toString().equals(""))
+                                log.info("Error al ejecutar el comando")
+                            else{
+                                log.info("Ejecutado correctamente")
+                                log.info(resultado)
+                            }
+
+
+
                             return parse(response)
                         } catch (Exception e) {
                             e.printStackTrace()
