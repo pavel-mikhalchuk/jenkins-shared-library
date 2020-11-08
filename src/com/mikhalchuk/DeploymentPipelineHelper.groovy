@@ -189,11 +189,9 @@ class DeploymentPipelineHelper {
                         }
 
                         try {      
-                            def url = 'https://dockerhub-vip.alutech.local/v2/${ctx.service}/tags/list'
-                            
-                            log.info("Start fetching tags from '${url}'")
+                            log.info("Start fetching tags from 'https://dockerhub-vip.alutech.local/v2/${ctx.service}/tags/list'")
 
-                            Process process = ["curl", "-k", url].execute()
+                            Process process = ["curl", "-k", "https://dockerhub-vip.alutech.local/v2/${ctx.service}/tags/list"].execute()
                             
                             def out = new StringBuffer()
                             def err = new StringBuffer()
