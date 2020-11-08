@@ -191,29 +191,23 @@ class DeploymentPipelineHelper {
                         try {      
                             log.info("Start fetching tags from 'https://dockerhub-vip.alutech.local/v2/${ctx.service}/tags/list'")
 
-                            def response = ["curl", "-k", "https://dockerhub-vip.alutech.local/v2/${ctx.service}/tags/list"].execute().text
+                            // def response = ["curl", "-k", "https://dockerhub-vip.alutech.local/v2/${ctx.service}/tags/list"].execute().text
 
-                            log.info("Response from docker hub: " + response)
+                            // log.info("Response from docker hub: " + response)
 
+                            Process process = ["curl", "-k", "https://dockerhub-vip.alutech.local/v2/${ctx.service}/tags/list"].execute()
+                            
+                            def out = new StringBuffer()
+                            def err = new StringBuffer()
+                            
+                            process.consumeProcessOutput( out, err )
+                            process.waitFor()
+                            
+                            if( out.size() > 0 ) log.info(out)
+                            if( err.size() > 0 ) log.info(err)
 
-                            def resultado = new StringBuilder()
-                            def error     = new StringBuilder()
-
-                            def comando = ["curl", "-k", "https://dockerhub-vip.alutech.local/v2/${ctx.service}/tags/list"].execute()
-                            comando.consumeProcessOutput(resultado, error)
-                            comando.waitForOrKill(5000)
-
-                            if (!error.toString().equals(""))
-                                log.info("Error al ejecutar el comando")
-                                log.info(error.toString())
-                            else{
-                                log.info("Ejecutado correctamente")
-                                log.info(resultado)
-                            }
-
-
-
-                            return parse(response)
+                            // return parse(response)
+                            return ["stub!"]
                         } catch (Exception e) {
                             e.printStackTrace()
                         }
