@@ -189,13 +189,11 @@ class DeploymentPipelineHelper {
                         }
 
                         try {      
-                            log.info("Start fetching tags from 'https://dockerhub-vip.alutech.local/v2/${ctx.service}/tags/list'")
+                            def url = 'https://dockerhub-vip.alutech.local/v2/${ctx.service}/tags/list'
+                            
+                            log.info("Start fetching tags from '${url}'")
 
-                            // def response = ["curl", "-k", "https://dockerhub-vip.alutech.local/v2/${ctx.service}/tags/list"].execute().text
-
-                            // log.info("Response from docker hub: " + response)
-
-                            Process process = ["curl", "-k", "https://dockerhub-vip.alutech.local/v2/${ctx.service}/tags/list"].execute()
+                            Process process = ["curl", "-k", url].execute()
                             
                             def out = new StringBuffer()
                             def err = new StringBuffer()
@@ -203,11 +201,15 @@ class DeploymentPipelineHelper {
                             process.consumeProcessOutput( out, err )
                             process.waitFor()
                             
-                            if( out.size() > 0 ) log.info(out.toString())
-                            if( err.size() > 0 ) log.info(err.toString())
+                            if (out.size() > 0) {
+                              log.info("Response from docker hub: " + out.toString())
+                              
+                              return parse(out)
+                            } else if (err.size() > 0) {
+                              log.info(err.toString())
 
-                            // return parse(response)
-                            return ["stub!"]
+                              return ["there was an error during pulling data from dockerhub"]
+                            }
                         } catch (Exception e) {
                             e.printStackTrace()
                         }
