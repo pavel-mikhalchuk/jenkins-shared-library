@@ -201,7 +201,7 @@ class DeploymentPipelineHelper {
 
                             def comando = ["curl", "-k", "https://dockerhub-vip.alutech.local/v2/${ctx.service}/tags/list"].execute()
                             comando.consumeProcessOutput(resultado, error)
-                            comando.waitForOrKill(1000)
+                            comando.waitForOrKill(5000)
 
                             if (!error.toString().equals(""))
                                 log.info("Error al ejecutar el comando")
