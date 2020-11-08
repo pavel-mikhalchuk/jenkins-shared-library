@@ -203,8 +203,8 @@ class DeploymentPipelineHelper {
                             process.consumeProcessOutput( out, err )
                             process.waitFor()
                             
-                            if( out.size() > 0 ) log.info(out)
-                            if( err.size() > 0 ) log.info(err)
+                            if( out.size() > 0 ) log.info(out.toString())
+                            if( err.size() > 0 ) log.info(err.toString())
 
                             // return parse(response)
                             return ["stub!"]
