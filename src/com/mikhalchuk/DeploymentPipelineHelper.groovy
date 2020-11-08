@@ -202,7 +202,7 @@ class DeploymentPipelineHelper {
                             if (out.size() > 0) {
                               log.info("Response from docker hub: " + out.toString())
                               
-                              return parse(out)
+                              return parse(out.toString())
                             } else if (err.size() > 0) {
                               log.info(err.toString())
 
