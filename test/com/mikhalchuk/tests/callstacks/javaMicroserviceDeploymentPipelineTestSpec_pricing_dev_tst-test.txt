@@ -23,13 +23,25 @@
                         }
 
                         try {      
-                            log.info("Start fetching tags...")
+                            log.info("Start fetching tags from 'https://dockerhub-vip.alutech.local/v2/pricing/tags/list'")
 
-                            def response = ["curl", "-k", "https://dockerhub-vip.alutech.local/v2/pricing/tags/list"].execute().text
+                            Process process = ["curl", "-k", "https://dockerhub-vip.alutech.local/v2/pricing/tags/list"].execute()
+                            
+                            def out = new StringBuffer()
+                            def err = new StringBuffer()
+                            
+                            process.consumeProcessOutput( out, err )
+                            process.waitFor()
+                            
+                            if (out.size() > 0) {
+                              log.info("Response from docker hub: " + out.toString())
+                              
+                              return parse(out.toString())
+                            } else if (err.size() > 0) {
+                              log.info(err.toString())
 
-                            log.info("Response from docker hub: " + response)
-
-                            return parse(response)
+                              return ["there was an error during pulling data from dockerhub"]
+                            }
                         } catch (Exception e) {
                             e.printStackTrace()
                         }
@@ -56,22 +68,25 @@ javaOpts: "-Xms500m -Xmx4g -Dcom.sun.management.jmxremote -Dcom.sun.management.j
          javaMicroserviceDeploymentPipeline.stages(groovy.lang.Closure)
             javaMicroserviceDeploymentPipeline.stage(notify slack, groovy.lang.Closure)
                javaMicroserviceDeploymentPipeline.steps(groovy.lang.Closure)
-                  javaMicroserviceDeploymentPipeline.sh({script=echo infra-$(date +"%d-%m-%Y_%H-%M-%S"), returnStdout=true})
                   javaMicroserviceDeploymentPipeline.script(groovy.lang.Closure)
-                     javaMicroserviceDeploymentPipeline.wrap({$class=BuildUser}, groovy.lang.Closure)
-                        javaMicroserviceDeploymentPipeline.slackSend({channel=java_services, color=good, message=*mikhalchuk* накатывает ветку *develop* на *pricing tst-test*.
+                     javaMicroserviceDeploymentPipeline.sh({script=echo infra-$(date +"%d-%m-%Y_%H-%M-%S"), returnStdout=true})
+                     javaMicroserviceDeploymentPipeline.script(groovy.lang.Closure)
+                        javaMicroserviceDeploymentPipeline.wrap({$class=BuildUser}, groovy.lang.Closure)
+                           javaMicroserviceDeploymentPipeline.slackSend({channel=java_services, color=good, message=*mikhalchuk* накатывает ветку *develop* на *pricing tst-test*.
 pricing:latest
 Сохраняйте спокойствие 😌})
             javaMicroserviceDeploymentPipeline.stage(checkout infra repo, groovy.lang.Closure)
                javaMicroserviceDeploymentPipeline.steps(groovy.lang.Closure)
-                  javaMicroserviceDeploymentPipeline.sh(mkdir infra-06-06-2020_06-06-06)
-                  javaMicroserviceDeploymentPipeline.dir(infra-06-06-2020_06-06-06, groovy.lang.Closure)
-                     javaMicroserviceDeploymentPipeline.git({credentialsId=jenkins, url=http://bb.alutech-mc.com:8080/scm/as/infra.git})
+                  javaMicroserviceDeploymentPipeline.script(groovy.lang.Closure)
+                     javaMicroserviceDeploymentPipeline.sh(mkdir infra-06-06-2020_06-06-06)
+                     javaMicroserviceDeploymentPipeline.dir(infra-06-06-2020_06-06-06, groovy.lang.Closure)
+                        javaMicroserviceDeploymentPipeline.git({credentialsId=jenkins, url=http://bb.alutech-mc.com:8080/scm/as/infra.git})
             javaMicroserviceDeploymentPipeline.stage(generate K8S manifests, groovy.lang.Closure)
                javaMicroserviceDeploymentPipeline.steps(groovy.lang.Closure)
                   javaMicroserviceDeploymentPipeline.container(helm, groovy.lang.Closure)
-                     javaMicroserviceDeploymentPipeline.sh(cp src/main/resources/application.tst-test.properties kubernetes/helm-chart/pricing/application.properties)
-                     javaMicroserviceDeploymentPipeline.writeFile({file=kubernetes/helm-chart/pricing/values.yaml, text=replicaCount: "1"
+                     javaMicroserviceDeploymentPipeline.script(groovy.lang.Closure)
+                        javaMicroserviceDeploymentPipeline.sh(cp src/main/resources/application.tst-test.properties kubernetes/helm-chart/pricing/application.properties)
+                        javaMicroserviceDeploymentPipeline.writeFile({file=kubernetes/helm-chart/pricing/values.yaml, text=replicaCount: "1"
 gitBranch: "develop"
 image:
   repository: "dockerhub-vip.alutech.local"
@@ -91,19 +106,21 @@ resources:
       memory: "5Gi"
       cpu: "2"
 javaOpts: "-Xms500m -Xmx4g -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.port=9011 -Dcom.sun.management.jmxremote.rmi.port=9011 -Djava.rmi.server.hostname=127.0.0.1"})
-                     javaMicroserviceDeploymentPipeline.sh(rm -rf infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/tst-test/pricing/raw-manifests)
-                     javaMicroserviceDeploymentPipeline.sh(mkdir -p infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/tst-test/pricing/raw-manifests)
-                     javaMicroserviceDeploymentPipeline.sh(helm template --namespace tst-test --name pricing-tst-test kubernetes/helm-chart/pricing > 'infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/tst-test/pricing/raw-manifests/kube-state.yaml')
+                        javaMicroserviceDeploymentPipeline.sh(rm -rf infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/tst-test/pricing/raw-manifests)
+                        javaMicroserviceDeploymentPipeline.sh(mkdir -p infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/tst-test/pricing/raw-manifests)
+                        javaMicroserviceDeploymentPipeline.sh(helm template --namespace tst-test --name pricing-tst-test kubernetes/helm-chart/pricing > 'infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/tst-test/pricing/raw-manifests/kube-state.yaml')
             javaMicroserviceDeploymentPipeline.stage(push K8S manifests to infra repo, groovy.lang.Closure)
                javaMicroserviceDeploymentPipeline.steps(groovy.lang.Closure)
-                  javaMicroserviceDeploymentPipeline.dir(infra-06-06-2020_06-06-06, groovy.lang.Closure)
-                     javaMicroserviceDeploymentPipeline.usernamePassword({credentialsId=jenkins, passwordVariable=GIT_PASSWORD, usernameVariable=GIT_USERNAME})
-                     javaMicroserviceDeploymentPipeline.withCredentials([{credentialsId=jenkins, passwordVariable=GIT_PASSWORD, usernameVariable=GIT_USERNAME}], groovy.lang.Closure)
-                        javaMicroserviceDeploymentPipeline.sh(git config user.email "jenkins@infra.tower")
-                        javaMicroserviceDeploymentPipeline.sh(git config user.name "Jenkins")
-                        javaMicroserviceDeploymentPipeline.sh(git add *)
-                        javaMicroserviceDeploymentPipeline.sh(git commit -m "[jenkins]: ${JOB_NAME} - ${BUILD_NUMBER}")
-                        javaMicroserviceDeploymentPipeline.sh(git push http://${GIT_USERNAME}:${GIT_PASSWORD}@bb.alutech-mc.com:8080/scm/as/infra.git HEAD:master)
+                  javaMicroserviceDeploymentPipeline.script(groovy.lang.Closure)
+                     javaMicroserviceDeploymentPipeline.dir(infra-06-06-2020_06-06-06, groovy.lang.Closure)
+                        javaMicroserviceDeploymentPipeline.usernamePassword({credentialsId=jenkins, passwordVariable=GIT_PASSWORD, usernameVariable=GIT_USERNAME})
+                        javaMicroserviceDeploymentPipeline.withCredentials([{credentialsId=jenkins, passwordVariable=GIT_PASSWORD, usernameVariable=GIT_USERNAME}], groovy.lang.Closure)
+                           javaMicroserviceDeploymentPipeline.sh(git config user.email "jenkins@infra.tower")
+                           javaMicroserviceDeploymentPipeline.sh(git config user.name "Jenkins")
+                           javaMicroserviceDeploymentPipeline.sh(git add *)
+                           javaMicroserviceDeploymentPipeline.sh(git commit -m "[jenkins]: ${JOB_NAME} - ${BUILD_NUMBER}")
+                           javaMicroserviceDeploymentPipeline.sh(git push http://${GIT_USERNAME}:${GIT_PASSWORD}@bb.alutech-mc.com:8080/scm/as/infra.git HEAD:master)
             javaMicroserviceDeploymentPipeline.stage(notify ArgoCD, groovy.lang.Closure)
                javaMicroserviceDeploymentPipeline.steps(groovy.lang.Closure)
-                  javaMicroserviceDeploymentPipeline.sh(curl -k -X POST https://git-events-publisher.in.in.alutech24.com/push)
+                  javaMicroserviceDeploymentPipeline.script(groovy.lang.Closure)
+                     javaMicroserviceDeploymentPipeline.sh(curl -k -X POST https://git-events-publisher.in.in.alutech24.com/push)

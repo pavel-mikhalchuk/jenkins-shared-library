@@ -23,13 +23,25 @@
                         }
 
                         try {      
-                            log.info("Start fetching tags...")
+                            log.info("Start fetching tags from 'https://dockerhub-vip.alutech.local/v2/super-service/tags/list'")
 
-                            def response = ["curl", "-k", "https://dockerhub-vip.alutech.local/v2/super-service/tags/list"].execute().text
+                            Process process = ["curl", "-k", "https://dockerhub-vip.alutech.local/v2/super-service/tags/list"].execute()
+                            
+                            def out = new StringBuffer()
+                            def err = new StringBuffer()
+                            
+                            process.consumeProcessOutput( out, err )
+                            process.waitFor()
+                            
+                            if (out.size() > 0) {
+                              log.info("Response from docker hub: " + out.toString())
+                              
+                              return parse(out.toString())
+                            } else if (err.size() > 0) {
+                              log.info(err.toString())
 
-                            log.info("Response from docker hub: " + response)
-
-                            return parse(response)
+                              return ["there was an error during pulling data from dockerhub"]
+                            }
                         } catch (Exception e) {
                             e.printStackTrace()
                         }
@@ -51,26 +63,29 @@
       cpu: "1"
     limits:
       memory: "1Gi"
-      cpu: "1", description=Kubernetes POD resources requests and limits + JavaOpts})
+      cpu: "1", description=Kubernetes POD resources requests and limits})
          helmChartDeploymentPipeline.stages(groovy.lang.Closure)
             helmChartDeploymentPipeline.stage(notify slack, groovy.lang.Closure)
                helmChartDeploymentPipeline.steps(groovy.lang.Closure)
-                  helmChartDeploymentPipeline.sh({script=echo infra-$(date +"%d-%m-%Y_%H-%M-%S"), returnStdout=true})
                   helmChartDeploymentPipeline.script(groovy.lang.Closure)
-                     helmChartDeploymentPipeline.wrap({$class=BuildUser}, groovy.lang.Closure)
-                        helmChartDeploymentPipeline.slackSend({channel=java_services, color=good, message=*mikhalchuk* накатывает ветку *develop* на *super-service dev-dev*.
+                     helmChartDeploymentPipeline.sh({script=echo infra-$(date +"%d-%m-%Y_%H-%M-%S"), returnStdout=true})
+                     helmChartDeploymentPipeline.script(groovy.lang.Closure)
+                        helmChartDeploymentPipeline.wrap({$class=BuildUser}, groovy.lang.Closure)
+                           helmChartDeploymentPipeline.slackSend({channel=java_services, color=good, message=*mikhalchuk* накатывает ветку *develop* на *super-service dev-dev*.
 super-service:latest
 Сохраняйте спокойствие 😌})
             helmChartDeploymentPipeline.stage(checkout infra repo, groovy.lang.Closure)
                helmChartDeploymentPipeline.steps(groovy.lang.Closure)
-                  helmChartDeploymentPipeline.sh(mkdir infra-06-06-2020_06-06-06)
-                  helmChartDeploymentPipeline.dir(infra-06-06-2020_06-06-06, groovy.lang.Closure)
-                     helmChartDeploymentPipeline.git({credentialsId=jenkins, url=http://bb.alutech-mc.com:8080/scm/as/infra.git})
+                  helmChartDeploymentPipeline.script(groovy.lang.Closure)
+                     helmChartDeploymentPipeline.sh(mkdir infra-06-06-2020_06-06-06)
+                     helmChartDeploymentPipeline.dir(infra-06-06-2020_06-06-06, groovy.lang.Closure)
+                        helmChartDeploymentPipeline.git({credentialsId=jenkins, url=http://bb.alutech-mc.com:8080/scm/as/infra.git})
             helmChartDeploymentPipeline.stage(generate K8S manifests, groovy.lang.Closure)
                helmChartDeploymentPipeline.steps(groovy.lang.Closure)
                   helmChartDeploymentPipeline.container(helm, groovy.lang.Closure)
-                     helmChartDeploymentPipeline.sh({script=$(super-service-get-password-shell-command), returnStdout=true})
-                     helmChartDeploymentPipeline.writeFile({file=kubernetes/helm-chart/super-service/values.yaml, text=replicaCount: "1"
+                     helmChartDeploymentPipeline.script(groovy.lang.Closure)
+                        helmChartDeploymentPipeline.sh({script=$(super-service-get-password-shell-command), returnStdout=true})
+                        helmChartDeploymentPipeline.writeFile({file=kubernetes/helm-chart/super-service/values.yaml, text=replicaCount: "1"
 gitBranch: "develop"
 image:
   repository: "dockerhub-vip.alutech.local"
@@ -92,19 +107,21 @@ resources:
     limits:
       memory: "1Gi"
       cpu: "1"})
-                     helmChartDeploymentPipeline.sh(rm -rf infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/dev-dev/super-service/raw-manifests)
-                     helmChartDeploymentPipeline.sh(mkdir -p infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/dev-dev/super-service/raw-manifests)
-                     helmChartDeploymentPipeline.sh(helm template --namespace dev-dev --name super-service-dev-dev kubernetes/helm-chart/super-service > 'infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/dev-dev/super-service/raw-manifests/kube-state.yaml')
+                        helmChartDeploymentPipeline.sh(rm -rf infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/dev-dev/super-service/raw-manifests)
+                        helmChartDeploymentPipeline.sh(mkdir -p infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/dev-dev/super-service/raw-manifests)
+                        helmChartDeploymentPipeline.sh(helm template --namespace dev-dev --name super-service-dev-dev kubernetes/helm-chart/super-service > 'infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/dev-dev/super-service/raw-manifests/kube-state.yaml')
             helmChartDeploymentPipeline.stage(push K8S manifests to infra repo, groovy.lang.Closure)
                helmChartDeploymentPipeline.steps(groovy.lang.Closure)
-                  helmChartDeploymentPipeline.dir(infra-06-06-2020_06-06-06, groovy.lang.Closure)
-                     helmChartDeploymentPipeline.usernamePassword({credentialsId=jenkins, passwordVariable=GIT_PASSWORD, usernameVariable=GIT_USERNAME})
-                     helmChartDeploymentPipeline.withCredentials([{credentialsId=jenkins, passwordVariable=GIT_PASSWORD, usernameVariable=GIT_USERNAME}], groovy.lang.Closure)
-                        helmChartDeploymentPipeline.sh(git config user.email "jenkins@infra.tower")
-                        helmChartDeploymentPipeline.sh(git config user.name "Jenkins")
-                        helmChartDeploymentPipeline.sh(git add *)
-                        helmChartDeploymentPipeline.sh(git commit -m "[jenkins]: ${JOB_NAME} - ${BUILD_NUMBER}")
-                        helmChartDeploymentPipeline.sh(git push http://${GIT_USERNAME}:${GIT_PASSWORD}@bb.alutech-mc.com:8080/scm/as/infra.git HEAD:master)
+                  helmChartDeploymentPipeline.script(groovy.lang.Closure)
+                     helmChartDeploymentPipeline.dir(infra-06-06-2020_06-06-06, groovy.lang.Closure)
+                        helmChartDeploymentPipeline.usernamePassword({credentialsId=jenkins, passwordVariable=GIT_PASSWORD, usernameVariable=GIT_USERNAME})
+                        helmChartDeploymentPipeline.withCredentials([{credentialsId=jenkins, passwordVariable=GIT_PASSWORD, usernameVariable=GIT_USERNAME}], groovy.lang.Closure)
+                           helmChartDeploymentPipeline.sh(git config user.email "jenkins@infra.tower")
+                           helmChartDeploymentPipeline.sh(git config user.name "Jenkins")
+                           helmChartDeploymentPipeline.sh(git add *)
+                           helmChartDeploymentPipeline.sh(git commit -m "[jenkins]: ${JOB_NAME} - ${BUILD_NUMBER}")
+                           helmChartDeploymentPipeline.sh(git push http://${GIT_USERNAME}:${GIT_PASSWORD}@bb.alutech-mc.com:8080/scm/as/infra.git HEAD:master)
             helmChartDeploymentPipeline.stage(notify ArgoCD, groovy.lang.Closure)
                helmChartDeploymentPipeline.steps(groovy.lang.Closure)
-                  helmChartDeploymentPipeline.sh(curl -k -X POST https://git-events-publisher.in.in.alutech24.com/push)
+                  helmChartDeploymentPipeline.script(groovy.lang.Closure)
+                     helmChartDeploymentPipeline.sh(curl -k -X POST https://git-events-publisher.in.in.alutech24.com/push)

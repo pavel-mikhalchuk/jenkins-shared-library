@@ -23,13 +23,25 @@
                         }
 
                         try {      
-                            log.info("Start fetching tags...")
+                            log.info("Start fetching tags from 'https://dockerhub-vip.alutech.local/v2/aservice/tags/list'")
 
-                            def response = ["curl", "-k", "https://dockerhub-vip.alutech.local/v2/aservice/tags/list"].execute().text
+                            Process process = ["curl", "-k", "https://dockerhub-vip.alutech.local/v2/aservice/tags/list"].execute()
+                            
+                            def out = new StringBuffer()
+                            def err = new StringBuffer()
+                            
+                            process.consumeProcessOutput( out, err )
+                            process.waitFor()
+                            
+                            if (out.size() > 0) {
+                              log.info("Response from docker hub: " + out.toString())
+                              
+                              return parse(out.toString())
+                            } else if (err.size() > 0) {
+                              log.info(err.toString())
 
-                            log.info("Response from docker hub: " + response)
-
-                            return parse(response)
+                              return ["there was an error during pulling data from dockerhub"]
+                            }
                         } catch (Exception e) {
                             e.printStackTrace()
                         }
@@ -45,33 +57,37 @@
          javaMicroserviceDeploymentPipeline.parameters(groovy.lang.Closure)
             javaMicroserviceDeploymentPipeline.choice({name=NAMESPACE, choices=[dev-dev], description=Kubernetes Namespace})
             javaMicroserviceDeploymentPipeline.text({name=RESOURCES, defaultValue=resources:
-  requests:
-    memory: "4Gi"
-    cpu: "100m"
-  limits:
-    memory: "5Gi"
-    cpu: "2"
+  resources:
+    requests:
+      memory: "4Gi"
+      cpu: "100m"
+    limits:
+      memory: "5Gi"
+      cpu: "2"
 javaOpts: "-Xms4g -Xmx4g -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote.rmi.port=9010 -Djava.rmi.server.hostname=127.0.0.1 -server -XX:MaxMetaspaceSize=1g -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:ParallelGCThreads=20 -XX:ConcGCThreads=5 -XX:InitiatingHeapOccupancyPercent=70 -Djdk.nio.maxCachedBufferSize=262144 -XX:HeapDumpPath=/aservice-images/oom-dumps/", description=Kubernetes POD resources requests and limits + JavaOpts})
          javaMicroserviceDeploymentPipeline.stages(groovy.lang.Closure)
             javaMicroserviceDeploymentPipeline.stage(notify slack, groovy.lang.Closure)
                javaMicroserviceDeploymentPipeline.steps(groovy.lang.Closure)
-                  javaMicroserviceDeploymentPipeline.sh({script=echo infra-$(date +"%d-%m-%Y_%H-%M-%S"), returnStdout=true})
                   javaMicroserviceDeploymentPipeline.script(groovy.lang.Closure)
-                     javaMicroserviceDeploymentPipeline.wrap({$class=BuildUser}, groovy.lang.Closure)
-                        javaMicroserviceDeploymentPipeline.slackSend({channel=java_services, color=good, message=*mikhalchuk* накатывает ветку *master* на *aservice dev-dev*.
+                     javaMicroserviceDeploymentPipeline.sh({script=echo infra-$(date +"%d-%m-%Y_%H-%M-%S"), returnStdout=true})
+                     javaMicroserviceDeploymentPipeline.script(groovy.lang.Closure)
+                        javaMicroserviceDeploymentPipeline.wrap({$class=BuildUser}, groovy.lang.Closure)
+                           javaMicroserviceDeploymentPipeline.slackSend({channel=java_services, color=good, message=*mikhalchuk* накатывает ветку *master* на *aservice dev-dev*.
 aservice:latest
 Сохраняйте спокойствие 😌})
             javaMicroserviceDeploymentPipeline.stage(checkout infra repo, groovy.lang.Closure)
                javaMicroserviceDeploymentPipeline.steps(groovy.lang.Closure)
-                  javaMicroserviceDeploymentPipeline.sh(mkdir infra-06-06-2020_06-06-06)
-                  javaMicroserviceDeploymentPipeline.dir(infra-06-06-2020_06-06-06, groovy.lang.Closure)
-                     javaMicroserviceDeploymentPipeline.git({credentialsId=jenkins, url=http://bb.alutech-mc.com:8080/scm/as/infra.git})
+                  javaMicroserviceDeploymentPipeline.script(groovy.lang.Closure)
+                     javaMicroserviceDeploymentPipeline.sh(mkdir infra-06-06-2020_06-06-06)
+                     javaMicroserviceDeploymentPipeline.dir(infra-06-06-2020_06-06-06, groovy.lang.Closure)
+                        javaMicroserviceDeploymentPipeline.git({credentialsId=jenkins, url=http://bb.alutech-mc.com:8080/scm/as/infra.git})
             javaMicroserviceDeploymentPipeline.stage(generate K8S manifests, groovy.lang.Closure)
                javaMicroserviceDeploymentPipeline.steps(groovy.lang.Closure)
                   javaMicroserviceDeploymentPipeline.container(helm, groovy.lang.Closure)
-                     javaMicroserviceDeploymentPipeline.sh(cp -r configuration/src/main/resources/* kubernetes/helm-chart/aservice/)
-                     javaMicroserviceDeploymentPipeline.sh(cp configuration/src/main/resources/env/base.${params.NAMESPACE}.properties kubernetes/helm-chart/aservice/base.properties)
-                     javaMicroserviceDeploymentPipeline.writeFile({file=kubernetes/helm-chart/aservice/values.yaml, text=replicaCount: "1"
+                     javaMicroserviceDeploymentPipeline.script(groovy.lang.Closure)
+                        javaMicroserviceDeploymentPipeline.sh(cp -r configuration/src/main/resources/* kubernetes/helm-chart/aservice/)
+                        javaMicroserviceDeploymentPipeline.sh(cp configuration/src/main/resources/env/base.${params.NAMESPACE}.properties kubernetes/helm-chart/aservice/base.properties)
+                        javaMicroserviceDeploymentPipeline.writeFile({file=kubernetes/helm-chart/aservice/values.yaml, text=replicaCount: "1"
 gitBranch: "master"
 image:
   repository: "dockerhub-vip.alutech.local"
@@ -89,26 +105,29 @@ host: "aservice.dev.dev.in.in.alutech24.com"
 hostin: "aservicein.dev.dev.in.in.alutech24.com"
 hostGates: "gates.dev.dev.in.in.alutech24.com"
 resources:
-  requests:
-    memory: "4Gi"
-    cpu: "100m"
-  limits:
-    memory: "5Gi"
-    cpu: "2"
+  resources:
+    requests:
+      memory: "4Gi"
+      cpu: "100m"
+    limits:
+      memory: "5Gi"
+      cpu: "2"
 javaOpts: "-Xms4g -Xmx4g -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote.rmi.port=9010 -Djava.rmi.server.hostname=127.0.0.1 -server -XX:MaxMetaspaceSize=1g -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:ParallelGCThreads=20 -XX:ConcGCThreads=5 -XX:InitiatingHeapOccupancyPercent=70 -Djdk.nio.maxCachedBufferSize=262144 -XX:HeapDumpPath=/aservice-images/oom-dumps/"})
-                     javaMicroserviceDeploymentPipeline.sh(rm -rf infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/dev-dev/aservice/raw-manifests)
-                     javaMicroserviceDeploymentPipeline.sh(mkdir -p infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/dev-dev/aservice/raw-manifests)
-                     javaMicroserviceDeploymentPipeline.sh(helm template --namespace dev-dev --name aservice-dev-dev kubernetes/helm-chart/aservice > 'infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/dev-dev/aservice/raw-manifests/kube-state.yaml')
+                        javaMicroserviceDeploymentPipeline.sh(rm -rf infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/dev-dev/aservice/raw-manifests)
+                        javaMicroserviceDeploymentPipeline.sh(mkdir -p infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/dev-dev/aservice/raw-manifests)
+                        javaMicroserviceDeploymentPipeline.sh(helm template --namespace dev-dev --name aservice-dev-dev kubernetes/helm-chart/aservice > 'infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/dev-dev/aservice/raw-manifests/kube-state.yaml')
             javaMicroserviceDeploymentPipeline.stage(push K8S manifests to infra repo, groovy.lang.Closure)
                javaMicroserviceDeploymentPipeline.steps(groovy.lang.Closure)
-                  javaMicroserviceDeploymentPipeline.dir(infra-06-06-2020_06-06-06, groovy.lang.Closure)
-                     javaMicroserviceDeploymentPipeline.usernamePassword({credentialsId=jenkins, passwordVariable=GIT_PASSWORD, usernameVariable=GIT_USERNAME})
-                     javaMicroserviceDeploymentPipeline.withCredentials([{credentialsId=jenkins, passwordVariable=GIT_PASSWORD, usernameVariable=GIT_USERNAME}], groovy.lang.Closure)
-                        javaMicroserviceDeploymentPipeline.sh(git config user.email "jenkins@infra.tower")
-                        javaMicroserviceDeploymentPipeline.sh(git config user.name "Jenkins")
-                        javaMicroserviceDeploymentPipeline.sh(git add *)
-                        javaMicroserviceDeploymentPipeline.sh(git commit -m "[jenkins]: ${JOB_NAME} - ${BUILD_NUMBER}")
-                        javaMicroserviceDeploymentPipeline.sh(git push http://${GIT_USERNAME}:${GIT_PASSWORD}@bb.alutech-mc.com:8080/scm/as/infra.git HEAD:master)
+                  javaMicroserviceDeploymentPipeline.script(groovy.lang.Closure)
+                     javaMicroserviceDeploymentPipeline.dir(infra-06-06-2020_06-06-06, groovy.lang.Closure)
+                        javaMicroserviceDeploymentPipeline.usernamePassword({credentialsId=jenkins, passwordVariable=GIT_PASSWORD, usernameVariable=GIT_USERNAME})
+                        javaMicroserviceDeploymentPipeline.withCredentials([{credentialsId=jenkins, passwordVariable=GIT_PASSWORD, usernameVariable=GIT_USERNAME}], groovy.lang.Closure)
+                           javaMicroserviceDeploymentPipeline.sh(git config user.email "jenkins@infra.tower")
+                           javaMicroserviceDeploymentPipeline.sh(git config user.name "Jenkins")
+                           javaMicroserviceDeploymentPipeline.sh(git add *)
+                           javaMicroserviceDeploymentPipeline.sh(git commit -m "[jenkins]: ${JOB_NAME} - ${BUILD_NUMBER}")
+                           javaMicroserviceDeploymentPipeline.sh(git push http://${GIT_USERNAME}:${GIT_PASSWORD}@bb.alutech-mc.com:8080/scm/as/infra.git HEAD:master)
             javaMicroserviceDeploymentPipeline.stage(notify ArgoCD, groovy.lang.Closure)
                javaMicroserviceDeploymentPipeline.steps(groovy.lang.Closure)
-                  javaMicroserviceDeploymentPipeline.sh(curl -k -X POST https://git-events-publisher.in.in.alutech24.com/push)
+                  javaMicroserviceDeploymentPipeline.script(groovy.lang.Closure)
+                     javaMicroserviceDeploymentPipeline.sh(curl -k -X POST https://git-events-publisher.in.in.alutech24.com/push)
