@@ -42,7 +42,8 @@ class helmChartDeploymentPipelineTestSpec extends PipelineSpockTestBase {
         assertJobStatusSuccess()
 
         where:
-        P_SERVICE       | P_BRANCH  | P_ENV | P_NAMESPACE | P_HELM_VALUES
-        "super-service" | "develop" | "dev" | "dev-dev"   | HelmValues.SUPER_SERVICE
+        P_SERVICE       | P_BRANCH  | P_ENV  | P_NAMESPACE | P_HELM_VALUES
+        "super-service" | "develop" | "dev"  | "dev-dev"   | HelmValues.SUPER_SERVICE
+        "super-service" | "master"  | "prod" | "prod"      | HelmValues.SUPER_SERVICE + [resources: null]
     }
 }

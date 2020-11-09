@@ -1,9 +1,14 @@
 package com.mikhalchuk.tests
 
 import com.mikhalchuk.Ingresses
-import com.mikhalchuk.Scripts
 import com.mikhalchuk.testSupport.PipelineSpockTestBase
 
+import static com.mikhalchuk.Scripts.ASERVICE_PRE_DEPLOY
+import static com.mikhalchuk.tests.HelmValues.ASERVICE_DEV
+import static com.mikhalchuk.tests.HelmValues.CALCULATION_DEV
+import static com.mikhalchuk.tests.HelmValues.CALCULATION_PROD
+import static com.mikhalchuk.tests.HelmValues.PRICING_DEV
+import static com.mikhalchuk.tests.HelmValues.PRICING_PROD
 import static com.mikhalchuk.tests.MockUtils.*
 
 class javaMicroserviceDeploymentPipelineTestSpec extends PipelineSpockTestBase {
@@ -102,13 +107,14 @@ class javaMicroserviceDeploymentPipelineTestSpec extends PipelineSpockTestBase {
         assertJobStatusSuccess()
 
         where:
-        P_SERVICE     | P_BRANCH   | P_ENV  | P_NAMESPACE | P_PRE_DEPLOY                | P_HELM_VALUES
-        "pricing"     | "develop"  | "dev"  | "dev-dev"   | null                        | HelmValues.PRICING_DEV
-        "pricing"     | "develop"  | "dev"  | "tst-test"  | null                        | HelmValues.PRICING_DEV
-        "pricing"     | "master"   | "prod" | "prod"      | null                        | HelmValues.PRICING_PROD
-        "calculation" | "develop"  | "dev"  | "dev-dev"   | null                        | HelmValues.CALCULATION_DEV
-        "calculation" | "develop"  | "dev"  | "tst-test"  | null                        | HelmValues.CALCULATION_DEV
-        "calculation" | "master"   | "prod" | "prod"      | null                        | HelmValues.CALCULATION_PROD
-        "aservice"    | "master"   | "dev"  | "dev-dev"   | Scripts.ASERVICE_PRE_DEPLOY | HelmValues.ASERVICE_DEV
+        P_SERVICE     | P_BRANCH      | P_ENV  | P_NAMESPACE   | P_PRE_DEPLOY        | P_HELM_VALUES
+        "pricing"     | "develop"     | "dev"  | "dev-dev"     | null                | PRICING_DEV
+        "pricing"     | "develop"     | "dev"  | "tst-test"    | null                | PRICING_DEV
+        "pricing"     | "master"      | "prod" | "prod"        | null                | PRICING_PROD
+        "calculation" | "develop"     | "dev"  | "dev-dev"     | null                | CALCULATION_DEV
+        "calculation" | "develop"     | "dev"  | "tst-test"    | null                | CALCULATION_DEV
+        "calculation" | "master"      | "prod" | "prod"        | null                | CALCULATION_PROD
+        "aservice"    | "master"      | "dev"  | "dev-dev"     | ASERVICE_PRE_DEPLOY | ASERVICE_DEV
+        "aservice"    | "no-javaOpts" | "dev"  | "no-javaOpts" | ASERVICE_PRE_DEPLOY | ASERVICE_DEV + [javaOpts: null]
     }
 }

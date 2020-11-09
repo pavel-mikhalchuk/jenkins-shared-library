@@ -55,7 +55,7 @@
             javaMicroserviceDeploymentPipeline.buildDiscarder(null)
             javaMicroserviceDeploymentPipeline.timestamps()
          javaMicroserviceDeploymentPipeline.parameters(groovy.lang.Closure)
-            javaMicroserviceDeploymentPipeline.choice({name=NAMESPACE, choices=[dev-dev], description=Kubernetes Namespace})
+            javaMicroserviceDeploymentPipeline.choice({name=NAMESPACE, choices=[no-javaOpts], description=Kubernetes Namespace})
             javaMicroserviceDeploymentPipeline.text({name=RESOURCES, defaultValue=resources:
   resources:
     requests:
@@ -64,7 +64,7 @@
     limits:
       memory: "5Gi"
       cpu: "2"
-javaOpts: "-Xms4g -Xmx4g -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote.rmi.port=9010 -Djava.rmi.server.hostname=127.0.0.1 -server -XX:MaxMetaspaceSize=1g -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:ParallelGCThreads=20 -XX:ConcGCThreads=5 -XX:InitiatingHeapOccupancyPercent=70 -Djdk.nio.maxCachedBufferSize=262144 -XX:HeapDumpPath=/aservice-images/oom-dumps/", description=Kubernetes POD resources requests and limits + JavaOpts})
+javaOpts: null, description=Kubernetes POD resources requests and limits + JavaOpts})
          javaMicroserviceDeploymentPipeline.stages(groovy.lang.Closure)
             javaMicroserviceDeploymentPipeline.stage(notify slack, groovy.lang.Closure)
                javaMicroserviceDeploymentPipeline.steps(groovy.lang.Closure)
@@ -72,7 +72,7 @@ javaOpts: "-Xms4g -Xmx4g -Dcom.sun.management.jmxremote -Dcom.sun.management.jmx
                      javaMicroserviceDeploymentPipeline.sh({script=echo infra-$(date +"%d-%m-%Y_%H-%M-%S"), returnStdout=true})
                      javaMicroserviceDeploymentPipeline.script(groovy.lang.Closure)
                         javaMicroserviceDeploymentPipeline.wrap({$class=BuildUser}, groovy.lang.Closure)
-                           javaMicroserviceDeploymentPipeline.slackSend({channel=java_services, color=good, message=*mikhalchuk* накатывает ветку *master* на *aservice dev-dev*.
+                           javaMicroserviceDeploymentPipeline.slackSend({channel=java_services, color=good, message=*mikhalchuk* накатывает ветку *no-javaOpts* на *aservice no-javaOpts*.
 aservice:latest
 Сохраняйте спокойствие 😌})
             javaMicroserviceDeploymentPipeline.stage(checkout infra repo, groovy.lang.Closure)
@@ -86,9 +86,9 @@ aservice:latest
                   javaMicroserviceDeploymentPipeline.container(helm, groovy.lang.Closure)
                      javaMicroserviceDeploymentPipeline.script(groovy.lang.Closure)
                         javaMicroserviceDeploymentPipeline.sh(cp -r configuration/src/main/resources/* kubernetes/helm-chart/aservice/)
-                        javaMicroserviceDeploymentPipeline.sh(cp configuration/src/main/resources/env/base.dev-dev.properties kubernetes/helm-chart/aservice/base.properties)
+                        javaMicroserviceDeploymentPipeline.sh(cp configuration/src/main/resources/env/base.no-javaOpts.properties kubernetes/helm-chart/aservice/base.properties)
                         javaMicroserviceDeploymentPipeline.writeFile({file=kubernetes/helm-chart/aservice/values.yaml, text=replicaCount: "1"
-gitBranch: "master"
+gitBranch: "no-javaOpts"
 image:
   repository: "dockerhub-vip.alutech.local"
   tag: "aservice:latest"
@@ -101,9 +101,9 @@ drawingService:
   serviceName: "drawing"
   path: "/drawingService"
   externalPort: "80"
-host: "aservice.dev.dev.in.in.alutech24.com"
-hostin: "aservicein.dev.dev.in.in.alutech24.com"
-hostGates: "gates.dev.dev.in.in.alutech24.com"
+host: "aservice.javaOpts.no.in.in.alutech24.com"
+hostin: "aservicein.javaOpts.no.in.in.alutech24.com"
+hostGates: "gates.javaOpts.no.in.in.alutech24.com"
 resources:
   resources:
     requests:
@@ -112,10 +112,10 @@ resources:
     limits:
       memory: "5Gi"
       cpu: "2"
-javaOpts: "-Xms4g -Xmx4g -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote.rmi.port=9010 -Djava.rmi.server.hostname=127.0.0.1 -server -XX:MaxMetaspaceSize=1g -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:ParallelGCThreads=20 -XX:ConcGCThreads=5 -XX:InitiatingHeapOccupancyPercent=70 -Djdk.nio.maxCachedBufferSize=262144 -XX:HeapDumpPath=/aservice-images/oom-dumps/"})
-                        javaMicroserviceDeploymentPipeline.sh(rm -rf infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/dev-dev/aservice/raw-manifests)
-                        javaMicroserviceDeploymentPipeline.sh(mkdir -p infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/dev-dev/aservice/raw-manifests)
-                        javaMicroserviceDeploymentPipeline.sh(helm template --namespace dev-dev --name aservice-dev-dev kubernetes/helm-chart/aservice > 'infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/dev-dev/aservice/raw-manifests/kube-state.yaml')
+javaOpts: null})
+                        javaMicroserviceDeploymentPipeline.sh(rm -rf infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/no-javaOpts/aservice/raw-manifests)
+                        javaMicroserviceDeploymentPipeline.sh(mkdir -p infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/no-javaOpts/aservice/raw-manifests)
+                        javaMicroserviceDeploymentPipeline.sh(helm template --namespace no-javaOpts --name aservice-no-javaOpts kubernetes/helm-chart/aservice > 'infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/no-javaOpts/aservice/raw-manifests/kube-state.yaml')
             javaMicroserviceDeploymentPipeline.stage(push K8S manifests to infra repo, groovy.lang.Closure)
                javaMicroserviceDeploymentPipeline.steps(groovy.lang.Closure)
                   javaMicroserviceDeploymentPipeline.script(groovy.lang.Closure)

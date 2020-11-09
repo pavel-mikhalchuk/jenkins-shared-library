@@ -11,6 +11,10 @@ class Yaml {
         return result
     }
 
+    static def quote(str) {
+        str ? "\"${str}\"" : null
+    }
+
     static def unquote(str) {
         if (str.charAt(0) == '"' && str.charAt(str.length() - 1) == '"') {
             return str.substring(1, str.length() - 1)
@@ -70,10 +74,10 @@ class Yaml {
                 result += doWrite(it.value, indent + '  ')
             } else if (it.value instanceof String) {
                 if (it.value?.trim()) {
-                    result += "${indent}${it.key}:${it.value.startsWith('\n') ? '' : ' '}\"${it.value}\"\n"
+                    result += "${indent}${it.key}:${it.value.startsWith('\n') ? '' : ' '}${quote(it.value)}\n"
                 }
             } else {
-                result += "${indent}${it.key}: \"${it.value}\"\n"
+                result += "${indent}${it.key}: ${quote(it.value)}\n"
             }
         }
         if (indent == '' && result.endsWith("\n")) {

@@ -1,6 +1,5 @@
 package com.mikhalchuk.tests
 
-
 import com.mikhalchuk.Yaml
 import spock.lang.Specification
 
@@ -25,22 +24,57 @@ javaOpts: "-Xms500m -Xmx4g"'''
 
         then:
         def expected = [
+            resources: [
                 resources: [
-                        resources: [
-                                requests: [
-                                        memory: '1500Mi',
-                                        cpu   : '100m'
-                                ],
-                                limits  : [
-                                        memory: '5Gi',
-                                        cpu   : '2'
-                                ]
-                        ]
-                ],
-                javaOpts : '-Xms500m -Xmx4g'
+                    requests: [
+                        memory: '1500Mi',
+                        cpu   : '100m'
+                    ],
+                    limits  : [
+                        memory: '5Gi',
+                        cpu   : '2'
+                    ]
+                ]
+            ],
+            javaOpts : '-Xms500m -Xmx4g'
         ]
         assertThat(map).isEqualTo(
             expected
+        )
+    }
+
+    def "test write"() {
+        given:
+        def map = [
+            resources: [
+                resources: [
+                    requests: [
+                        memory: '1500Mi',
+                        cpu   : '100m'
+                    ],
+                    limits  : [
+                        memory: '5Gi',
+                        cpu   : '2'
+                    ]
+                ]
+            ],
+            javaOpts : null
+        ]
+
+        when:
+        def yaml = Yaml.write(map)
+
+        then:
+        assertThat(yaml).isEqualTo(
+            '''resources:
+  resources:
+    requests:
+      memory: "1500Mi"
+      cpu: "100m"
+    limits:
+      memory: "5Gi"
+      cpu: "2"
+javaOpts: null'''
         )
     }
 }
