@@ -115,7 +115,7 @@ class DeploymentPipelineHelper {
 
     def pushK8SManifests(ctx) {
         pipeline.dir("${ctx.infraFolder}") {
-            pipeline.withCredentials([usernamePassword(credentialsId: 'jenkins', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+            pipeline.withCredentials([pipeline.usernamePassword(credentialsId: 'jenkins', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
                 pipeline.sh 'git config user.email "jenkins@infra.tower"'
                 pipeline.sh 'git config user.name "Jenkins"'
 
