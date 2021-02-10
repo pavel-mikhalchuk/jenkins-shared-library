@@ -69,6 +69,7 @@ def setUpContext(body) {
     // client-defined parameters in the body block
     def ctx = HelmChartDeployPipelineContracts.resolve(ObjUtils.closureToMap(body))
 
+    ctx.slackChannel = ctx.slackChannel ?: 'java_services'
     ctx.resources = Yaml.write([resources: ctx.helmValues.resources])
 
     // defining more parameters for ourselves

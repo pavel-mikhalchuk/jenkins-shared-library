@@ -74,6 +74,7 @@ def setUpContext(body) {
     // client-defined parameters in the body block
     def ctx = JavaMicroserviceDeployPipelineContracts.resolve(ObjUtils.closureToMap(body))
 
+    ctx.slackChannel = ctx.slackChannel ?: 'java_services'
     ctx.resourcesAndJavaOpts = Yaml.write([resources: ctx.helmValues.resources, javaOpts: ctx.helmValues.javaOpts])
 
     // defining more parameters for ourselves
