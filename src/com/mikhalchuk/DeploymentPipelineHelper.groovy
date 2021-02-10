@@ -119,6 +119,9 @@ class DeploymentPipelineHelper {
                 pipeline.sh 'git config user.email "jenkins@infra.tower"'
                 pipeline.sh 'git config user.name "Jenkins"'
 
+                pipeline.sh 'git checkout master'
+                pipeline.sh 'git pull http://${GIT_USERNAME}:${GIT_PASSWORD}@bb.alutech-mc.com:8080/scm/as/infra.git HEAD:master'
+
                 pipeline.sh 'git add *'
                 pipeline.sh 'git commit -m "[jenkins]: ${JOB_NAME} - ${BUILD_NUMBER}"'
                 pipeline.sh 'git push http://${GIT_USERNAME}:${GIT_PASSWORD}@bb.alutech-mc.com:8080/scm/as/infra.git HEAD:master'
