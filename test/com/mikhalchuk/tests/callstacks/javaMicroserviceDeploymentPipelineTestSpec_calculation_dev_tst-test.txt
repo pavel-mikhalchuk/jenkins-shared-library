@@ -117,6 +117,8 @@ javaOpts: "-Xmx2g -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.
                         javaMicroserviceDeploymentPipeline.withCredentials([{credentialsId=jenkins, passwordVariable=GIT_PASSWORD, usernameVariable=GIT_USERNAME}], groovy.lang.Closure)
                            javaMicroserviceDeploymentPipeline.sh(git config user.email "jenkins@infra.tower")
                            javaMicroserviceDeploymentPipeline.sh(git config user.name "Jenkins")
+                           javaMicroserviceDeploymentPipeline.sh(git checkout master)
+                           javaMicroserviceDeploymentPipeline.sh(git pull http://${GIT_USERNAME}:${GIT_PASSWORD}@bb.alutech-mc.com:8080/scm/as/infra.git HEAD:master)
                            javaMicroserviceDeploymentPipeline.sh(git add *)
                            javaMicroserviceDeploymentPipeline.sh(git commit -m "[jenkins]: ${JOB_NAME} - ${BUILD_NUMBER}")
                            javaMicroserviceDeploymentPipeline.sh(git push http://${GIT_USERNAME}:${GIT_PASSWORD}@bb.alutech-mc.com:8080/scm/as/infra.git HEAD:master)
