@@ -4,9 +4,11 @@ class ObjUtils {
 
     static def closureToMap(closure, mapPrefill = [:]) {
         def map = mapPrefill
-        closure.resolveStrategy = Closure.DELEGATE_FIRST
-        closure.delegate = map
-        closure()
+        if (closure) {
+            closure.resolveStrategy = Closure.DELEGATE_FIRST
+            closure.delegate = map
+            closure()
+        }
         return map
     }
 

@@ -1,0 +1,5 @@
+   npmInstall.getBinding()
+   npmInstall.call()
+      npmInstall.sh(rm -rf ./node_modules && (cp -r /root/node_modules/npm-project/master/node_modules ./node_modules || true))
+      npmInstall.sh(npm install --loglevel=verbose)
+      npmInstall.sh(rm -rf /root/node_modules/npm-project/master && mkdir -p /root/node_modules/npm-project/master && cp -r ./node_modules /root/node_modules/npm-project/master)
