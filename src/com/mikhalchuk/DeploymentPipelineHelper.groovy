@@ -37,7 +37,17 @@ class DeploymentPipelineHelper {
     }
 
     def dockerImgTag(ctx) {
-        "${pipeline.currentTimestamp()}__${ctx.currentBranchName.replace('/', '_')}__${gitRev()}"
+        "${currentTimestamp()}__${ctx.currentBranchName.replace('/', '_')}__${gitRev()}"
+    }
+
+    def currentTimestamp() {
+        def clock = env.IS_CLOCK_MOCKED == 'true'
+                ? MOCKED_CLOCK
+                : java.time.Clock.system(java.time.ZoneId.of("UTC+3"))
+
+        java.time.ZonedDateTime
+                .now(clock)
+                .format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss"))
     }
 
     def gitRev() {
