@@ -3,7 +3,7 @@ import com.mikhalchuk.*
 def call(body) {
     def ctx = setUpContext(body)
 
-    def pipeline = new PipelineHelper(this)
+    def helper = new PipelineHelper(this)
     def builder = new BuildPipelineHelper(this)
     def deployer = new DeploymentPipelineHelper(this)
 
@@ -16,7 +16,7 @@ def call(body) {
         stages {
             stage('abort-previous-builds') {
                 steps {
-                    pipeline.abortPreviousBuilds()
+                    helper.abortPreviousBuilds()
                 }
             }
             stage('docker-build') {
