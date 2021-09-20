@@ -54,9 +54,10 @@ def abortPreviousBuilds() {
             def executor = previousBuild.getExecutor()
             if (executor != null) {
                 echo ">> Aborting older build #${previousBuild.number}"
-                executor.interrupt(Result.ABORTED, new UserInterruption(
-                        "Aborted by newer build #${currentBuild.number}"
-                ))
+
+                def cause = { "interrupted by build #${build.getId()}" as String } as CauseOfInterruption
+
+                executor.interrupt(Result.ABORTED, cause)
             }
         }
 
