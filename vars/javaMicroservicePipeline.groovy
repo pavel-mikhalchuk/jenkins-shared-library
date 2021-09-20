@@ -25,7 +25,9 @@ def call(body) {
                 }
             }
             stage('deploy-to-dev-dev') {
-                input "Deploy to 'dev-dev'?"
+                input {
+                    message "Deploy to 'dev-dev'?"
+                }
                 agent { label 'helm-deploy' }
                 steps {
                     deploy('dev-dev', deployer, ctx)
