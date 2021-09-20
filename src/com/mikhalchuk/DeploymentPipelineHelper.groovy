@@ -24,11 +24,7 @@ class DeploymentPipelineHelper {
     }
 
     def dockerBuild(ctx) {
-        pipeline.echo "Before build..."
-        pipeline.echo "${ctx.toString()}"
         ctx.containerImages.each {
-            pipeline.echo "In build - ${it}"
-
             def img = (it.name + ':' + dockerImgTag(ctx)).toLowerCase()
             def imgLatest = (it.name + ':latest').toLowerCase()
 
@@ -38,11 +34,10 @@ class DeploymentPipelineHelper {
             ctx.dockerImages << img
             ctx.dockerImages << imgLatest
         }
-        pipeline.echo "After build..."
     }
 
     def dockerImgTag(ctx) {
-        "${currentTimestamp()}__${ctx.currentBranchName.replace('/', '_')}__${gitRev()}"
+        "${pipeline.currentTimestamp()}__${ctx.currentBranchName.replace('/', '_')}__${gitRev()}"
     }
 
     def gitRev() {
