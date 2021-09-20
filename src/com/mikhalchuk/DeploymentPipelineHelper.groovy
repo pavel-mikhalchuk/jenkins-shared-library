@@ -23,6 +23,27 @@ class DeploymentPipelineHelper {
         ////  ////  //// //// //// ////////  ////  //// //// //// ////
     }
 
+    def dockerBuild(ctx) {
+        ctx.containerImages.each {
+            def img = (it.name + ':' + dockerImgTag(ctx)).toLowerCase()
+            def imgLatest = (it.name + ':latest').toLowerCase()
+
+            sh "docker build -t ${img} ${it.source}"
+            sh "docker tag ${img} ${imgLatest}"
+
+            ctx.dockerImages << img
+            ctx.dockerImages << imgLatest
+        }
+    }
+
+    def dockerImgTag(ctx) {
+        "${currentTimestamp()}__${ctx.currentBranchName.replace('/', '_')}__${gitRev()}"
+    }
+
+    def gitRev() {
+        pipeline.sh(script: 'echo $(git rev-parse HEAD)', returnStdout: true).trim()
+    }
+
     def notifySlack(ctx) {
         pipeline.script {
             pipeline.wrap([$class: 'BuildUser']) {
