@@ -13,7 +13,7 @@ class PipelineHelper {
     }
 
     def abortPreviousBuilds() {
-        Run previousBuild = currentBuild.rawBuild.getPreviousBuildInProgress()
+        Run previousBuild = pipeline.currentBuild.rawBuild.getPreviousBuildInProgress()
 
         while (previousBuild != null) {
             if (previousBuild.isInProgress()) {
