@@ -28,8 +28,8 @@ class DeploymentPipelineHelper {
             def img = (it.name + ':' + dockerImgTag(ctx)).toLowerCase()
             def imgLatest = (it.name + ':latest').toLowerCase()
 
-            sh "docker build -t ${img} ${it.source}"
-            sh "docker tag ${img} ${imgLatest}"
+            pipeline.sh "docker build -t ${img} ${it.source}"
+            pipeline.sh "docker tag ${img} ${imgLatest}"
 
             ctx.dockerImages << img
             ctx.dockerImages << imgLatest
