@@ -23,37 +23,6 @@ class DeploymentPipelineHelper {
         ////  ////  //// //// //// ////////  ////  //// //// //// ////
     }
 
-    def dockerBuild(ctx) {
-        ctx.containerImages.each {
-            def img = (it.name + ':' + dockerImgTag(ctx)).toLowerCase()
-            def imgLatest = (it.name + ':latest').toLowerCase()
-
-            pipeline.sh "docker build -t ${img} ${it.source}"
-            pipeline.sh "docker tag ${img} ${imgLatest}"
-
-            ctx.dockerImages << img
-            ctx.dockerImages << imgLatest
-        }
-    }
-
-    def dockerImgTag(ctx) {
-        "${currentTimestamp()}__${ctx.currentBranchName.replace('/', '_')}__${gitRev()}"
-    }
-
-    def currentTimestamp() {
-        def clock = pipeline.env.IS_CLOCK_MOCKED == 'true'
-                ? MOCKED_CLOCK
-                : java.time.Clock.system(java.time.ZoneId.of("UTC+3"))
-
-        java.time.ZonedDateTime
-                .now(clock)
-                .format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss"))
-    }
-
-    def gitRev() {
-        pipeline.sh(script: 'echo $(git rev-parse HEAD)', returnStdout: true).trim()
-    }
-
     def notifySlack(ctx) {
         pipeline.script {
             pipeline.wrap([$class: 'BuildUser']) {
