@@ -1,12 +1,9 @@
 import com.mikhalchuk.*
 
-import hudson.model.Result
-import hudson.model.Run
-import jenkins.model.CauseOfInterruption.UserInterruption
-
 def call(body) {
     def ctx = setUpContext(body)
 
+    def pipeline = new PipelineHelper(this)
     def builder = new BuildPipelineHelper(this)
     def deployer = new DeploymentPipelineHelper(this)
 
@@ -19,7 +16,7 @@ def call(body) {
         stages {
             stage('abort-previous-builds') {
                 steps {
-                    abortPreviousBuilds()
+                    pipeline.abortPreviousBuilds()
                 }
             }
             stage('docker-build') {
@@ -43,25 +40,6 @@ def call(body) {
                 }
             }
         }
-    }
-}
-
-def abortPreviousBuilds() {
-    Run previousBuild = currentBuild.rawBuild.getPreviousBuildInProgress()
-
-    while (previousBuild != null) {
-        if (previousBuild.isInProgress()) {
-            def executor = previousBuild.getExecutor()
-            if (executor != null) {
-                echo ">> Aborting older build #${previousBuild.number}"
-
-                def cause = { "interrupted by build #${build.getId()}" as String } as CauseOfInterruption
-
-                executor.interrupt(Result.ABORTED, cause)
-            }
-        }
-
-        previousBuild = previousBuild.getPreviousBuildInProgress()
     }
 }
 
