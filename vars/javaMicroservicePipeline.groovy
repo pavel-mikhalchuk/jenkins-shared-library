@@ -27,21 +27,7 @@ def call(body) {
             stage('deploy-to-dev-dev') {
                 agent { label 'helm-deploy' }
                 steps {
-                    script {
-                        deployer.defineJavaMsDeploymentContext('dev-dev', ctx.dockerImageTag, ctx)
-                        deployer.checkoutInfraRepo(ctx)
-
-                        deployer.copyConfigToHelmChart(ctx)
-                        deployer.writeHelmValuesYaml(ctx)
-                    }
-                    container('helm') {
-                        script {
-                            deployer.generateK8SManifests(ctx)
-                        }
-                    }
-                    script {
-                        deployer.pushK8SManifests(ctx)
-                    }
+                    deploy(ctx)
                 }
             }
         }
@@ -55,4 +41,22 @@ def setUpContext(body) {
     // defining more parameters for ourselves
     ctx.dockerImages = []
     return ctx
+}
+
+def deploy(ctx) {
+    script {
+        deployer.defineJavaMsDeploymentContext('dev-dev', ctx.dockerImageTag, ctx)
+        deployer.checkoutInfraRepo(ctx)
+
+        deployer.copyConfigToHelmChart(ctx)
+        deployer.writeHelmValuesYaml(ctx)
+    }
+    container('helm') {
+        script {
+            deployer.generateK8SManifests(ctx)
+        }
+    }
+    script {
+        deployer.pushK8SManifests(ctx)
+    }
 }
