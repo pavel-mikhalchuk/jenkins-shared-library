@@ -9,9 +9,9 @@ class DeploymentPipelineHelper {
     }
 
     def deployJavaMsTo(namespace, ctx) {
-//        defineJavaMsDeploymentContext(namespace, ctx.dockerImageTag, ctx)
+        defineJavaMsDeploymentContext(namespace, ctx.dockerImageTag, ctx)
 
-//        checkoutInfraRepo(ctx)
+        checkoutInfraRepo(ctx)
 
         copyConfigToHelmChart(ctx)
         writeHelmValuesYaml(ctx)
