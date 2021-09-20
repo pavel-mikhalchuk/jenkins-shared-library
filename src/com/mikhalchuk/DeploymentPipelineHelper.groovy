@@ -24,8 +24,8 @@ class DeploymentPipelineHelper {
     }
 
     def dockerBuild(ctx) {
-        echo "Before build..."
-        echo "${ctx.toString()}"
+        pipeline.echo "Before build..."
+        pipeline.echo "${ctx.toString()}"
         ctx.containerImages.each {
             echo "In build - ${it}"
 
