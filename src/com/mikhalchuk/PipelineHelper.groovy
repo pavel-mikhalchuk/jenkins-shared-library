@@ -21,7 +21,7 @@ class PipelineHelper {
                 if (executor != null) {
                     pipeline.echo ">> Aborting older build #${previousBuild.number}"
                     executor.interrupt(Result.ABORTED, new UserInterruption(
-                            "Aborted by newer build #${currentBuild.number}"
+                            "Aborted by newer build #${pipeline.currentBuild.number}"
                     ))
                 }
             }
