@@ -29,17 +29,7 @@ def call(body) {
                 steps {
                     container('helm') {
                         script {
-                            params.NAMESPACE = 'dev-dev'
-                            params.IMAGE_TAG = ctx.dockerImageTag
-
-                            deployer.defineMoreContextBasedOnUserInput(ctx)
-                            deployer.checkoutInfraRepo(ctx)
-
-                            deployer.copyConfigToHelmChart(ctx)
-                            deployer.writeHelmValuesYaml(ctx)
-                            deployer.generateK8SManifests(ctx)
-
-                            deployer.pushK8SManifests(ctx)
+                            deployer.deployJavaMsTo('dev-dev', ctx)
                         }
                     }
                 }

@@ -8,9 +8,29 @@ class DeploymentPipelineHelper {
         this.pipeline = pipeline
     }
 
+    def deployJavaMsTo(namespace, ctx) {
+        defineJavaMsDeploymentContext(namespace, ctx.dockerImageTag, ctx)
+
+        checkoutInfraRepo(ctx)
+
+        copyConfigToHelmChart(ctx)
+        writeHelmValuesYaml(ctx)
+        generateK8SManifests(ctx)
+
+        pushK8SManifests(ctx)
+    }
+
     def defineMoreContextBasedOnUserInput(ctx) {
-        ctx.namespace = "${pipeline.params.NAMESPACE}"
-        ctx.dockerImage = "${ctx.service}:${pipeline.params.IMAGE_TAG ?: 'latest'}"
+        defineJavaMsDeploymentContext(
+                pipeline.params.NAMESPACE,
+                "${ctx.service}:${pipeline.params.IMAGE_TAG ?: 'latest'}",
+                ctx
+        )
+    }
+
+    def defineJavaMsDeploymentContext(namespace, dockerImageTag, ctx) {
+        ctx.namespace = namespace
+        ctx.dockerImage = dockerImageTag
         ctx.jenkinsBuildNumber = "${pipeline.JOB_NAME}-${pipeline.BUILD_NUMBER}"
         ctx.currentBranchName = "${pipeline.BRANCH_NAME}"
 
