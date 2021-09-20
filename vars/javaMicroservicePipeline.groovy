@@ -16,7 +16,9 @@ def call(body) {
         stages {
             stage('abort-previous-builds') {
                 steps {
-                    helper.abortPreviousBuilds()
+                    script {
+                        helper.abortPreviousBuilds()
+                    }
                 }
             }
             stage('docker-build') {
