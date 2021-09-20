@@ -15,13 +15,15 @@ def call(body) {
             stage('docker') {
                 steps {
                     container('docker') {
-                        // This step is very important!!!
-                        // Please do not remove it unless you find a better way without introducing "Init" stage because it's ugly :)"
-                        // Later stages depend on it.
-                        defineMoreContextBasedOnUserInput(ctx)
+                        script {
+                            // This step is very important!!!
+                            // Please do not remove it unless you find a better way without introducing "Init" stage because it's ugly :)"
+                            // Later stages depend on it.
+                            defineMoreContextBasedOnUserInput(ctx)
 
-                        helper.dockerBuild(ctx)
-//                        dockerPush(ctx)
+                            helper.dockerBuild(ctx)
+                            //dockerPush(ctx)
+                        }
                     }
                 }
             }
