@@ -27,7 +27,8 @@ def call(body) {
             stage('deploy-to-dev-dev') {
                 agent { label 'helm-deploy' }
                 steps {
-                    deploy(deployer, ctx)
+                    input "Deploy to 'dev-dev'?"
+                    deploy('dev-dev', deployer, ctx)
                 }
             }
         }
@@ -43,9 +44,9 @@ def setUpContext(body) {
     return ctx
 }
 
-def deploy(deployer, ctx) {
+def deploy(namespace, deployer, ctx) {
     script {
-        deployer.defineJavaMsDeploymentContext('dev-dev', ctx.dockerImageTag, ctx)
+        deployer.defineJavaMsDeploymentContext(namespace, ctx.dockerImageTag, ctx)
         deployer.checkoutInfraRepo(ctx)
 
         deployer.copyConfigToHelmChart(ctx)
