@@ -29,6 +29,8 @@ def call(body) {
                 steps {
                     container('helm') {
                         script {
+                            deployer.defineJavaMsDeploymentContext(namespace, ctx.dockerImageTag, ctx)
+                            deployer.checkoutInfraRepo(ctx)
                             deployer.deployJavaMsTo('dev-dev', ctx)
                         }
                     }
