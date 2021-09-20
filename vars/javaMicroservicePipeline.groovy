@@ -27,6 +27,9 @@ def call(body) {
             stage('deploy-to-dev-dev') {
                 agent { label 'helm-deploy' }
                 steps {
+                    script {
+                        deployer.defineJavaMsDeploymentContext(namespace, ctx.dockerImageTag, ctx)
+                    }
                     container('helm') {
                         script {
                             deployer.defineJavaMsDeploymentContext(namespace, ctx.dockerImageTag, ctx)
