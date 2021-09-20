@@ -34,8 +34,6 @@ def call(body) {
 def setUpContext(body) {
     // client-defined parameters in the body block
 
-    echo "body - ${body}"
-
     def ctx = JavaMicroservicePipelineContracts.resolve(ObjUtils.closureToMap(body))
 
     echo "ctx - ${ctx}"
