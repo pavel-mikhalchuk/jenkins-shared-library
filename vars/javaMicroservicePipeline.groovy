@@ -27,7 +27,7 @@ def call(body) {
             stage('deploy-to-dev-dev') {
                 agent { label 'helm-deploy' }
                 steps {
-                    deploy(ctx)
+                    deploy(deployer, ctx)
                 }
             }
         }
@@ -43,7 +43,7 @@ def setUpContext(body) {
     return ctx
 }
 
-def deploy(ctx) {
+def deploy(deployer, ctx) {
     script {
         deployer.defineJavaMsDeploymentContext('dev-dev', ctx.dockerImageTag, ctx)
         deployer.checkoutInfraRepo(ctx)
