@@ -8,18 +8,6 @@ class DeploymentPipelineHelper {
         this.pipeline = pipeline
     }
 
-    def deployJavaMsTo(namespace, ctx) {
-        defineJavaMsDeploymentContext(namespace, ctx.dockerImageTag, ctx)
-
-        checkoutInfraRepo(ctx)
-
-        copyConfigToHelmChart(ctx)
-        writeHelmValuesYaml(ctx)
-        generateK8SManifests(ctx)
-
-        pushK8SManifests(ctx)
-    }
-
     def defineMoreContextBasedOnUserInput(ctx) {
         defineJavaMsDeploymentContext(
                 pipeline.params.NAMESPACE,
