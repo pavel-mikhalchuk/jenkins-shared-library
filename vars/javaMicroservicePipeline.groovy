@@ -76,7 +76,7 @@ def deploy(env, namespace, deployer, ctx) {
 
         deployer.getHelmChart(ctx)
         defineHelmValues(ctx)
-        deployer.copyConfigToHelmChart(ctx)
+        deployer.smartCopyConfigToHelmChart(ctx)
         deployer.writeHelmValuesYaml(ctx, false)
     }
     container('helm') {
