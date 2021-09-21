@@ -33,14 +33,29 @@ def call(body) {
                 }
             }
             stage('deploy-to-dev-dev') {
+                agent { label 'helm-deploy' }
+                steps {
+                    deploy('dev', 'dev-dev', deployer, ctx)
+                }
+            }
+            stage('deploy-to-tst-test') {
                 input {
-                    message "Deploy to 'dev-dev'?"
+                    message "Deploy to 'tst-test'?"
                 }
                 agent { label 'helm-deploy' }
                 steps {
-                    deploy('dev-dev', deployer, ctx)
+                    deploy('dev', 'tst-test', deployer, ctx)
                 }
             }
+//            stage('deploy-to-prod') {
+//                input {
+//                    message "Deploy to 'prod'?"
+//                }
+//                agent { label 'helm-deploy' }
+//                steps {
+//                    deploy('prod', 'prod', deployer, ctx)
+//                }
+//            }
         }
     }
 }
@@ -54,13 +69,15 @@ def setUpContext(body) {
     return ctx
 }
 
-def deploy(namespace, deployer, ctx) {
+def deploy(env, namespace, deployer, ctx) {
     script {
-        deployer.defineJavaMsDeploymentContext(namespace, ctx.dockerImageTag, ctx)
+        deployer.defineJavaMsDeploymentContext(env, namespace, ctx.dockerImageTag, ctx)
         deployer.checkoutInfraRepo(ctx)
 
+        deployer.getHelmChart(ctx)
+        defineHelmValues(ctx)
         deployer.copyConfigToHelmChart(ctx)
-        deployer.writeHelmValuesYaml(ctx)
+        deployer.writeHelmValuesYaml(ctx, false)
     }
     container('helm') {
         script {
@@ -70,4 +87,66 @@ def deploy(namespace, deployer, ctx) {
     script {
         deployer.pushK8SManifests(ctx)
     }
+}
+
+def defineHelmValues(ctx) {
+    ctx.helmValues = [
+        name: ctx.service,
+
+        deployment: [
+            image: [
+                registry: 'dockerhub-vip.alutech.local',
+                repository: ctx.service,
+                tag: ctx.dockerImageTag,
+                pullPolicy: 'IfNotPresent'
+            ],
+
+            replicaCount: 2,
+
+            gitBranch: ctx.currentBranchName,
+            jenkinsBuildNumber: ctx.jenkinsBuildNumber,
+
+            nodeSelector: [
+                runtime: 'java'
+            ],
+
+            readinessProbe: [
+                httpGet: [
+                    path: '/actuator/health/readiness',
+                    port: 8080
+                ],
+                initialDelaySeconds: 3,
+                periodSeconds: 3
+            ],
+
+            livenessProbe: [
+                httpGet: [
+                    path: '/actuator/health/liveness',
+                    port: 8080
+                ],
+                initialDelaySeconds: 3,
+                periodSeconds: 3
+            ],
+            resources: [
+                requests: [
+                    memory: '2Gi',
+                    cpu: 1
+                ],
+                limits: [
+                    memory: '3Gi',
+                    cpu: 2
+                ]
+            ]
+        ],
+
+        service: [
+            externalPort: 80,
+            internalPort: 8080,
+            metricsPort: 8081,
+        ],
+
+        ingress: [
+            enabled: false
+        ]
+    ]
 }

@@ -10,13 +10,15 @@ class DeploymentPipelineHelper {
 
     def defineMoreContextBasedOnUserInput(ctx) {
         defineJavaMsDeploymentContext(
+                ctx.env,
                 pipeline.params.NAMESPACE,
                 "${ctx.service}:${pipeline.params.IMAGE_TAG ?: 'latest'}",
                 ctx
         )
     }
 
-    def defineJavaMsDeploymentContext(namespace, dockerImageTag, ctx) {
+    def defineJavaMsDeploymentContext(env, namespace, dockerImageTag, ctx) {
+        ctx.env = env
         ctx.namespace = namespace
         ctx.dockerImage = dockerImageTag
         ctx.jenkinsBuildNumber = "${pipeline.JOB_NAME}-${pipeline.BUILD_NUMBER}"
@@ -47,17 +49,22 @@ class DeploymentPipelineHelper {
         }
     }
 
+    def getHelmChart(ctx) {
+        pipeline.sh "mkdir -p ${ctx.helmChartFolder}"
+        pipeline.sh "cp -r ${ctx.infraFolder}/helm-charts/java/microservice/* ${ctx.helmChartFolder}"
+    }
+
     def copyConfigToHelmChart(ctx) {
-        pipeline.sh "cp src/main/resources/application.${ctx.namespace}.properties ${ctx.helmChartFolder}/application.properties"
+        pipeline.sh "cp src/main/resources/application.${ctx.namespace}.properties ${ctx.helmChartFolder}/application.properties" || true
     }
 
-    def writeHelmValuesYaml(ctx) {
-        pipeline.writeFile file: "${ctx.helmChartFolder}/values.yaml", text: helmValues(ctx)
+    def writeHelmValuesYaml(ctx, mergeWithDefaults = true) {
+        pipeline.writeFile file: "${ctx.helmChartFolder}/values.yaml", text: helmValues(ctx, mergeWithDefaults)
     }
 
-    def helmValues(ctx) {
+    def helmValues(ctx, mergeWithDefaults = true) {
         Yaml.write(
-                resolveClosureValues(ctx, merge(defaultValues(ctx), ctx.helmValues))
+                resolveClosureValues(ctx, mergeWithDefaults ? merge(defaultValues(ctx), ctx.helmValues) : ctx.helmValues)
         ).trim()
     }
 
