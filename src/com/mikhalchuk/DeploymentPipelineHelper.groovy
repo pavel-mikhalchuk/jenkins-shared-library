@@ -59,11 +59,8 @@ class DeploymentPipelineHelper {
     }
 
     def smartCopyConfigToHelmChart(ctx) {
-        pipeline.sh "find . -name 'application.${ctx.namespace}.properties' -type f -exec cp {} ${ctx.helmChartFolder}/application.properties \\\\;"
-        pipeline.sh "find . -name 'application.${ctx.namespace}.yaml' -type f -exec cp {} ${ctx.helmChartFolder}/application.yaml \\\\;"
-        pipeline.sh "find . -name \"application.${ctx.namespace}.properties\" -type f -exec cp {} ${ctx.helmChartFolder}/application.properties \\\\;"
-        pipeline.sh "find . -name \"application.${ctx.namespace}.yaml\" -type f -exec cp {} ${ctx.helmChartFolder}/application.yaml \\\\;"
-        pipeline.sh ('find . -name "application.' + (ctx.namespace as String) + '.yaml" -type f -exec cp {} ' + (ctx.helmChartFolder as String) + '/application.yaml \\;')
+        pipeline.sh "find . -name application.${ctx.namespace}.properties -type f -exec cp {} ${ctx.helmChartFolder}/application.properties \";\""
+        pipeline.sh "find . -name application.${ctx.namespace}.yaml -type f -exec cp {} ${ctx.helmChartFolder}/application.yaml \";\""
     }
 
     def writeHelmValuesYaml(ctx, mergeWithDefaults = true) {
