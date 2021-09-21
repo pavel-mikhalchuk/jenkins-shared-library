@@ -86,6 +86,7 @@ def deploy(env, namespace, deployer, ctx) {
     }
     script {
         deployer.pushK8SManifests(ctx)
+        deployer.notifyArgoCD()
     }
 }
 
