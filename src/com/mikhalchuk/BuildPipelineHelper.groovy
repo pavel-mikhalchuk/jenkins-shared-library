@@ -9,7 +9,7 @@ class BuildPipelineHelper {
     }
 
     def dockerBuild(ctx) {
-        ctx.dockerImageTag = dockerImgTag(ctx)
+        ctx.dockerImageTag = dockerImgTag(ctx).toLowerCase()
 
         ctx.containerImages.each {
             def img = (it.name + ':' + ctx.dockerImageTag).toLowerCase()
