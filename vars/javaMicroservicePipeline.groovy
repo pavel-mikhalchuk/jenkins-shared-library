@@ -129,11 +129,11 @@ def defineHelmValues(ctx) {
             ],
             resources: [
                 requests: [
-                    memory: '2Gi',
+                    memory: '1Gi',
                     cpu: 1
                 ],
                 limits: [
-                    memory: '3Gi',
+                    memory: '2Gi',
                     cpu: 2
                 ]
             ]
