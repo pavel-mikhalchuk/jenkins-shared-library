@@ -56,6 +56,7 @@ class DeploymentPipelineHelper {
 
     def copyConfigToHelmChart(ctx) {
         pipeline.sh "cp src/main/resources/application.${ctx.namespace}.properties ${ctx.helmChartFolder}/application.properties || true"
+        pipeline.sh "cp src/main/resources/application.${ctx.namespace}.yaml ${ctx.helmChartFolder}/application.yaml || true"
     }
 
     def writeHelmValuesYaml(ctx, mergeWithDefaults = true) {
