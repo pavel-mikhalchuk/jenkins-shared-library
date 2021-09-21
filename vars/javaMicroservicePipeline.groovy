@@ -110,23 +110,24 @@ def defineHelmValues(ctx) {
                 runtime: 'java'
             ],
 
-            readinessProbe: [
-                httpGet: [
-                    path: '/actuator/health/readiness',
-                    port: 8080
-                ],
-                initialDelaySeconds: 3,
-                periodSeconds: 3
-            ],
+//            readinessProbe: [
+//                httpGet: [
+//                    path: '/actuator/health/readiness',
+//                    port: 8080
+//                ],
+//                initialDelaySeconds: 3,
+//                periodSeconds: 3
+//            ],
 
-            livenessProbe: [
-                httpGet: [
-                    path: '/actuator/health/liveness',
-                    port: 8080
-                ],
-                initialDelaySeconds: 3,
-                periodSeconds: 3
-            ],
+//            livenessProbe: [
+//                httpGet: [
+//                    path: '/actuator/health/liveness',
+//                    port: 8080
+//                ],
+//                initialDelaySeconds: 3,
+//                periodSeconds: 3
+//            ],
+
             resources: [
                 requests: [
                     memory: '1Gi',
