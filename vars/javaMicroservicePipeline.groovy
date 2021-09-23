@@ -149,7 +149,10 @@ def defineHelmValues(ctx) {
 
         ingress: [
             enabled: true,
-            host: { ingUtils-> "${ingUtils.svc_ns_inin()}" }
+            host: { ingUtils-> "${ingUtils.svc_ns_inin()}" },
+            annotations: [
+                "kubernetes.io/ingress.class": "nginx-dev"
+            ]
         ]
     ]
 }
