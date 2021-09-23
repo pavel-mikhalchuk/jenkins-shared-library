@@ -148,7 +148,8 @@ def defineHelmValues(ctx) {
         ],
 
         ingress: [
-            enabled: false
+            enabled: true,
+            host: { ingUtils-> "${ingUtils.svc_ns_inin()}" }
         ]
     ]
 }
