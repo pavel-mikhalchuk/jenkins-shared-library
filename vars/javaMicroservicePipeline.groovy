@@ -116,7 +116,7 @@ def defineHelmValues(ctx) {
                     path: '/actuator/health/readiness',
                     port: 8081
                 ],
-                initialDelaySeconds: 3,
+                initialDelaySeconds: 30,
                 periodSeconds: 3
             ],
 
@@ -125,7 +125,7 @@ def defineHelmValues(ctx) {
                     path: '/actuator/health/liveness',
                     port: 8081
                 ],
-                initialDelaySeconds: 3,
+                initialDelaySeconds: 30,
                 periodSeconds: 3
             ],
 
