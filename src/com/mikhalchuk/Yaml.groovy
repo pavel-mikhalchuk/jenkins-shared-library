@@ -78,6 +78,8 @@ class Yaml {
                 }
             } else if (it.value instanceof Integer) {
                 result += "${indent}${it.key}: ${it.value}\n"
+            } else if (it.value instanceof Boolean) {
+                result += "${indent}${it.key}: ${it.value}\n"
             } else {
                 result += "${indent}${it.key}: ${quote(it.value)}\n"
             }

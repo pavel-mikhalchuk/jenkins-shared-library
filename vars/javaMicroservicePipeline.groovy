@@ -47,15 +47,15 @@ def call(body) {
                     deploy('dev', 'tst-test', deployer, ctx)
                 }
             }
-//            stage('deploy-to-prod') {
-//                input {
-//                    message "Deploy to 'prod'?"
-//                }
-//                agent { label 'helm-deploy' }
-//                steps {
-//                    deploy('prod', 'prod', deployer, ctx)
-//                }
-//            }
+            stage('deploy-to-prod') {
+                input {
+                    message "Deploy to 'prod'?"
+                }
+                agent { label 'helm-deploy' }
+                steps {
+                    deploy('prod', 'prod', deployer, ctx)
+                }
+            }
         }
     }
 }
@@ -75,9 +75,8 @@ def deploy(env, namespace, deployer, ctx) {
         deployer.checkoutInfraRepo(ctx)
 
         deployer.getHelmChart(ctx)
-        defineHelmValues(ctx)
         deployer.smartCopyConfigToHelmChart(ctx)
-        deployer.writeHelmValuesYaml(ctx, false)
+        deployer.writeRawHelmValuesYaml(helmValuesForEnvironment(env, ctx), ctx)
     }
     container('helm') {
         script {
@@ -90,8 +89,19 @@ def deploy(env, namespace, deployer, ctx) {
     }
 }
 
-def defineHelmValues(ctx) {
-    ctx.helmValues = [
+static def helmValuesForEnvironment(env, ctx) {
+    switch (env) {
+        case "dev":
+            return devEnvHelmValues(ctx)
+        case "prod":
+            return prodEnvHelmValues(ctx)
+        default:
+            return []
+    }
+}
+
+static def devEnvHelmValues(ctx) {
+    [
         name: ctx.service,
 
         deployment: [
@@ -153,6 +163,65 @@ def defineHelmValues(ctx) {
             annotations: [
                 "kubernetes.io/ingress.class": "nginx-dev"
             ]
+        ]
+    ]
+}
+
+static def prodEnvHelmValues(ctx) {
+    [
+        name: ctx.service,
+
+        deployment: [
+            image: [
+                registry: 'dockerhub-vip.alutech.local',
+                repository: ctx.service,
+                tag: ctx.dockerImageTag,
+                pullPolicy: 'IfNotPresent'
+            ],
+
+            replicaCount: 2,
+
+            gitBranch: ctx.currentBranchName,
+            jenkinsBuildNumber: ctx.jenkinsBuildNumber,
+
+            readinessProbe: [
+                httpGet: [
+                    path: '/actuator/health/readiness',
+                    port: 8081
+                ],
+                initialDelaySeconds: 30,
+                periodSeconds: 3
+            ],
+
+            livenessProbe: [
+                httpGet: [
+                    path: '/actuator/health/liveness',
+                    port: 8081
+                ],
+                initialDelaySeconds: 30,
+                periodSeconds: 3
+            ],
+
+            resources: [
+                requests: [
+                    memory: '1Gi',
+                    cpu: 1
+                ],
+                limits: [
+                    memory: '2Gi',
+                    cpu: 2
+                ]
+            ]
+        ],
+
+        service: [
+            externalPort: 80,
+            internalPort: 8080,
+            metricsPort: 8081,
+        ],
+
+        ingress: [
+            enabled: false
         ]
     ]
 }

@@ -23,7 +23,6 @@ class javaMicroservicePipelineTestSpec extends PipelineSpockTestBase {
         pipeline.getBinding().setVariable('JOB_NAME', "java-micro-service")
         pipeline.getBinding().setVariable('BUILD_NUMBER', '666')
         pipeline.getBinding().setVariable('BRANCH_NAME', "master")
-//        pipeline.getBinding().setVariable('BUILD_USER', 'mikhalchuk')
 
         when:
         pipeline {

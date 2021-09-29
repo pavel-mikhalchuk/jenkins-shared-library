@@ -63,14 +63,16 @@ class DeploymentPipelineHelper {
         pipeline.sh "find . -name application.${ctx.namespace}.yaml -type f -exec cp {} ${ctx.helmChartFolder}/application.yaml \";\""
     }
 
-    def writeHelmValuesYaml(ctx, mergeWithDefaults = true) {
-        pipeline.writeFile file: "${ctx.helmChartFolder}/values.yaml", text: helmValues(ctx, mergeWithDefaults)
+    def writeHelmValuesYaml(ctx) {
+        writeRawHelmValuesYaml(merge(defaultValues(ctx), ctx.helmValues), ctx)
     }
 
-    def helmValues(ctx, mergeWithDefaults = true) {
-        Yaml.write(
-                resolveClosureValues(ctx, mergeWithDefaults ? merge(defaultValues(ctx), ctx.helmValues) : ctx.helmValues)
-        ).trim()
+    def writeRawHelmValuesYaml(helmValuesMap, ctx) {
+        pipeline.writeFile file: "${ctx.helmChartFolder}/values.yaml", text: helmValues(helmValuesMap, ctx)
+    }
+
+    def helmValues(helmValues, ctx) {
+        Yaml.write(resolveClosureValues(ctx, helmValues)).trim()
     }
 
     def resolveClosureValues(ctx, helmValues) {
