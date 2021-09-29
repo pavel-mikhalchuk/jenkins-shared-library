@@ -3,6 +3,10 @@ package com.mikhalchuk.tests
 
 import com.mikhalchuk.testSupport.PipelineSpockTestBase
 
+import java.time.Clock
+import java.time.Instant
+import java.time.ZoneId
+
 class MockUtils {
     static void mockParameters(PipelineSpockTestBase test) {
         def isDockerImgTagChoiceParam = { params ->
@@ -35,6 +39,18 @@ class MockUtils {
         })
     }
 
+    static void mockInput(PipelineSpockTestBase test) {
+        test.helper.registerAllowedMethod("input", [Closure.class], { body ->
+            body()
+        })
+    }
+
+    static void mockMessage(PipelineSpockTestBase test) {
+        test.helper.registerAllowedMethod("message", [String.class], { msg ->
+            println msg
+        })
+    }
+
     static void mockInfraFolderName(PipelineSpockTestBase test) {
         test.helper.addShMock('echo infra-$(date +"%d-%m-%Y_%H-%M-%S")',
                 'infra-06-06-2020_06-06-06', 0)
@@ -43,5 +59,11 @@ class MockUtils {
     static void mockGitRevParse(PipelineSpockTestBase test) {
         test.helper.addShMock('echo $(git rev-parse HEAD)',
                 'bbfcd9f9632d4d8d7a9b7b4f0f155f16c78660eb', 0)
+    }
+
+    static void mockClock(Script pipeline, PipelineSpockTestBase test) {
+        test.addEnvVar('IS_CLOCK_MOCKED', 'true')
+        pipeline.getBinding().setVariable('MOCKED_CLOCK',
+                Clock.fixed(Instant.parse('2020-08-30T00:59:45.00Z'), ZoneId.of("UTC")))
     }
 }

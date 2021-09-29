@@ -1,0 +1,184 @@
+   javaMicroservicePipeline.getBinding()
+   javaMicroservicePipeline.getBinding()
+   javaMicroservicePipeline.getBinding()
+   javaMicroservicePipeline.getBinding()
+   javaMicroservicePipeline.call(groovy.lang.Closure)
+      javaMicroservicePipeline.pipeline(groovy.lang.Closure)
+         javaMicroservicePipeline.agent(groovy.lang.Closure)
+         javaMicroservicePipeline.options(groovy.lang.Closure)
+            javaMicroservicePipeline.logRotator({numToKeepStr=5})
+            javaMicroservicePipeline.buildDiscarder(null)
+            javaMicroservicePipeline.timestamps()
+         javaMicroservicePipeline.stages(groovy.lang.Closure)
+            javaMicroservicePipeline.stage(abort-previous-builds, groovy.lang.Closure)
+               javaMicroservicePipeline.steps(groovy.lang.Closure)
+                  javaMicroservicePipeline.script(groovy.lang.Closure)
+            javaMicroservicePipeline.stage(docker-build, groovy.lang.Closure)
+               javaMicroservicePipeline.agent(groovy.lang.Closure)
+                  javaMicroservicePipeline.label(docker-build)
+               javaMicroservicePipeline.steps(groovy.lang.Closure)
+                  javaMicroservicePipeline.container(docker, groovy.lang.Closure)
+                     javaMicroservicePipeline.script(groovy.lang.Closure)
+                        javaMicroservicePipeline.sh({script=echo $(git rev-parse HEAD), returnStdout=true})
+                        javaMicroservicePipeline.sh(docker build -t java-micro-service:20200830t005945__master__abcd123 .)
+                        javaMicroservicePipeline.sh(docker tag java-micro-service:20200830t005945__master__abcd123 java-micro-service:latest)
+                        javaMicroservicePipeline.sh(docker tag java-micro-service:20200830t005945__master__abcd123 blue.dockerhub.alutech.local/java-micro-service:20200830t005945__master__abcd123 && docker push blue.dockerhub.alutech.local/java-micro-service:20200830t005945__master__abcd123)
+                        javaMicroservicePipeline.sh(docker tag java-micro-service:20200830t005945__master__abcd123 green.dockerhub.alutech.local/java-micro-service:20200830t005945__master__abcd123 && docker push green.dockerhub.alutech.local/java-micro-service:20200830t005945__master__abcd123)
+                        javaMicroservicePipeline.sh(docker tag java-micro-service:latest blue.dockerhub.alutech.local/java-micro-service:latest && docker push blue.dockerhub.alutech.local/java-micro-service:latest)
+                        javaMicroservicePipeline.sh(docker tag java-micro-service:latest green.dockerhub.alutech.local/java-micro-service:latest && docker push green.dockerhub.alutech.local/java-micro-service:latest)
+            javaMicroservicePipeline.stage(deploy-to-dev-dev, groovy.lang.Closure)
+               javaMicroservicePipeline.agent(groovy.lang.Closure)
+                  javaMicroservicePipeline.label(helm-deploy)
+               javaMicroservicePipeline.steps(groovy.lang.Closure)
+                  javaMicroservicePipeline.script(groovy.lang.Closure)
+                     javaMicroservicePipeline.sh({script=echo infra-$(date +"%d-%m-%Y_%H-%M-%S"), returnStdout=true})
+                     javaMicroservicePipeline.sh(mkdir bbb
+ccc)
+                     javaMicroservicePipeline.dir(bbb
+ccc, groovy.lang.Closure)
+                        javaMicroservicePipeline.git({credentialsId=jenkins, url=http://bb.alutech-mc.com:8080/scm/as/infra.git})
+                     javaMicroservicePipeline.sh(mkdir -p kubernetes/helm-chart/java-micro-service)
+                     javaMicroservicePipeline.sh(cp -r bbb
+ccc/helm-charts/java/microservice/* kubernetes/helm-chart/java-micro-service)
+                     javaMicroservicePipeline.sh(find . -name application.dev-dev.properties -type f -exec cp {} kubernetes/helm-chart/java-micro-service/application.properties ";")
+                     javaMicroservicePipeline.sh(find . -name application.dev-dev.yaml -type f -exec cp {} kubernetes/helm-chart/java-micro-service/application.yaml ";")
+                     javaMicroservicePipeline.writeFile({file=kubernetes/helm-chart/java-micro-service/values.yaml, text=name: "java-micro-service"
+deployment:
+  image:
+    registry: "dockerhub-vip.alutech.local"
+    repository: "java-micro-service"
+    tag: "20200830t005945__master__abcd123"
+    pullPolicy: "IfNotPresent"
+  replicaCount: 2
+  gitBranch: "master"
+  jenkinsBuildNumber: "java-micro-service-666"
+  nodeSelector:
+    runtime: "java"
+  readinessProbe:
+    httpGet:
+      path: "/actuator/health/readiness"
+      port: 8081
+    initialDelaySeconds: 3
+    periodSeconds: 3
+  livenessProbe:
+    httpGet:
+      path: "/actuator/health/liveness"
+      port: 8081
+    initialDelaySeconds: 3
+    periodSeconds: 3
+  resources:
+    requests:
+      memory: "1Gi"
+      cpu: 1
+    limits:
+      memory: "2Gi"
+      cpu: 2
+service:
+  externalPort: 80
+  internalPort: 8080
+  metricsPort: 8081
+ingress:
+  enabled: "true"
+  host: "java-micro-service.dev.dev.in.in.alutech24.com"
+  annotations:
+    kubernetes.io/ingress.class: "nginx-dev"})
+                  javaMicroservicePipeline.container(helm, groovy.lang.Closure)
+                     javaMicroservicePipeline.script(groovy.lang.Closure)
+                        javaMicroservicePipeline.sh(rm -rf bbb
+ccc/kube-dev/cluster-state/alutech-services/dev-dev/java-micro-service/raw-manifests)
+                        javaMicroservicePipeline.sh(mkdir -p bbb
+ccc/kube-dev/cluster-state/alutech-services/dev-dev/java-micro-service/raw-manifests)
+                        javaMicroservicePipeline.sh(helm template --namespace dev-dev --name java-micro-service-dev-dev kubernetes/helm-chart/java-micro-service > 'bbb
+ccc/kube-dev/cluster-state/alutech-services/dev-dev/java-micro-service/raw-manifests/kube-state.yaml')
+                  javaMicroservicePipeline.script(groovy.lang.Closure)
+                     javaMicroservicePipeline.dir(bbb
+ccc, groovy.lang.Closure)
+                        javaMicroservicePipeline.usernamePassword({credentialsId=jenkins, passwordVariable=GIT_PASSWORD, usernameVariable=GIT_USERNAME})
+                        javaMicroservicePipeline.withCredentials([{credentialsId=jenkins, passwordVariable=GIT_PASSWORD, usernameVariable=GIT_USERNAME}], groovy.lang.Closure)
+                           javaMicroservicePipeline.sh(git config user.email "jenkins@infra.tower")
+                           javaMicroservicePipeline.sh(git config user.name "Jenkins")
+                           javaMicroservicePipeline.sh(git checkout master)
+                           javaMicroservicePipeline.sh(git pull http://${GIT_USERNAME}:${GIT_PASSWORD}@bb.alutech-mc.com:8080/scm/as/infra.git HEAD:master)
+                           javaMicroservicePipeline.sh(git add *)
+                           javaMicroservicePipeline.sh(git commit -m "[jenkins]: ${JOB_NAME} - ${BUILD_NUMBER}")
+                           javaMicroservicePipeline.sh(git push http://${GIT_USERNAME}:${GIT_PASSWORD}@bb.alutech-mc.com:8080/scm/as/infra.git HEAD:master)
+                     javaMicroservicePipeline.sh(curl -k -X POST https://git-events-publisher.in.in.alutech24.com/push)
+            javaMicroservicePipeline.stage(deploy-to-tst-test, groovy.lang.Closure)
+               javaMicroservicePipeline.input(groovy.lang.Closure)
+                  javaMicroservicePipeline.message(Deploy to 'tst-test'?)
+               javaMicroservicePipeline.agent(groovy.lang.Closure)
+                  javaMicroservicePipeline.label(helm-deploy)
+               javaMicroservicePipeline.steps(groovy.lang.Closure)
+                  javaMicroservicePipeline.script(groovy.lang.Closure)
+                     javaMicroservicePipeline.sh({script=echo infra-$(date +"%d-%m-%Y_%H-%M-%S"), returnStdout=true})
+                     javaMicroservicePipeline.sh(mkdir bbb
+ccc)
+                     javaMicroservicePipeline.dir(bbb
+ccc, groovy.lang.Closure)
+                        javaMicroservicePipeline.git({credentialsId=jenkins, url=http://bb.alutech-mc.com:8080/scm/as/infra.git})
+                     javaMicroservicePipeline.sh(mkdir -p kubernetes/helm-chart/java-micro-service)
+                     javaMicroservicePipeline.sh(cp -r bbb
+ccc/helm-charts/java/microservice/* kubernetes/helm-chart/java-micro-service)
+                     javaMicroservicePipeline.sh(find . -name application.tst-test.properties -type f -exec cp {} kubernetes/helm-chart/java-micro-service/application.properties ";")
+                     javaMicroservicePipeline.sh(find . -name application.tst-test.yaml -type f -exec cp {} kubernetes/helm-chart/java-micro-service/application.yaml ";")
+                     javaMicroservicePipeline.writeFile({file=kubernetes/helm-chart/java-micro-service/values.yaml, text=name: "java-micro-service"
+deployment:
+  image:
+    registry: "dockerhub-vip.alutech.local"
+    repository: "java-micro-service"
+    tag: "20200830t005945__master__abcd123"
+    pullPolicy: "IfNotPresent"
+  replicaCount: 2
+  gitBranch: "master"
+  jenkinsBuildNumber: "java-micro-service-666"
+  nodeSelector:
+    runtime: "java"
+  readinessProbe:
+    httpGet:
+      path: "/actuator/health/readiness"
+      port: 8081
+    initialDelaySeconds: 3
+    periodSeconds: 3
+  livenessProbe:
+    httpGet:
+      path: "/actuator/health/liveness"
+      port: 8081
+    initialDelaySeconds: 3
+    periodSeconds: 3
+  resources:
+    requests:
+      memory: "1Gi"
+      cpu: 1
+    limits:
+      memory: "2Gi"
+      cpu: 2
+service:
+  externalPort: 80
+  internalPort: 8080
+  metricsPort: 8081
+ingress:
+  enabled: "true"
+  host: "java-micro-service.test.tst.in.in.alutech24.com"
+  annotations:
+    kubernetes.io/ingress.class: "nginx-dev"})
+                  javaMicroservicePipeline.container(helm, groovy.lang.Closure)
+                     javaMicroservicePipeline.script(groovy.lang.Closure)
+                        javaMicroservicePipeline.sh(rm -rf bbb
+ccc/kube-dev/cluster-state/alutech-services/tst-test/java-micro-service/raw-manifests)
+                        javaMicroservicePipeline.sh(mkdir -p bbb
+ccc/kube-dev/cluster-state/alutech-services/tst-test/java-micro-service/raw-manifests)
+                        javaMicroservicePipeline.sh(helm template --namespace tst-test --name java-micro-service-tst-test kubernetes/helm-chart/java-micro-service > 'bbb
+ccc/kube-dev/cluster-state/alutech-services/tst-test/java-micro-service/raw-manifests/kube-state.yaml')
+                  javaMicroservicePipeline.script(groovy.lang.Closure)
+                     javaMicroservicePipeline.dir(bbb
+ccc, groovy.lang.Closure)
+                        javaMicroservicePipeline.usernamePassword({credentialsId=jenkins, passwordVariable=GIT_PASSWORD, usernameVariable=GIT_USERNAME})
+                        javaMicroservicePipeline.withCredentials([{credentialsId=jenkins, passwordVariable=GIT_PASSWORD, usernameVariable=GIT_USERNAME}], groovy.lang.Closure)
+                           javaMicroservicePipeline.sh(git config user.email "jenkins@infra.tower")
+                           javaMicroservicePipeline.sh(git config user.name "Jenkins")
+                           javaMicroservicePipeline.sh(git checkout master)
+                           javaMicroservicePipeline.sh(git pull http://${GIT_USERNAME}:${GIT_PASSWORD}@bb.alutech-mc.com:8080/scm/as/infra.git HEAD:master)
+                           javaMicroservicePipeline.sh(git add *)
+                           javaMicroservicePipeline.sh(git commit -m "[jenkins]: ${JOB_NAME} - ${BUILD_NUMBER}")
+                           javaMicroservicePipeline.sh(git push http://${GIT_USERNAME}:${GIT_PASSWORD}@bb.alutech-mc.com:8080/scm/as/infra.git HEAD:master)
+                     javaMicroservicePipeline.sh(curl -k -X POST https://git-events-publisher.in.in.alutech24.com/push)

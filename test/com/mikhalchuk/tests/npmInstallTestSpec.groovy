@@ -42,10 +42,4 @@ class npmInstallTestSpec extends PipelineSpockTestBase {
         testNonRegression("specific_node_modules_cache_path")
         assertJobStatusSuccess()
     }
-
-    def mockClock(pipeline) {
-        addEnvVar('IS_CLOCK_MOCKED', 'true')
-        pipeline.getBinding().setVariable('MOCKED_CLOCK',
-                Clock.fixed(Instant.parse('2020-08-30T00:59:45.00Z'), ZoneId.of("UTC")))
-    }
 }

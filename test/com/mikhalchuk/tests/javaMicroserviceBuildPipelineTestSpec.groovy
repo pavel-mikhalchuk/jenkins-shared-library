@@ -6,6 +6,7 @@ import java.time.Clock
 import java.time.Instant
 import java.time.ZoneId
 
+import static com.mikhalchuk.tests.MockUtils.mockClock
 import static com.mikhalchuk.tests.MockUtils.mockContainer
 import static com.mikhalchuk.tests.MockUtils.mockGitRevParse
 import static com.mikhalchuk.tests.MockUtils.mockParameters
@@ -24,7 +25,7 @@ class javaMicroserviceBuildPipelineTestSpec extends PipelineSpockTestBase {
 
         and:
         pipeline.getBinding().setVariable('BRANCH_NAME', "super/master")
-        mockClock(pipeline)
+        mockClock(pipeline, this)
 
         when:
         pipeline {
@@ -48,7 +49,7 @@ class javaMicroserviceBuildPipelineTestSpec extends PipelineSpockTestBase {
 
         and:
         pipeline.getBinding().setVariable('BRANCH_NAME', "super/master")
-        mockClock(pipeline)
+        mockClock(pipeline, this)
 
         when:
         pipeline {
@@ -75,7 +76,7 @@ class javaMicroserviceBuildPipelineTestSpec extends PipelineSpockTestBase {
 
         and:
         pipeline.getBinding().setVariable('BRANCH_NAME', "super/master")
-        mockClock(pipeline)
+        mockClock(pipeline, this)
 
         when:
         pipeline {
@@ -99,11 +100,5 @@ class javaMicroserviceBuildPipelineTestSpec extends PipelineSpockTestBase {
         P_SERVICE                        | P_SKIP_TESTS
         "service_with_custom_mvn_params" | false
         "service_with_custom_mvn_params" | true
-    }
-
-    def mockClock(pipeline) {
-        addEnvVar('IS_CLOCK_MOCKED', 'true')
-        pipeline.getBinding().setVariable('MOCKED_CLOCK',
-                Clock.fixed(Instant.parse('2020-08-30T00:59:45.00Z'), ZoneId.of("UTC")))
     }
 }
