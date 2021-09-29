@@ -87,15 +87,15 @@ aservice:latest
                      javaMicroserviceDeploymentPipeline.script(groovy.lang.Closure)
                         javaMicroserviceDeploymentPipeline.sh(cp -r configuration/src/main/resources/* kubernetes/helm-chart/aservice/)
                         javaMicroserviceDeploymentPipeline.sh(cp configuration/src/main/resources/env/base.dev-dev.properties kubernetes/helm-chart/aservice/base.properties)
-                        javaMicroserviceDeploymentPipeline.writeFile({file=kubernetes/helm-chart/aservice/values.yaml, text=replicaCount: "1"
+                        javaMicroserviceDeploymentPipeline.writeFile({file=kubernetes/helm-chart/aservice/values.yaml, text=replicaCount: 1
 gitBranch: "master"
 image:
   repository: "dockerhub-vip.alutech.local"
   tag: "aservice:latest"
   pullPolicy: "IfNotPresent"
 service:
-  externalPort: "80"
-  internalPort: "8080"
+  externalPort: 80
+  internalPort: 8080
 jenkinsBuildNumber: "aservice-deploy-dev-666"
 drawingService:
   serviceName: "drawing"

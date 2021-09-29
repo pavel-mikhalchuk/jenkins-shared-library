@@ -3,10 +3,17 @@ apply plugin:   'groovy'
 repositories {
     mavenCentral()
     maven { url 'https://repo.jenkins-ci.org/releases/' }
+    maven { url 'https://repo.jenkins-ci.org/public/' }
 }
 
 dependencies {
     compile 'org.codehaus.groovy:groovy-all:2.4.11'
+
+    /**
+     * Hudson/Jenkins dependencies
+     */
+    compile 'org.jenkins-ci.main:jenkins-core:2.85'
+    compileOnly 'javax.servlet:javax.servlet-api:3.1.0'
 
     /**
      * JenkinsPipelineUnit for testing pipelines from:
@@ -21,7 +28,6 @@ dependencies {
     testCompile 'cglib:cglib-nodep:3.2.2'
     testCompile 'org.objenesis:objenesis:1.2'
     testCompile 'org.assertj:assertj-core:3.7.0'
-
 }
 
 test {

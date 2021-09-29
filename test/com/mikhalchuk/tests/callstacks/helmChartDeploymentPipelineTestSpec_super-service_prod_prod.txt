@@ -77,7 +77,7 @@ super-service:latest
                helmChartDeploymentPipeline.steps(groovy.lang.Closure)
                   helmChartDeploymentPipeline.container(helm, groovy.lang.Closure)
                      helmChartDeploymentPipeline.script(groovy.lang.Closure)
-                        helmChartDeploymentPipeline.writeFile({file=kubernetes/helm-chart/super-service/values.yaml, text=replicaCount: "1"
+                        helmChartDeploymentPipeline.writeFile({file=kubernetes/helm-chart/super-service/values.yaml, text=replicaCount: 1
 gitBranch: "master"
 image:
   repository: "dockerhub-vip.alutech.local"
@@ -85,8 +85,8 @@ image:
   pullPolicy: "IfNotPresent"
   additionalProperty: "super-service-image-additional-property"
 service:
-  externalPort: "80"
-  internalPort: "8080"
+  externalPort: 80
+  internalPort: 8080
 jenkinsBuildNumber: "super-service-deploy-prod-666"
 environment: "prod"
 superServiceDatabase:

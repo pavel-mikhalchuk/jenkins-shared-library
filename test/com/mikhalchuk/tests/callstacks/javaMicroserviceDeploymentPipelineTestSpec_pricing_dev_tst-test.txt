@@ -86,15 +86,15 @@ pricing:latest
                   javaMicroserviceDeploymentPipeline.container(helm, groovy.lang.Closure)
                      javaMicroserviceDeploymentPipeline.script(groovy.lang.Closure)
                         javaMicroserviceDeploymentPipeline.sh(cp src/main/resources/application.tst-test.properties kubernetes/helm-chart/pricing/application.properties)
-                        javaMicroserviceDeploymentPipeline.writeFile({file=kubernetes/helm-chart/pricing/values.yaml, text=replicaCount: "1"
+                        javaMicroserviceDeploymentPipeline.writeFile({file=kubernetes/helm-chart/pricing/values.yaml, text=replicaCount: 1
 gitBranch: "develop"
 image:
   repository: "dockerhub-vip.alutech.local"
   tag: "pricing:latest"
   pullPolicy: "IfNotPresent"
 service:
-  externalPort: "80"
-  internalPort: "8080"
+  externalPort: 80
+  internalPort: 8080
 jenkinsBuildNumber: "pricing-deploy-dev-666"
 host: "pricing.test.tst.in.in.alutech24.com"
 resources:

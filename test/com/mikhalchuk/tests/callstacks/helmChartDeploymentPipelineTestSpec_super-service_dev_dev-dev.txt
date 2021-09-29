@@ -85,7 +85,7 @@ super-service:latest
                   helmChartDeploymentPipeline.container(helm, groovy.lang.Closure)
                      helmChartDeploymentPipeline.script(groovy.lang.Closure)
                         helmChartDeploymentPipeline.sh({script=$(super-service-get-password-shell-command), returnStdout=true})
-                        helmChartDeploymentPipeline.writeFile({file=kubernetes/helm-chart/super-service/values.yaml, text=replicaCount: "1"
+                        helmChartDeploymentPipeline.writeFile({file=kubernetes/helm-chart/super-service/values.yaml, text=replicaCount: 1
 gitBranch: "develop"
 image:
   repository: "dockerhub-vip.alutech.local"
@@ -93,8 +93,8 @@ image:
   pullPolicy: "IfNotPresent"
   additionalProperty: "super-service-image-additional-property"
 service:
-  externalPort: "80"
-  internalPort: "8080"
+  externalPort: 80
+  internalPort: 8080
 jenkinsBuildNumber: "super-service-deploy-dev-666"
 superServiceDatabase:
   password: "alex111"

@@ -86,15 +86,15 @@ calculation:latest
                   javaMicroserviceDeploymentPipeline.container(helm, groovy.lang.Closure)
                      javaMicroserviceDeploymentPipeline.script(groovy.lang.Closure)
                         javaMicroserviceDeploymentPipeline.sh(cp src/main/resources/application.prod.properties kubernetes/helm-chart/calculation/application.properties)
-                        javaMicroserviceDeploymentPipeline.writeFile({file=kubernetes/helm-chart/calculation/values.yaml, text=replicaCount: "1"
+                        javaMicroserviceDeploymentPipeline.writeFile({file=kubernetes/helm-chart/calculation/values.yaml, text=replicaCount: 1
 gitBranch: "master"
 image:
   repository: "dockerhub-vip.alutech.local"
   tag: "calculation:latest"
   pullPolicy: "IfNotPresent"
 service:
-  externalPort: "80"
-  internalPort: "8080"
+  externalPort: 80
+  internalPort: 8080
 jenkinsBuildNumber: "calculation-deploy-prod-666"
 environment: "prod"
 host: "calculation.alutech24.com"

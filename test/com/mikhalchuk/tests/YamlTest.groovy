@@ -43,7 +43,7 @@ javaOpts: "-Xms500m -Xmx4g"'''
         )
     }
 
-    def "test write"() {
+    def "test write strings"() {
         given:
         def map = [
             resources: [
@@ -75,6 +75,29 @@ javaOpts: "-Xms500m -Xmx4g"'''
       memory: "5Gi"
       cpu: "2"
 javaOpts: null'''
+        )
+    }
+
+    def "test write integers"() {
+        given:
+        def map = [
+            livenessProbe: [
+                httpGet: [
+                    path: '/actuator/health/liveness',
+                    port: 8081
+                ]
+            ]
+        ]
+
+        when:
+        def yaml = Yaml.write(map)
+
+        then:
+        assertThat(yaml).isEqualTo(
+            '''livenessProbe:
+  httpGet:
+    path: "/actuator/health/liveness"
+    port: 8081'''
         )
     }
 }
