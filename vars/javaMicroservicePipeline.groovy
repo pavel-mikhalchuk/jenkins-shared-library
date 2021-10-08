@@ -24,9 +24,11 @@ def call(body) {
             stage('build') {
                 agent { label 'java-build' }
                 steps {
+                    container('maven') {
+                        builder.mavenPackage()
+                    }
                     container('docker') {
                         script {
-                            builder.mavenPackage()
                             builder.dockerBuild(ctx)
                             builder.dockerPush(ctx)
                         }
