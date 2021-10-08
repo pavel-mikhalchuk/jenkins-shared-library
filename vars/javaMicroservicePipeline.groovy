@@ -22,7 +22,7 @@ def call(body) {
                 }
             }
             stage('build') {
-                agent { label 'java-build' }
+                agent { label 'java-build-16' }
                 steps {
                     container('maven') {
                         script {
