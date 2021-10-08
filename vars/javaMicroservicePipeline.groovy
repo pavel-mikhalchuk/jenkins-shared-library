@@ -21,11 +21,12 @@ def call(body) {
                     }
                 }
             }
-            stage('docker-build') {
-                agent { label 'docker-build' }
+            stage('build') {
+                agent { label 'java-build' }
                 steps {
                     container('docker') {
                         script {
+                            builder.mavenPackage()
                             builder.dockerBuild(ctx)
                             builder.dockerPush(ctx)
                         }

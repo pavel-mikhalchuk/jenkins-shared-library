@@ -8,6 +8,10 @@ class BuildPipelineHelper {
         this.pipeline = pipeline
     }
 
+    def mavenPackage() {
+        pipeline.sh "mvn clean package"
+    }
+
     def dockerBuild(ctx) {
         ctx.dockerImageTag = dockerImgTag(ctx).toLowerCase()
 
