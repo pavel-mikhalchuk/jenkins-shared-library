@@ -25,7 +25,9 @@ def call(body) {
                 agent { label 'java-build' }
                 steps {
                     container('maven') {
-                        builder.mavenPackage()
+                        script {
+                            builder.mavenPackage()
+                        }
                     }
                     container('docker') {
                         script {
