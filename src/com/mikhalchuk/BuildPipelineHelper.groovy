@@ -9,7 +9,7 @@ class BuildPipelineHelper {
     }
 
     def mavenPackage() {
-        pipeline.sh "export TESTCONTAINERS_HOST_OVERRIDE=10.100.20.22 && mvn clean package"
+        pipeline.sh "mvn clean package"
     }
 
     def dockerBuild(ctx) {
