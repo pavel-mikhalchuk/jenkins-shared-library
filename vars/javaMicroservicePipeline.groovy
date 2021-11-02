@@ -50,9 +50,7 @@ def call(body) {
                                     input message: "Deploy to 'dev-dev'?"
                                 }
                             } catch(err) {
-                                echo "Finish the pipeline!"
-                                currentBuild.result = 'SUCCESS'
-                                return
+                                error('Aborting the build.')
                             }
                         }
                     }
