@@ -41,13 +41,21 @@ def call(body) {
                 }
             }
             stage('deploy-to-dev-dev') {
-                script {
-                    if (BRANCH_NAME != 'master') {
-                        message "Deploy to 'dev-dev'?"
-                    }
-                }
                 agent { label 'helm-deploy' }
                 steps {
+                    script {
+                        if (BRANCH_NAME != 'master') {
+                            try {
+                                timeout(time: 10, unit: 'SECONDS') {
+                                    input message: "Deploy to 'dev-dev'?"
+                                }
+                            } catch(err) {
+                                echo "Finish the pipeline!"
+                                currentBuild.result = 'SUCCESS'
+                                return
+                            }
+                        }
+                    }
                     deploy('dev', 'dev-dev', deployer, ctx)
                 }
             }
