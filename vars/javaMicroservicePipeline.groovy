@@ -41,6 +41,11 @@ def call(body) {
                 }
             }
             stage('deploy-to-dev-dev') {
+                script {
+                    if (BRANCH_NAME != 'master') {
+                        message "Deploy to 'dev-dev'?"
+                    }
+                }
                 agent { label 'helm-deploy' }
                 steps {
                     deploy('dev', 'dev-dev', deployer, ctx)
