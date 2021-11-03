@@ -9,9 +9,6 @@ def call(body) {
 
     pipeline {
         agent none
-//        triggers {
-//            bitbucketPush()
-//        }
         options {
             buildDiscarder(logRotator(numToKeepStr: '5'))
             timestamps ()
