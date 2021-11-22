@@ -117,7 +117,7 @@ static def helmValuesForEnvironment(env, ctx) {
 }
 
 static def devEnvHelmValues(ctx) {
-    [
+    def values = [
         name: ctx.service,
 
         deployment: [
@@ -181,10 +181,12 @@ static def devEnvHelmValues(ctx) {
             ]
         ]
     ]
+
+    return addStorageHelmValues(ctx, values)
 }
 
 static def prodEnvHelmValues(ctx) {
-    [
+    def values = [
         name: ctx.service,
 
         deployment: [
@@ -240,4 +242,14 @@ static def prodEnvHelmValues(ctx) {
             enabled: false
         ]
     ]
+
+    return addStorageHelmValues(ctx, values)
+}
+
+static def addStorageHelmValues(ctx, values) {
+    if (ctx.storage) {
+        values.nfs = ctx.storage
+    }
+
+    return values
 }
