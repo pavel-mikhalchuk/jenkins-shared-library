@@ -64,7 +64,10 @@ class DeploymentPipelineHelper {
     }
 
     def writeHelmValuesYaml(ctx) {
-        writeRawHelmValuesYaml(merge(defaultValues(ctx), ctx.helmValues), ctx)
+        def jenkinsFileHelmValues = ctx.helmValues
+        def userInputHelmValues = Yaml.parse(pipeline.params.RESOURCES)
+
+        writeRawHelmValuesYaml(merge(defaultValues(ctx), merge(jenkinsFileHelmValues, userInputHelmValues)), ctx)
     }
 
     def writeRawHelmValuesYaml(helmValuesMap, ctx) {

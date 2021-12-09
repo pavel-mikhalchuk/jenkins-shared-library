@@ -16,6 +16,9 @@ class Yaml {
     }
 
     static def unquote(str) {
+        if (str == "null") {
+            return null
+        }
         if (str.charAt(0) == '"' && str.charAt(str.length() - 1) == '"') {
             return str.substring(1, str.length() - 1)
         }
@@ -45,7 +48,7 @@ class Yaml {
 
         lines.eachWithIndex {line, i ->
             def indent = indentOf(line)
-            def keyValue = line.split(':')
+            def keyValue = line.split(':', 2)
 
             if (keyValue.size() == 1) {
 
