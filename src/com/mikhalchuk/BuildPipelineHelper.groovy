@@ -33,7 +33,7 @@ class BuildPipelineHelper {
 
     def currentTimestamp() {
         def clock = pipeline.env.IS_CLOCK_MOCKED == 'true'
-                ? pipeline.MOCKED_CLOCK
+                ? pipeline.MOCKED_CLOCK.remove(0)
                 : java.time.Clock.system(java.time.ZoneId.of("UTC+3"))
 
         java.time.ZonedDateTime

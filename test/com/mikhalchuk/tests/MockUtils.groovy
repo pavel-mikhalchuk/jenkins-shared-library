@@ -64,6 +64,10 @@ class MockUtils {
     static void mockClock(Script pipeline, PipelineSpockTestBase test) {
         test.addEnvVar('IS_CLOCK_MOCKED', 'true')
         pipeline.getBinding().setVariable('MOCKED_CLOCK',
-                Clock.fixed(Instant.parse('2020-08-30T00:59:45.00Z'), ZoneId.of("UTC")))
+                [Clock.fixed(Instant.parse('2020-08-30T00:59:45.00Z'), ZoneId.of("UTC")),
+                 Clock.fixed(Instant.parse('2020-08-30T00:59:46.00Z'), ZoneId.of("UTC")),
+                 Clock.fixed(Instant.parse('2020-08-30T00:59:47.00Z'), ZoneId.of("UTC")),
+                 Clock.fixed(Instant.parse('2020-08-30T00:59:48.00Z'), ZoneId.of("UTC")),
+                 Clock.fixed(Instant.parse('2020-08-30T00:59:49.00Z'), ZoneId.of("UTC"))])
     }
 }

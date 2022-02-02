@@ -76,8 +76,10 @@ def mavenBuild(ctx) {
 }
 
 def dockerBuild(ctx) {
+    def tag = dockerImgTag(ctx).toLowerCase()
+
     ctx.containerImages.each {
-        def img = (it.name + ':' + dockerImgTag(ctx)).toLowerCase()
+        def img = (it.name + ':' + tag).toLowerCase()
         def imgLatest = (it.name + ':latest').toLowerCase()
 
         sh "docker build -t ${img} ${it.source}"
@@ -111,7 +113,7 @@ def dockerImgTag(ctx) {
 
 def currentTimestamp() {
     def clock = env.IS_CLOCK_MOCKED == 'true'
-            ? MOCKED_CLOCK
+            ? MOCKED_CLOCK.remove(0)
             : java.time.Clock.system(java.time.ZoneId.of("UTC+3"))
 
     java.time.ZonedDateTime
