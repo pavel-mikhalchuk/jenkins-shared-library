@@ -9,6 +9,8 @@ def call(body) {
 
     sh "rm -rf ./node_modules && (cp -r ${ctx.nodeModulesCachePath}/node_modules ./node_modules || true)"
 
+    sh "npm config set strict-ssl false"
+
     sh "npm install --loglevel=verbose"
 
     sh "rm -rf ${ctx.nodeModulesCachePath} && mkdir -p ${ctx.nodeModulesCachePath} && cp -r ./node_modules ${ctx.nodeModulesCachePath}"
