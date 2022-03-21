@@ -82,7 +82,7 @@ def dockerBuild(ctx) {
         def img = (it.name + ':' + tag).toLowerCase()
         def imgLatest = (it.name + ':latest').toLowerCase()
 
-        sh "docker build --add-host=registry.npmjs.org:10.100.20.43 -t ${img} ${it.source}"
+        sh "DOCKER_BUILDKIT=0 docker build --add-host=registry.npmjs.org:10.100.20.43 -t ${img} ${it.source}"
         sh "docker tag ${img} ${imgLatest}"
 
         ctx.dockerImages << img
