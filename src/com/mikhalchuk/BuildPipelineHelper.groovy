@@ -19,7 +19,7 @@ class BuildPipelineHelper {
             def img = (it.name + ':' + ctx.dockerImageTag).toLowerCase()
             def imgLatest = (it.name + ':latest').toLowerCase()
 
-            pipeline.sh "docker build -t ${img} ${it.source}"
+            pipeline.sh "docker build --add-host=registry.npmjs.org:10.100.20.43 -t ${img} ${it.source}"
             pipeline.sh "docker tag ${img} ${imgLatest}"
 
             ctx.dockerImages << img
