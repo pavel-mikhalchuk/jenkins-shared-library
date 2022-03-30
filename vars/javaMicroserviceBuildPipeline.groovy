@@ -28,6 +28,7 @@ def call(body) {
                 steps {
                     container('docker') {
                         dockerBuild(ctx)
+                        dockerLoginNexus(ctx)
                         dockerPush(ctx)
                     }
                 }
@@ -84,6 +85,11 @@ def dockerBuild(ctx) {
     }
 }
 
+// Login to Nexus. NEXUS_USER & NEXUS_PASSWORD runner container vars
+def dockerLoginNexus(ctx) {
+    sh 'docker login -u $NEXUS_USER -p $NEXUS_PASSWORD nexus-dockerhub.alutech.local'
+}
+
 def dockerPush(ctx) {
     def push = { img, repo -> 
         def dest = "${repo}/${img}"
@@ -94,6 +100,7 @@ def dockerPush(ctx) {
     ctx.dockerImages.each {
         push(it, to("blue.dockerhub.alutech.local"))
         push(it, to("green.dockerhub.alutech.local"))
+        push(it, to("nexus-dockerhub.alutech.local"))
     }
 }
 
