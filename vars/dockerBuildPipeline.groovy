@@ -17,6 +17,7 @@ def call(body) {
                         defineMoreContextBasedOnUserInput(ctx)
 
                         dockerBuild(ctx)
+                        dockerLoginNexus(ctx)
                         dockerPush(ctx)
                     }
                 }
@@ -82,12 +83,16 @@ def dockerBuild(ctx) {
         def img = (it.name + ':' + tag).toLowerCase()
         def imgLatest = (it.name + ':latest').toLowerCase()
 
-        sh "docker build --no-cache --add-host=registry.npmjs.org:10.100.20.43 -t ${img} ${it.source}"
+        sh "docker build --add-host=registry.npmjs.org:10.100.20.43 -t ${img} ${it.source}"
         sh "docker tag ${img} ${imgLatest}"
 
         ctx.dockerImages << img
         ctx.dockerImages << imgLatest
     }
+}
+// Login to docker hub Nexus, NEXUS_USER, NEXUS_PASSWORD is docker container vars
+def dockerLoginNexus(ctx) {
+    sh "docker login -u ${NEXUS_USER} -p ${NEXUS_PASSWORD} nexus-dockerhub.alutech.local"
 }
 
 def dockerPush(ctx) {
@@ -100,6 +105,7 @@ def dockerPush(ctx) {
     ctx.dockerImages.each {
         push(it, to("blue.dockerhub.alutech.local"))
         push(it, to("green.dockerhub.alutech.local"))
+        push(it, to("nexus-dockerhub.alutech.local"))
     }
 }
 
