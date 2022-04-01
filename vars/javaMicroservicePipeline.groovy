@@ -32,7 +32,7 @@ def call(body) {
                     container('docker') {
                         script {
                             builder.dockerBuild(ctx)
-                            builder.dockerLoginNexus
+                            builder.dockerLoginNexus(ctx)
                             builder.dockerPush(ctx)
                         }
                     }
