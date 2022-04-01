@@ -45,6 +45,11 @@ class BuildPipelineHelper {
         pipeline.sh(script: 'echo $(git rev-parse HEAD)', returnStdout: true).trim()
     }
 
+// Login to Nexus. NEXUS_USER & NEXUS_PASSWORD runner container vars
+    def dockerLoginNexus(ctx) {
+        sh 'docker login -u $NEXUS_USER -p $NEXUS_PASSWORD nexus-dockerhub.alutech.local'
+    }
+
     def dockerPush(ctx) {
         def push = { img, repo ->
             def dest = "${repo}/${img}"
@@ -55,6 +60,7 @@ class BuildPipelineHelper {
         ctx.dockerImages.each {
             push(it, to("blue.dockerhub.alutech.local"))
             push(it, to("green.dockerhub.alutech.local"))
+            push(it, to("nexus-dockerhub.alutech.local"))
         }
     }
 }
