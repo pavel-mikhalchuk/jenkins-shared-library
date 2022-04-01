@@ -47,7 +47,7 @@ class BuildPipelineHelper {
 
 // Login to Nexus. NEXUS_USER & NEXUS_PASSWORD runner container vars
     def dockerLoginNexus(ctx) {
-        pipeline.sh "docker login -u ${NEXUS_USER} -p ${NEXUS_PASSWORD} nexus-dockerhub.alutech.local"
+        pipeline.sh "docker login -u \${NEXUS_USER} -p \${NEXUS_PASSWORD} nexus-dockerhub.alutech.local"
     }
 
     def dockerPush(ctx) {
