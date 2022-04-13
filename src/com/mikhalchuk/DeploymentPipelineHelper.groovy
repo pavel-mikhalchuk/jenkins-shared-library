@@ -150,7 +150,7 @@ class DeploymentPipelineHelper {
         // Kube 1.23
         pipeline.sh "rm -rf ${ctx.kubeStateFolderKubeNew}"
         pipeline.sh "mkdir -p ${ctx.kubeStateFolderKubeNew}"
-        pipeline.sh "helm template --namespace ${ctx.namespace} --name ${ctx.helmRelease} ${ctx.helmChartFolder} > '${ctx.kubeStateFolderKubeNew}/kube-state.yaml'"
+        pipeline.sh "helm template --namespace ${ctx.namespace} --name ${ctx.helmRelease} ${ctx.helmChartFolderKubeNew} > '${ctx.kubeStateFolderKubeNew}/kube-state.yaml'"
     }
 
     def pushK8SManifests(ctx) {
