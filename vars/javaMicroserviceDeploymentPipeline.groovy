@@ -41,13 +41,15 @@ def call(body) {
                 steps {
                     container('helm') {
                         script {
-                            if (ctx.preDeploy) {
-                                helper.preDeploy(ctx)
-                            } else {
-                                helper.copyConfigToHelmChart(ctx)
+                            catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                                if (ctx.preDeploy) {
+                                    helper.preDeploy(ctx)
+                                } else {
+                                    helper.copyConfigToHelmChart(ctx)
+                                }
+                                helper.writeHelmValuesYaml(ctx)
+                                helper.generateK8SManifests(ctx)
                             }
-                            helper.writeHelmValuesYaml(ctx)
-                            helper.generateK8SManifests(ctx)
                         }
                     }
                 }
