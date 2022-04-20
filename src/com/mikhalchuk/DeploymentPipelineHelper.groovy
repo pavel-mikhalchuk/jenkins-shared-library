@@ -64,6 +64,7 @@ class DeploymentPipelineHelper {
     def copyConfigToHelmChart(ctx) {
         pipeline.sh "cp src/main/resources/application.${ctx.namespace}.properties ${ctx.helmChartFolder}/application.properties"
         // Kube 1.23
+        pipeline.sh "mkdir -p ${ctx.kubeStateFolderKubeNew}"
         pipeline.sh "cp src/main/resources/application.${ctx.namespace}.properties ${ctx.helmChartFolderKubeNew}/application.properties"
     }
 
