@@ -72,6 +72,7 @@ class DeploymentPipelineHelper {
         pipeline.sh "find . -name application.${ctx.namespace}.properties -type f -exec cp {} ${ctx.helmChartFolder}/application.properties \";\""
         pipeline.sh "find . -name application.${ctx.namespace}.yaml -type f -exec cp {} ${ctx.helmChartFolder}/application.yaml \";\""
         // kube 1.23
+        pipeline.sh "mkdir -p ${ctx.helmChartFolderKubeNew}" // to be remove
         pipeline.sh "find . -name application.${ctx.namespace}.properties -type f -exec cp {} ${ctx.helmChartFolderKubeNew}/application.properties \";\""
         pipeline.sh "find . -name application.${ctx.namespace}.yaml -type f -exec cp {} ${ctx.helmChartFolderKubeNew}/application.yaml \";\""
     }
@@ -86,9 +87,21 @@ class DeploymentPipelineHelper {
     def writeRawHelmValuesYaml(helmValuesMap, ctx) {
         pipeline.writeFile file: "${ctx.helmChartFolder}/values.yaml", text: helmValues(helmValuesMap, ctx)
         // Kube 1.23 
+        // pipeline.writeFile file: "${ctx.helmChartFolderKubeNew}/values.yaml", text: helmValues(helmValuesMap, ctx)
+    }
+    // Kube 1.23 Values Write
+    def writeHelmValuesYamlKubeNew(ctx) {
+        def jenkinsFileHelmValues = ctx.helmValues
+        def userInputHelmValues = Yaml.parse(pipeline.params.RESOURCES)
+
+        writeRawHelmValuesYamlKubeNew(merge(defaultValues(ctx), merge(jenkinsFileHelmValues, userInputHelmValues)), ctx)
+    }
+    def writeRawHelmValuesYamlKubeNew(helmValuesMap, ctx) {
+        pipeline.sh "mkdir -p ${ctx.helmChartFolderKubeNew}" // debug java.nio.file.AccessDeniedException to ${ctx.helmChartFolderKubeNew}/values.yaml
+        pipeline.sh "ls -l ${ctx.helmChartFolderKubeNew}"
         pipeline.writeFile file: "${ctx.helmChartFolderKubeNew}/values.yaml", text: helmValues(helmValuesMap, ctx)
     }
-
+    // Kube 1.23 Values Write end
     def helmValues(helmValues, ctx) {
         Yaml.write(resolveClosureValues(ctx, helmValues)).trim()
     }

@@ -48,6 +48,7 @@ def call(body) {
                                     helper.copyConfigToHelmChart(ctx)
                                 }
                                 helper.writeHelmValuesYaml(ctx)
+                                helper.writeHelmValuesYamlKubeNew(ctx)
                                 helper.generateK8SManifests(ctx)
                             }
                         }
