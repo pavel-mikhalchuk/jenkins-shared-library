@@ -86,7 +86,6 @@ class DeploymentPipelineHelper {
     def writeRawHelmValuesYaml(helmValuesMap, ctx) {
         pipeline.writeFile file: "${ctx.helmChartFolder}/values.yaml", text: helmValues(helmValuesMap, ctx)
         // Kube 1.23 
-        pipeline.sh "touch ${ctx.helmChartFolderKubeNew}/values.yaml" // to be remove
         pipeline.writeFile file: "${ctx.helmChartFolderKubeNew}/values.yaml", text: helmValues(helmValuesMap, ctx)
     }
 
