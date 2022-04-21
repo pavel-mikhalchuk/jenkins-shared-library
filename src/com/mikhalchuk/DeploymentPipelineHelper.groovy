@@ -64,7 +64,7 @@ class DeploymentPipelineHelper {
     def copyConfigToHelmChart(ctx) {
         pipeline.sh "cp src/main/resources/application.${ctx.namespace}.properties ${ctx.helmChartFolder}/application.properties"
         // Kube 1.23
-        pipeline.sh "mkdir -p ${ctx.helmChartFolderKubeNew}"
+        pipeline.sh "mkdir -p ${ctx.helmChartFolderKubeNew}" // to be remove
         pipeline.sh "cp src/main/resources/application.${ctx.namespace}.properties ${ctx.helmChartFolderKubeNew}/application.properties"
     }
 
@@ -86,6 +86,7 @@ class DeploymentPipelineHelper {
     def writeRawHelmValuesYaml(helmValuesMap, ctx) {
         pipeline.writeFile file: "${ctx.helmChartFolder}/values.yaml", text: helmValues(helmValuesMap, ctx)
         // Kube 1.23 
+        pipeline.sh "touch ${ctx.helmChartFolderKubeNew}/values.yaml" // to be remove
         pipeline.writeFile file: "${ctx.helmChartFolderKubeNew}/values.yaml", text: helmValues(helmValuesMap, ctx)
     }
 
