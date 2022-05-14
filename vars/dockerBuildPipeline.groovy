@@ -92,7 +92,7 @@ def dockerBuild(ctx) {
 }
 // Login to docker hub Nexus, NEXUS_USER, NEXUS_PASSWORD is docker container vars
 def dockerLoginNexus(ctx) {
-    sh "docker login -u ${NEXUS_USER} -p ${NEXUS_PASSWORD} nexus-dockerhub.alutech.local"
+    sh "docker login -u \${NEXUS_USER} -p \${NEXUS_PASSWORD} nexus-dockerhub.alutech.local"
 }
 
 def dockerPush(ctx) {
