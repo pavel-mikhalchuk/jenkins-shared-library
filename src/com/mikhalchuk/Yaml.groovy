@@ -84,7 +84,7 @@ class Yaml {
             } else if (it.value instanceof Boolean) {
                 result += "${indent}${it.key}: ${it.value}\n"
             } else if(it.value instanceof List) {
-                result += "${indent}${it.key}: [${it.value.collect {"'${it}'"}.join(', ')}]\n"
+                result += "${indent}${it.key}: [${it.value.collect {quote(it)}.join(', ')}]\n"
             } else {
                 result += "${indent}${it.key}: ${quote(it.value)}\n"
             }
