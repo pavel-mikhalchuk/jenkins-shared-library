@@ -106,7 +106,7 @@ class DeploymentPipelineHelper {
         try {
             resolveIngressHost(value, ctx)
         } catch (Exception e) {
-            ClosureUtils.invoke(value, pipeline)
+            ClosureUtils.invoke(ctx, value, pipeline)
         }
     }
 
@@ -142,7 +142,7 @@ class DeploymentPipelineHelper {
     }
 
     def preDeploy(ctx) {
-        ClosureUtils.invoke(ctx.preDeploy, pipeline)
+        ClosureUtils.invoke(ctx, ctx.preDeploy, pipeline)
     }
 
     def generateK8SManifests(ctx) {
@@ -183,17 +183,23 @@ class DeploymentPipelineHelper {
 
             def ingUtils = [
                 svc_ns_inin: {
-                    return "${ctx.service}.${hostByNs(ctx.namespace)}.in.in.alutech24.com"
+                    return IngressUtils.svcNsInIn(ctx)
                 },
                 str_ns_inin: { str ->
-                    return "${str}.${hostByNs(ctx.namespace)}.in.in.alutech24.com"
+                    return IngressUtils.strNsInIn(ctx, str)
                 },
                 svc_prod: {
-                    return "${ctx.service}.alutech24.com"
+                    return IngressUtils.svcProd(ctx)
                 },
                 str_prod: { str ->
-                    return "${str}.alutech24.com"
+                    return IngressUtils.strProd(ctx, str)
                 },
+                svc_ns_inin_no_domain: {
+                    return IngressUtils.svcNsInInNoDomain(ctx)
+                },
+                str_ns_inin_no_domain: { str ->
+                    return IngressUtils.strNsInInNoDomain(ctx, str)
+                }
             ]
             return host.call(ingUtils)
         } else {

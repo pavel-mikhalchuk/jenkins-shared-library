@@ -1,0 +1,167 @@
+   javaMicroserviceDeploymentPipeline.getBinding()
+   javaMicroserviceDeploymentPipeline.getBinding()
+   javaMicroserviceDeploymentPipeline.getBinding()
+   javaMicroserviceDeploymentPipeline.getBinding()
+   javaMicroserviceDeploymentPipeline.call(groovy.lang.Closure)
+      javaMicroserviceDeploymentPipeline.parameters([{$class=ChoiceParameter, choiceType=PT_SINGLE_SELECT, description=Docker image tags, filterLength=1, filterable=true, name=IMAGE_TAG, script={$class=GroovyScript, fallbackScript={classpath=[], sandbox=true, script=["error :("]}, script={classpath=[], sandbox=true, script=
+                        import java.util.logging.Level 
+                        import java.util.logging.Logger
+
+                        import groovy.json.JsonSlurper
+
+                        def log = Logger.getLogger("com.alutech.activechoice.dockerhub")
+
+                        def parse = { response ->
+                            log.info("Parsing response...")
+
+                            def tags = response?.trim() ? new JsonSlurper().parseText(response).tags : []
+
+                            log.info("Parsed!")
+
+                            def hasLatest = tags.remove("latest")
+                            return hasLatest ? tags.plus(0, ["latest"]) : tags
+                        }
+
+                        try {      
+                            log.info("Start fetching tags from 'https://dockerhub-vip.alutech.local/v2/aservice/tags/list'")
+
+                            Process process = ["curl", "-k", "https://dockerhub-vip.alutech.local/v2/aservice/tags/list"].execute()
+                            
+                            def out = new StringBuffer()
+                            def err = new StringBuffer()
+                            
+                            process.consumeProcessOutput( out, err )
+                            process.waitFor()
+                            
+                            if (out.size() > 0) {
+                              log.info("Response from docker hub: " + out.toString())
+                              
+                              return parse(out.toString())
+                            } else if (err.size() > 0) {
+                              log.info(err.toString())
+
+                              return ["there was an error during pulling data from dockerhub"]
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace()
+                        }
+                    }}}])
+      javaMicroserviceDeploymentPipeline.properties([null])
+      javaMicroserviceDeploymentPipeline.pipeline(groovy.lang.Closure)
+         javaMicroserviceDeploymentPipeline.agent(groovy.lang.Closure)
+            javaMicroserviceDeploymentPipeline.label(helm-deploy)
+         javaMicroserviceDeploymentPipeline.options(groovy.lang.Closure)
+            javaMicroserviceDeploymentPipeline.logRotator({numToKeepStr=5})
+            javaMicroserviceDeploymentPipeline.buildDiscarder(null)
+            javaMicroserviceDeploymentPipeline.timestamps()
+         javaMicroserviceDeploymentPipeline.parameters(groovy.lang.Closure)
+            javaMicroserviceDeploymentPipeline.choice({name=NAMESPACE, choices=[multi-domains], description=Kubernetes Namespace})
+            javaMicroserviceDeploymentPipeline.text({name=RESOURCES, defaultValue=resources:
+  resources:
+    requests:
+      memory: "4Gi"
+      cpu: "100m"
+    limits:
+      memory: "5Gi"
+      cpu: "2"
+javaOpts: "-Xms4g -Xmx4g -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote.rmi.port=9010 -Djava.rmi.server.hostname=127.0.0.1 -server -XX:MaxMetaspaceSize=1g -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:ParallelGCThreads=20 -XX:ConcGCThreads=5 -XX:InitiatingHeapOccupancyPercent=70 -Djdk.nio.maxCachedBufferSize=262144 -XX:HeapDumpPath=/aservice-images/oom-dumps/", description=Kubernetes POD resources requests and limits + JavaOpts})
+         javaMicroserviceDeploymentPipeline.stages(groovy.lang.Closure)
+            javaMicroserviceDeploymentPipeline.stage(notify slack, groovy.lang.Closure)
+               javaMicroserviceDeploymentPipeline.steps(groovy.lang.Closure)
+                  javaMicroserviceDeploymentPipeline.script(groovy.lang.Closure)
+                     javaMicroserviceDeploymentPipeline.sh({script=echo infra-$(date +"%d-%m-%Y_%H-%M-%S"), returnStdout=true})
+                     javaMicroserviceDeploymentPipeline.script(groovy.lang.Closure)
+                        javaMicroserviceDeploymentPipeline.wrap({$class=BuildUser}, groovy.lang.Closure)
+                           javaMicroserviceDeploymentPipeline.slackSend({channel=java_services, color=good, message=*mikhalchuk* накатывает ветку *develop* на *aservice multi-domains*.
+aservice:latest
+Сохраняйте спокойствие 😌})
+            javaMicroserviceDeploymentPipeline.stage(checkout infra repo, groovy.lang.Closure)
+               javaMicroserviceDeploymentPipeline.steps(groovy.lang.Closure)
+                  javaMicroserviceDeploymentPipeline.script(groovy.lang.Closure)
+                     javaMicroserviceDeploymentPipeline.sh(mkdir infra-06-06-2020_06-06-06)
+                     javaMicroserviceDeploymentPipeline.dir(infra-06-06-2020_06-06-06, groovy.lang.Closure)
+                        javaMicroserviceDeploymentPipeline.git({credentialsId=jenkins, url=http://bb.alutech-mc.com:8080/scm/as/infra.git})
+            javaMicroserviceDeploymentPipeline.stage(generate K8S manifests, groovy.lang.Closure)
+               javaMicroserviceDeploymentPipeline.steps(groovy.lang.Closure)
+                  javaMicroserviceDeploymentPipeline.container(helm, groovy.lang.Closure)
+                     javaMicroserviceDeploymentPipeline.script(groovy.lang.Closure)
+                        javaMicroserviceDeploymentPipeline.catchError({buildResult=SUCCESS, stageResult=FAILURE}, groovy.lang.Closure)
+                           javaMicroserviceDeploymentPipeline.sh(cp -r configuration/src/main/resources/* kubernetes/helm-chart/aservice/)
+                           javaMicroserviceDeploymentPipeline.sh(cp configuration/src/main/resources/env/base.multi-domains.properties kubernetes/helm-chart/aservice/base.properties)
+                           javaMicroserviceDeploymentPipeline.writeFile({file=kubernetes/helm-chart/aservice/values.yaml, text=replicaCount: 1
+gitBranch: "develop"
+image:
+  repository: "dockerhub-vip.alutech.local"
+  tag: "aservice:latest"
+  pullPolicy: "IfNotPresent"
+service:
+  externalPort: 80
+  internalPort: 8080
+jenkinsBuildNumber: "aservice-deploy-dev-666"
+drawingService:
+  serviceName: "drawing"
+  path: "/drawingService"
+  externalPort: "80"
+host: "aservice.domains.multi.in.in"
+hostin: "aservicein.domains.multi.in.in"
+hostGates: "gates.domains.multi.in.in"
+domains: "[.alutech24.com, .alutech24.by, .alutech24.eu]"
+resources:
+  resources:
+    requests:
+      memory: "4Gi"
+      cpu: "100m"
+    limits:
+      memory: "5Gi"
+      cpu: "2"
+javaOpts: "-Xms4g -Xmx4g -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote.rmi.port=9010 -Djava.rmi.server.hostname=127.0.0.1 -server -XX:MaxMetaspaceSize=1g -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:ParallelGCThreads=20 -XX:ConcGCThreads=5 -XX:InitiatingHeapOccupancyPercent=70 -Djdk.nio.maxCachedBufferSize=262144 -XX:HeapDumpPath=/aservice-images/oom-dumps/"})
+                           javaMicroserviceDeploymentPipeline.writeFile({file=kubernetes/helm-chart-1-23/aservice/values.yaml, text=replicaCount: 1
+gitBranch: "develop"
+image:
+  repository: "dockerhub-vip.alutech.local"
+  tag: "aservice:latest"
+  pullPolicy: "IfNotPresent"
+service:
+  externalPort: 80
+  internalPort: 8080
+jenkinsBuildNumber: "aservice-deploy-dev-666"
+drawingService:
+  serviceName: "drawing"
+  path: "/drawingService"
+  externalPort: "80"
+host: "aservice.domains.multi.in.in"
+hostin: "aservicein.domains.multi.in.in"
+hostGates: "gates.domains.multi.in.in"
+domains: "[.alutech24.com, .alutech24.by, .alutech24.eu]"
+resources:
+  resources:
+    requests:
+      memory: "4Gi"
+      cpu: "100m"
+    limits:
+      memory: "5Gi"
+      cpu: "2"
+javaOpts: "-Xms4g -Xmx4g -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote.rmi.port=9010 -Djava.rmi.server.hostname=127.0.0.1 -server -XX:MaxMetaspaceSize=1g -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:ParallelGCThreads=20 -XX:ConcGCThreads=5 -XX:InitiatingHeapOccupancyPercent=70 -Djdk.nio.maxCachedBufferSize=262144 -XX:HeapDumpPath=/aservice-images/oom-dumps/"})
+                           javaMicroserviceDeploymentPipeline.sh(rm -rf infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/multi-domains/aservice/raw-manifests)
+                           javaMicroserviceDeploymentPipeline.sh(mkdir -p infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/multi-domains/aservice/raw-manifests)
+                           javaMicroserviceDeploymentPipeline.sh(helm template --namespace multi-domains --name aservice-multi-domains kubernetes/helm-chart/aservice > 'infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/multi-domains/aservice/raw-manifests/kube-state.yaml')
+                           javaMicroserviceDeploymentPipeline.sh(rm -rf infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/multi-domains/aservice/raw-manifests-kube-1-23)
+                           javaMicroserviceDeploymentPipeline.sh(mkdir -p infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/multi-domains/aservice/raw-manifests-kube-1-23)
+                           javaMicroserviceDeploymentPipeline.sh(helm template --namespace multi-domains --name aservice-multi-domains kubernetes/helm-chart-1-23/aservice > 'infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/multi-domains/aservice/raw-manifests-kube-1-23/kube-state.yaml')
+            javaMicroserviceDeploymentPipeline.stage(push K8S manifests to infra repo, groovy.lang.Closure)
+               javaMicroserviceDeploymentPipeline.steps(groovy.lang.Closure)
+                  javaMicroserviceDeploymentPipeline.script(groovy.lang.Closure)
+                     javaMicroserviceDeploymentPipeline.dir(infra-06-06-2020_06-06-06, groovy.lang.Closure)
+                        javaMicroserviceDeploymentPipeline.usernamePassword({credentialsId=jenkins, passwordVariable=GIT_PASSWORD, usernameVariable=GIT_USERNAME})
+                        javaMicroserviceDeploymentPipeline.withCredentials([{credentialsId=jenkins, passwordVariable=GIT_PASSWORD, usernameVariable=GIT_USERNAME}], groovy.lang.Closure)
+                           javaMicroserviceDeploymentPipeline.sh(git config user.email "jenkins@infra.tower")
+                           javaMicroserviceDeploymentPipeline.sh(git config user.name "Jenkins")
+                           javaMicroserviceDeploymentPipeline.sh(git checkout master)
+                           javaMicroserviceDeploymentPipeline.sh(git pull http://${GIT_USERNAME}:${GIT_PASSWORD}@bb.alutech-mc.com:8080/scm/as/infra.git HEAD:master)
+                           javaMicroserviceDeploymentPipeline.sh(git add *)
+                           javaMicroserviceDeploymentPipeline.sh(git commit -m "[jenkins]: ${JOB_NAME} - ${BUILD_NUMBER}")
+                           javaMicroserviceDeploymentPipeline.sh(git push http://${GIT_USERNAME}:${GIT_PASSWORD}@bb.alutech-mc.com:8080/scm/as/infra.git HEAD:master)
+            javaMicroserviceDeploymentPipeline.stage(notify ArgoCD, groovy.lang.Closure)
+               javaMicroserviceDeploymentPipeline.steps(groovy.lang.Closure)
+                  javaMicroserviceDeploymentPipeline.script(groovy.lang.Closure)
+                     javaMicroserviceDeploymentPipeline.sh(curl -k -X POST https://git-events-publisher.in.in.alutech24.com/push)
