@@ -76,7 +76,7 @@ class DeploymentPipelineHelper {
     }
 
     def writeHelmValuesYaml(ctx) {
-        def jenkinsFileHelmValues = ctx.helmValues
+        def jenkinsFileHelmValues = ClosureUtils.maybeResolve(ctx, ctx.helmValues)
         def userInputHelmValues = Yaml.parse(pipeline.params.RESOURCES)
 
         writeRawHelmValuesYaml(merge(defaultValues(ctx), merge(jenkinsFileHelmValues, userInputHelmValues)), ctx)
