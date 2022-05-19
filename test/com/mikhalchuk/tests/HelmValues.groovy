@@ -95,59 +95,29 @@ class HelmValues {
         javaOpts: '-Xms4g -Xmx4g -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote.rmi.port=9010 -Djava.rmi.server.hostname=127.0.0.1 -server -XX:MaxMetaspaceSize=1g -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:ParallelGCThreads=20 -XX:ConcGCThreads=5 -XX:InitiatingHeapOccupancyPercent=70 -Djdk.nio.maxCachedBufferSize=262144 -XX:HeapDumpPath=/aservice-images/oom-dumps/'
     ]
 
-    static def ASERVICE_DEV_MULTIPLE_DOMAINS = { ctx ->
-        [
-            drawingService: [
-                serviceName: 'drawing',
-                path: '/drawingService',
-                externalPort: '80'
-            ],
-            host: Ingresses.SVC_NS_IN_IN_NO_DOMAIN.host,
-            hostin: Ingresses.STR_NS_IN_IN_NO_DOMAIN('aservicein').host,
-            hostGates: Ingresses.STR_NS_IN_IN_NO_DOMAIN('gates').host,
-            domains: ctx.ingressDomains,
+    static def ASERVICE_PROD = [
+        drawingService: [
+            serviceName: 'drawing',
+            path: '/drawingService',
+            externalPort: '80'
+        ],
+        host: Ingresses.SVC_PROD.host,
+        hostin: Ingresses.STR_PROD('aservicein').host,
+        hostGates: Ingresses.STR_PROD('gates').host,
+        resources: [
             resources: [
-                resources: [
-                    requests: [
-                        memory: '4Gi',
-                        cpu: '100m'
-                    ],
-                    limits: [
-                        memory: '5Gi',
-                        cpu: '2'
-                    ]
+                requests: [
+                    memory: '4Gi',
+                    cpu: '100m'
+                ],
+                limits: [
+                    memory: '5Gi',
+                    cpu: '2'
                 ]
-            ],
-            javaOpts: '-Xms4g -Xmx4g -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote.rmi.port=9010 -Djava.rmi.server.hostname=127.0.0.1 -server -XX:MaxMetaspaceSize=1g -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:ParallelGCThreads=20 -XX:ConcGCThreads=5 -XX:InitiatingHeapOccupancyPercent=70 -Djdk.nio.maxCachedBufferSize=262144 -XX:HeapDumpPath=/aservice-images/oom-dumps/'
-        ]
-    }
-
-    static def ASERVICE_PROD_MULTIPLE_DOMAINS = { ctx ->
-        [
-            drawingService: [
-                serviceName: 'drawing',
-                path: '/drawingService',
-                externalPort: '80'
-            ],
-            host: 'aservice',
-            hostin: 'aservicein',
-            hostGates: 'gates',
-            domains: ctx.ingressDomains,
-            resources: [
-                resources: [
-                    requests: [
-                        memory: '4Gi',
-                        cpu: '100m'
-                    ],
-                    limits: [
-                        memory: '5Gi',
-                        cpu: '2'
-                    ]
-                ]
-            ],
-            javaOpts: '-Xms4g -Xmx4g -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote.rmi.port=9010 -Djava.rmi.server.hostname=127.0.0.1 -server -XX:MaxMetaspaceSize=1g -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:ParallelGCThreads=20 -XX:ConcGCThreads=5 -XX:InitiatingHeapOccupancyPercent=70 -Djdk.nio.maxCachedBufferSize=262144 -XX:HeapDumpPath=/aservice-images/oom-dumps/'
-        ]
-    }
+            ]
+        ],
+        javaOpts: '-Xms4g -Xmx4g -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote.rmi.port=9010 -Djava.rmi.server.hostname=127.0.0.1 -server -XX:MaxMetaspaceSize=1g -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:ParallelGCThreads=20 -XX:ConcGCThreads=5 -XX:InitiatingHeapOccupancyPercent=70 -Djdk.nio.maxCachedBufferSize=262144 -XX:HeapDumpPath=/aservice-images/oom-dumps/'
+    ]
 
     static def SUPER_SERVICE = [
         image: [

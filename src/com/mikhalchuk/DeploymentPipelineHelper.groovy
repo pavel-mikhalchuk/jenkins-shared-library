@@ -28,7 +28,7 @@ class DeploymentPipelineHelper {
         ctx.helmChartFolder = "kubernetes/helm-chart/${ctx.service}"
         ctx.helmRelease = "${ctx.service}-${ctx.namespace}"
         // Kube 1.23
-        ctx.helmChartFolderKubeNew = "kubernetes/helm-chart-1-23/${ctx.service}" 
+        ctx.helmChartFolderKubeNew = "kubernetes/helm-chart-1-23/${ctx.service}"
 
         //// env-specific (dev VS prod)
         ctx.kubeStateFolder = "${ctx.infraFolder}/kube-${ctx.env}/cluster-state/alutech-services/${ctx.namespace}/${ctx.service}/raw-manifests"
@@ -54,7 +54,7 @@ class DeploymentPipelineHelper {
     }
 
     def getHelmChart(ctx) {
-        pipeline.sh "mkdir -p ${ctx.helmChartFolder}" 
+        pipeline.sh "mkdir -p ${ctx.helmChartFolder}"
         pipeline.sh "cp -r ${ctx.infraFolder}/helm-charts/java/microservice/* ${ctx.helmChartFolder}"
         // kube 1.23
         pipeline.sh "mkdir -p ${ctx.helmChartFolderKubeNew}"
@@ -95,7 +95,27 @@ class DeploymentPipelineHelper {
     def resolveClosureValues(ctx, helmValues) {
         ObjUtils.walk(helmValues, { res, key, value ->
             if (value instanceof Closure) {
-                res[key] = resolveClosureValue(ctx, value)
+                def v = resolveClosureValue(ctx, value)
+
+                // Fix for mistakenly wrap ingress host with quotes on the client side.
+                // Host can be a list so wrapping it would break Kube ingress object
+                if (key == 'host' || key == 'hostin' || key == 'hostGates') {
+                    if (v instanceof String || v instanceof GString) {
+                        // Check if it is an array
+                        if (v[0] == '[' && v[v.length() - 1] == ']') {
+                            res[key] = v.toString()
+                                    .substring(1, v.length() - 1)
+                                    .split(",")
+                                    .collect {it.trim()}
+                        } else {
+                            res[key] = v
+                        }
+                    } else {
+                        res[key] = v
+                    }
+                } else {
+                    res[key] = v
+                }
             } else {
                 res[key] = value
             }
@@ -177,28 +197,18 @@ class DeploymentPipelineHelper {
 
     def static resolveIngressHost(host, ctx) {
         if (host instanceof Closure) {
-            def hostByNs = { ns->
-                return ns.contains('-') ? "${ns.split('-')[1]}.${ns.split('-')[0]}" : ns
-            }
-
             def ingUtils = [
                 svc_ns_inin: {
-                    return IngressUtils.svcNsInIn(ctx)
+                    return IngressUtils.resolveNsInIn(ctx, ctx.service)
                 },
                 str_ns_inin: { str ->
-                    return IngressUtils.strNsInIn(ctx, str)
+                    return IngressUtils.resolveNsInIn(ctx, str)
                 },
                 svc_prod: {
-                    return IngressUtils.svcProd(ctx)
+                    return IngressUtils.resolve(ctx, ctx.service)
                 },
                 str_prod: { str ->
-                    return IngressUtils.strProd(ctx, str)
-                },
-                svc_ns_inin_no_domain: {
-                    return IngressUtils.svcNsInInNoDomain(ctx)
-                },
-                str_ns_inin_no_domain: { str ->
-                    return IngressUtils.strNsInInNoDomain(ctx, str)
+                    return IngressUtils.resolve(ctx, str)
                 }
             ]
             return host.call(ingUtils)
@@ -209,18 +219,18 @@ class DeploymentPipelineHelper {
 
     def initDockerImageChoiceParameter(ctx) {
         pipeline.properties([
-            pipeline.parameters([
-                [
-                    $class: 'ChoiceParameter',
-                    choiceType: 'PT_SINGLE_SELECT',
-                    description: 'Docker image tags',
-                    filterLength: 1,
-                    filterable: true,
-                    name: 'IMAGE_TAG',
-                    script: [
-                        $class: 'GroovyScript',
-                        fallbackScript: [classpath: [], sandbox: true, script: '["error :("]'],
-                        script: [classpath: [], sandbox: true, script: """
+                pipeline.parameters([
+                        [
+                                $class: 'ChoiceParameter',
+                                choiceType: 'PT_SINGLE_SELECT',
+                                description: 'Docker image tags',
+                                filterLength: 1,
+                                filterable: true,
+                                name: 'IMAGE_TAG',
+                                script: [
+                                        $class: 'GroovyScript',
+                                        fallbackScript: [classpath: [], sandbox: true, script: '["error :("]'],
+                                        script: [classpath: [], sandbox: true, script: """
                         import java.util.logging.Level 
                         import java.util.logging.Logger
 
@@ -263,9 +273,9 @@ class DeploymentPipelineHelper {
                             e.printStackTrace()
                         }
                     """]
-                    ]
-                ]
-            ])
+                                ]
+                        ]
+                ])
         ])
     }
 }

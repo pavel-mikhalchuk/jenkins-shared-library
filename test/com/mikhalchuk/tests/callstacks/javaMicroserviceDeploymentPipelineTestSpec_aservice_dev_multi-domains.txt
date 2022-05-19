@@ -102,10 +102,9 @@ drawingService:
   serviceName: "drawing"
   path: "/drawingService"
   externalPort: "80"
-host: "aservice.domains.multi.in.in"
-hostin: "aservicein.domains.multi.in.in"
-hostGates: "gates.domains.multi.in.in"
-domains: "[.alutech24.com, .alutech24.by, .alutech24.eu]"
+host: ['aservice.domains.multi.in.in.alutech24.com', 'aservice.domains.multi.in.in.alutech24.by', 'aservice.domains.multi.in.in.alutech24.eu']
+hostin: ['aservicein.domains.multi.in.in.alutech24.com', 'aservicein.domains.multi.in.in.alutech24.by', 'aservicein.domains.multi.in.in.alutech24.eu']
+hostGates: ['gates.domains.multi.in.in.alutech24.com', 'gates.domains.multi.in.in.alutech24.by', 'gates.domains.multi.in.in.alutech24.eu']
 resources:
   resources:
     requests:
@@ -129,10 +128,9 @@ drawingService:
   serviceName: "drawing"
   path: "/drawingService"
   externalPort: "80"
-host: "aservice.domains.multi.in.in"
-hostin: "aservicein.domains.multi.in.in"
-hostGates: "gates.domains.multi.in.in"
-domains: "[.alutech24.com, .alutech24.by, .alutech24.eu]"
+host: ['aservice.domains.multi.in.in.alutech24.com', 'aservice.domains.multi.in.in.alutech24.by', 'aservice.domains.multi.in.in.alutech24.eu']
+hostin: ['aservicein.domains.multi.in.in.alutech24.com', 'aservicein.domains.multi.in.in.alutech24.by', 'aservicein.domains.multi.in.in.alutech24.eu']
+hostGates: ['gates.domains.multi.in.in.alutech24.com', 'gates.domains.multi.in.in.alutech24.by', 'gates.domains.multi.in.in.alutech24.eu']
 resources:
   resources:
     requests:

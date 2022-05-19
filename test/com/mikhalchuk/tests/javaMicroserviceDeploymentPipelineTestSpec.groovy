@@ -116,7 +116,7 @@ class javaMicroserviceDeploymentPipelineTestSpec extends PipelineSpockTestBase {
         "calculation" | "master"        | "dev"  | "prod"          | null                                 | CALCULATION_DEV                 | PodResources.CALCULATION_PROD
         "aservice"    | "master"        | "dev"  | "dev-dev"       | ASERVICE_PRE_DEPLOY                  | ASERVICE_DEV                    | PodResources.ASERVICE_DEV
         "aservice"    | "no-javaOpts"   | "dev"  | "no-javaOpts"   | ASERVICE_PRE_DEPLOY                  | ASERVICE_DEV + [javaOpts: null] | PodResources.ASERVICE_DEV_JAVA_OPTS_NULL
-        "aservice"    | "develop"       | "dev"  | "multi-domains" | ASERVICE_PRE_DEPLOY_MULTIPLE_DOMAINS | ASERVICE_DEV_MULTIPLE_DOMAINS   | PodResources.ASERVICE_DEV
-        "aservice"    | "master"        | "prod" | "multi-domains" | ASERVICE_PRE_DEPLOY_MULTIPLE_DOMAINS | ASERVICE_PROD_MULTIPLE_DOMAINS  | PodResources.ASERVICE_DEV
+        "aservice"    | "develop"       | "dev"  | "multi-domains" | ASERVICE_PRE_DEPLOY_MULTIPLE_DOMAINS | ASERVICE_DEV                    | PodResources.ASERVICE_DEV
+        "aservice"    | "master"        | "prod" | "multi-domains" | ASERVICE_PRE_DEPLOY_MULTIPLE_DOMAINS | ASERVICE_PROD                   | PodResources.ASERVICE_DEV
     }
 }

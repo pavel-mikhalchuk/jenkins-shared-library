@@ -103,10 +103,9 @@ drawingService:
   serviceName: "drawing"
   path: "/drawingService"
   externalPort: "80"
-host: "aservice"
-hostin: "aservicein"
-hostGates: "gates"
-domains: "[.alutech24.com, .alutech24.by, .alutech24.eu]"
+host: ['aservice.alutech24.com', 'aservice.alutech24.by', 'aservice.alutech24.eu']
+hostin: ['aservicein.alutech24.com', 'aservicein.alutech24.by', 'aservicein.alutech24.eu']
+hostGates: ['gates.alutech24.com', 'gates.alutech24.by', 'gates.alutech24.eu']
 resources:
   resources:
     requests:
@@ -131,10 +130,9 @@ drawingService:
   serviceName: "drawing"
   path: "/drawingService"
   externalPort: "80"
-host: "aservice"
-hostin: "aservicein"
-hostGates: "gates"
-domains: "[.alutech24.com, .alutech24.by, .alutech24.eu]"
+host: ['aservice.alutech24.com', 'aservice.alutech24.by', 'aservice.alutech24.eu']
+hostin: ['aservicein.alutech24.com', 'aservicein.alutech24.by', 'aservicein.alutech24.eu']
+hostGates: ['gates.alutech24.com', 'gates.alutech24.by', 'gates.alutech24.eu']
 resources:
   resources:
     requests:
