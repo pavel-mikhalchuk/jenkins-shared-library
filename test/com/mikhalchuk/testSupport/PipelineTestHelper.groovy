@@ -217,6 +217,11 @@ class PipelineTestHelper extends BasePipelineTest {
         helper.registerAllowedMethod('success', [Closure.class], postResultEmulator.curry('success'))
         helper.registerAllowedMethod('unstable', [Closure.class], postResultEmulator.curry('unstable'))
         helper.registerAllowedMethod('failure', [Closure.class], postResultEmulator.curry('failure'))
+
+        helper.registerAllowedMethod("catchError", [Map.class, Closure.class],
+                { Map params, Closure body ->
+            return body()
+        })
     }
 
     /**
