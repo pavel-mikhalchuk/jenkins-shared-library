@@ -42,7 +42,8 @@ class BuildPipelineHelper {
     }
 
     def gitRev() {
-        pipeline.sh(script: 'echo $(git rev-parse HEAD)', returnStdout: true).trim()
+        // pipeline.sh(script: 'echo $(git rev-parse HEAD)', returnStdout: true).trim()
+        pipeline.sh(script: 'git config --global --add safe.directory $(pwd) && echo $(git rev-parse HEAD)', returnStdout: true).trim()
     }
 
 // Login to Nexus. NEXUS_USER & NEXUS_PASSWORD runner container vars
