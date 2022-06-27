@@ -81,13 +81,13 @@ def dockerBuild(ctx) {
 
     ctx.containerImages.each {
         def img = (it.name + ':' + tag).toLowerCase()
-        def imgLatest = (it.name + ':latest').toLowerCase()
+        // def imgLatest = (it.name + ':latest').toLowerCase()
 
         sh "docker build --add-host=registry.npmjs.org:10.100.20.43 -t ${img} ${it.source}"
-        sh "docker tag ${img} ${imgLatest}"
+        // sh "docker tag ${img} ${imgLatest}"
 
         ctx.dockerImages << img
-        ctx.dockerImages << imgLatest
+        // ctx.dockerImages << imgLatest
     }
 }
 // Login to docker hub Nexus, NEXUS_USER, NEXUS_PASSWORD is docker container vars
@@ -103,8 +103,8 @@ def dockerPush(ctx) {
     def to = Closure.IDENTITY
     
     ctx.dockerImages.each {
-        push(it, to("blue.dockerhub.alutech.local"))
-        push(it, to("green.dockerhub.alutech.local"))
+        // push(it, to("blue.dockerhub.alutech.local"))
+        // push(it, to("green.dockerhub.alutech.local"))
         push(it, to("nexus-dockerhub.alutech.local"))
     }
 }

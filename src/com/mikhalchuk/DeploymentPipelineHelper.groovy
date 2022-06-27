@@ -135,7 +135,7 @@ class DeploymentPipelineHelper {
             replicaCount: 1,
             gitBranch: ctx.currentBranchName,
             image: [
-                repository: 'dockerhub-vip.alutech.local',
+                repository: 'nexus-dockerhub.alutech.local',
                 tag: ctx.dockerImage,
                 pullPolicy: 'IfNotPresent'
             ],
@@ -250,9 +250,9 @@ class DeploymentPipelineHelper {
                         }
 
                         try {      
-                            log.info("Start fetching tags from 'https://dockerhub-vip.alutech.local/v2/${ctx.service}/tags/list'")
+                            log.info("Start fetching tags from 'https://nexus-dockerhub.alutech.local/v2/${ctx.service}/tags/list'")
 
-                            Process process = ["curl", "-k", "https://dockerhub-vip.alutech.local/v2/${ctx.service}/tags/list"].execute()
+                            Process process = ["curl", "-k", "https://nexus-dockerhub.alutech.local/v2/${ctx.service}/tags/list"].execute()
                             
                             def out = new StringBuffer()
                             def err = new StringBuffer()

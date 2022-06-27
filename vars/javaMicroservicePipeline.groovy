@@ -123,7 +123,7 @@ static def devEnvHelmValues(ctx) {
 
         deployment: [
             image: [
-                registry: 'dockerhub-vip.alutech.local',
+                registry: 'nexus-dockerhub.alutech.local',
                 repository: ctx.service,
                 tag: ctx.dockerImageTag,
                 pullPolicy: 'IfNotPresent'
@@ -192,7 +192,7 @@ static def prodEnvHelmValues(ctx) {
 
         deployment: [
             image: [
-                registry: 'dockerhub-vip.alutech.local',
+                registry: 'nexus-dockerhub.alutech.local',
                 repository: ctx.service,
                 tag: ctx.dockerImageTag,
                 pullPolicy: 'IfNotPresent'
