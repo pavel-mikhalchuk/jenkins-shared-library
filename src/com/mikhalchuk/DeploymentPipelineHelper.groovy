@@ -12,7 +12,8 @@ class DeploymentPipelineHelper {
         defineJavaMsDeploymentContext(
                 ctx.env,
                 pipeline.params.NAMESPACE,
-                "${ctx.service}:${pipeline.params.IMAGE_TAG ?: 'latest'}",
+                // "${ctx.service}:${pipeline.params.IMAGE_TAG ?: 'latest'}",
+                "${ctx.service}:${pipeline.params.IMAGE_TAG}",
                 ctx
         )
     }
@@ -23,6 +24,10 @@ class DeploymentPipelineHelper {
         ctx.dockerImage = dockerImageTag
         ctx.jenkinsBuildNumber = "${pipeline.JOB_NAME}-${pipeline.BUILD_NUMBER}"
         ctx.currentBranchName = "${pipeline.BRANCH_NAME}"
+
+        if (pipeline.params.IMAGE_TAG == '') {
+            error "You didn\'t enter a IMAGE_TAG paramener!"
+        }
 
         ctx.infraFolder = pipeline.sh(script: 'echo infra-$(date +"%d-%m-%Y_%H-%M-%S")', returnStdout: true).trim()
         ctx.helmChartFolder = "kubernetes/helm-chart/${ctx.service}"
