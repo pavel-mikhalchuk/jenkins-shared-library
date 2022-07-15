@@ -11,6 +11,7 @@ class javaMicroservicePipelineTestSpec extends PipelineSpockTestBase {
         mockGit(this)
         mockInput(this)
         mockMessage(this)
+        mockDateShellCommand(this)
     }
 
     def "test java ms pipeline 1.0"() {

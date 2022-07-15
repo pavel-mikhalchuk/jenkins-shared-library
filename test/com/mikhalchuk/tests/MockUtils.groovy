@@ -51,9 +51,9 @@ class MockUtils {
         })
     }
 
-    static void mockInfraFolderName(PipelineSpockTestBase test) {
-        test.helper.addShMock('echo infra-$(date +"%d-%m-%Y_%H-%M-%S")',
-                'infra-06-06-2020_06-06-06', 0)
+    static void mockDateShellCommand(PipelineSpockTestBase test) {
+        test.helper.addShMock('echo $(date +"%d-%m-%Y_%H-%M-%S")',
+                '06-06-2020_06-06-06', 0)
     }
 
     static void mockGitRevParse(PipelineSpockTestBase test) {

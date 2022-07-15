@@ -12,34 +12,39 @@ class DeploymentPipelineHelper {
         defineJavaMsDeploymentContext(
                 ctx.env,
                 pipeline.params.NAMESPACE,
-                // "${ctx.service}:${pipeline.params.IMAGE_TAG ?: 'latest'}",
                 "${ctx.service}:${pipeline.params.IMAGE_TAG}",
                 ctx
         )
     }
 
     def defineJavaMsDeploymentContext(env, namespace, dockerImageTag, ctx) {
+        validateInputParameters(dockerImageTag)
+
         ctx.env = env
         ctx.namespace = namespace
         ctx.dockerImage = dockerImageTag
         ctx.jenkinsBuildNumber = "${pipeline.JOB_NAME}-${pipeline.BUILD_NUMBER}"
         ctx.currentBranchName = "${pipeline.BRANCH_NAME}"
 
-        if (pipeline.params.IMAGE_TAG == '') {
-            error "You didn\'t enter a IMAGE_TAG paramener!"
-        }
+        def timestamp = pipeline.sh(script: 'echo $(date +"%d-%m-%Y_%H-%M-%S")', returnStdout: true).trim()
 
-        ctx.infraFolder = pipeline.sh(script: 'echo infra-$(date +"%d-%m-%Y_%H-%M-%S")', returnStdout: true).trim()
-        ctx.helmChartFolder = "kubernetes/helm-chart/${ctx.service}"
+        ctx.infraFolder = "infra-${timestamp}"
+        ctx.helmChartFolder = "kubernetes-${timestamp}/helm-chart/${ctx.service}"
         ctx.helmRelease = "${ctx.service}-${ctx.namespace}"
         // Kube 1.23
-        ctx.helmChartFolderKubeNew = "kubernetes/helm-chart-1-23/${ctx.service}"
+        ctx.helmChartFolderKubeNew = "kubernetes-${timestamp}/helm-chart-1-23/${ctx.service}"
 
         //// env-specific (dev VS prod)
         ctx.kubeStateFolder = "${ctx.infraFolder}/kube-${ctx.env}/cluster-state/alutech-services/${ctx.namespace}/${ctx.service}/raw-manifests"
         // Kube 1.23
         ctx.kubeStateFolderKubeNew = "${ctx.infraFolder}/kube-${ctx.env}/cluster-state/alutech-services/${ctx.namespace}/${ctx.service}/raw-manifests-kube-1-23"
         ////  ////  //// //// //// ////////  ////  //// //// //// ////
+    }
+
+    def validateInputParameters(dockerImageTag) {
+        if (dockerImageTag == '') {
+            error "You didn\'t enter a IMAGE_TAG parameter!"
+        }
     }
 
     def notifySlack(ctx) {
@@ -78,6 +83,12 @@ class DeploymentPipelineHelper {
         // kube 1.23
         pipeline.sh "find . -name application.${ctx.namespace}.properties -type f -exec cp {} ${ctx.helmChartFolderKubeNew}/application.properties \";\""
         pipeline.sh "find . -name application.${ctx.namespace}.yaml -type f -exec cp {} ${ctx.helmChartFolderKubeNew}/application.yaml \";\""
+    }
+
+    def copyCustomKubeConfigs(ctx) {
+        pipeline.sh "cp -r kubernetes/ ${ctx.helmChartFolder}/templates || true"
+        // kube 1.23
+        pipeline.sh "cp -r kubernetes/ ${ctx.helmChartFolderKubeNew}/templates || true"
     }
 
     def writeHelmValuesYaml(ctx) {

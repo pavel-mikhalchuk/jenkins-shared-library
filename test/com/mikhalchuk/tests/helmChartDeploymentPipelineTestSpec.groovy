@@ -13,7 +13,7 @@ class helmChartDeploymentPipelineTestSpec extends PipelineSpockTestBase {
         mockSlack(this)
         mockGit(this)
         mockContainer(this)
-        mockInfraFolderName(this)
+        mockDateShellCommand(this)
     }
 
     def "test helm chart deploy pipeline 1.0"() {

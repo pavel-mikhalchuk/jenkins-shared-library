@@ -93,6 +93,7 @@ def deploy(env, namespace, deployer, ctx) {
 
         deployer.getHelmChart(ctx)
         deployer.smartCopyConfigToHelmChart(ctx)
+        deployer.copyCustomKubeConfigs(ctx)
         deployer.writeRawHelmValuesYaml(helmValuesForEnvironment(env, ctx), ctx)
     }
     container('helm') {

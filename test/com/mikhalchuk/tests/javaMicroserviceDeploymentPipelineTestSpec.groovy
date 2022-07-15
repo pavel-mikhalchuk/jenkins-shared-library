@@ -16,7 +16,7 @@ class javaMicroserviceDeploymentPipelineTestSpec extends PipelineSpockTestBase {
         mockSlack(this)
         mockGit(this)
         mockContainer(this)
-        mockInfraFolderName(this)
+        mockDateShellCommand(this)
     }
 
     def "test java ms deploy pipeline 1.0"() {
