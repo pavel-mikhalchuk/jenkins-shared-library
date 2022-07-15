@@ -44,9 +44,9 @@ def call(body) {
                     script {
                         if (BRANCH_NAME != 'master') {
                             try {
-                                timeout(time: 10, unit: 'SECONDS') {
-                                    input message: "Deploy to 'dev-dev'?"
-                                }
+//                                timeout(time: 10, unit: 'SECONDS') {
+                                input message: "Deploy to 'dev-dev'?"
+//                                }
                             } catch(err) {
                                 error('Aborting the build.')
                             }
