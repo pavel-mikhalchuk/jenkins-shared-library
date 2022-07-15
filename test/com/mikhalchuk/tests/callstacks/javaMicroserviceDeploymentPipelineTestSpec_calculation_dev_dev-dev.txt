@@ -23,9 +23,9 @@
                         }
 
                         try {      
-                            log.info("Start fetching tags from 'https://dockerhub-vip.alutech.local/v2/calculation/tags/list'")
+                            log.info("Start fetching tags from 'https://nexus-dockerhub.alutech.local/v2/calculation/tags/list'")
 
-                            Process process = ["curl", "-k", "https://dockerhub-vip.alutech.local/v2/calculation/tags/list"].execute()
+                            Process process = ["curl", "-k", "https://nexus-dockerhub.alutech.local/v2/calculation/tags/list"].execute()
                             
                             def out = new StringBuffer()
                             def err = new StringBuffer()
@@ -91,7 +91,7 @@ calculation:latest
                            javaMicroserviceDeploymentPipeline.writeFile({file=kubernetes/helm-chart/calculation/values.yaml, text=replicaCount: 1
 gitBranch: "develop"
 image:
-  repository: "dockerhub-vip.alutech.local"
+  repository: "nexus-dockerhub.alutech.local"
   tag: "calculation:latest"
   pullPolicy: "IfNotPresent"
 service:
@@ -111,7 +111,7 @@ javaOpts: "-Xmx2g -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.
                            javaMicroserviceDeploymentPipeline.writeFile({file=kubernetes/helm-chart-1-23/calculation/values.yaml, text=replicaCount: 1
 gitBranch: "develop"
 image:
-  repository: "dockerhub-vip.alutech.local"
+  repository: "nexus-dockerhub.alutech.local"
   tag: "calculation:latest"
   pullPolicy: "IfNotPresent"
 service:

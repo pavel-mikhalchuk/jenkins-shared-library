@@ -22,16 +22,10 @@
                         javaMicroservicePipeline.sh(mvn clean package)
                   javaMicroservicePipeline.container(docker, groovy.lang.Closure)
                      javaMicroservicePipeline.script(groovy.lang.Closure)
-                        javaMicroservicePipeline.sh({script=echo $(git rev-parse HEAD), returnStdout=true})
+                        javaMicroservicePipeline.sh({script=git config --global --add safe.directory $(pwd) && echo $(git rev-parse HEAD), returnStdout=true})
                         javaMicroservicePipeline.sh(docker build -t java-micro-service:20200830t005945__master__abcd123 .)
-                        javaMicroservicePipeline.sh(docker tag java-micro-service:20200830t005945__master__abcd123 java-micro-service:latest)
                         javaMicroservicePipeline.sh(docker login -u ${NEXUS_USER} -p ${NEXUS_PASSWORD} nexus-dockerhub.alutech.local)
-                        javaMicroservicePipeline.sh(docker tag java-micro-service:20200830t005945__master__abcd123 blue.dockerhub.alutech.local/java-micro-service:20200830t005945__master__abcd123 && docker push blue.dockerhub.alutech.local/java-micro-service:20200830t005945__master__abcd123)
-                        javaMicroservicePipeline.sh(docker tag java-micro-service:20200830t005945__master__abcd123 green.dockerhub.alutech.local/java-micro-service:20200830t005945__master__abcd123 && docker push green.dockerhub.alutech.local/java-micro-service:20200830t005945__master__abcd123)
                         javaMicroservicePipeline.sh(docker tag java-micro-service:20200830t005945__master__abcd123 nexus-dockerhub.alutech.local/java-micro-service:20200830t005945__master__abcd123 && docker push nexus-dockerhub.alutech.local/java-micro-service:20200830t005945__master__abcd123)
-                        javaMicroservicePipeline.sh(docker tag java-micro-service:latest blue.dockerhub.alutech.local/java-micro-service:latest && docker push blue.dockerhub.alutech.local/java-micro-service:latest)
-                        javaMicroservicePipeline.sh(docker tag java-micro-service:latest green.dockerhub.alutech.local/java-micro-service:latest && docker push green.dockerhub.alutech.local/java-micro-service:latest)
-                        javaMicroservicePipeline.sh(docker tag java-micro-service:latest nexus-dockerhub.alutech.local/java-micro-service:latest && docker push nexus-dockerhub.alutech.local/java-micro-service:latest)
             javaMicroservicePipeline.stage(deploy-to-dev-dev, groovy.lang.Closure)
                javaMicroservicePipeline.agent(groovy.lang.Closure)
                   javaMicroservicePipeline.label(helm-deploy)
@@ -57,7 +51,7 @@ ccc/helm-charts/kub-1.23/java/microservice/* kubernetes/helm-chart-1-23/java-mic
                      javaMicroservicePipeline.writeFile({file=kubernetes/helm-chart/java-micro-service/values.yaml, text=name: "java-micro-service"
 deployment:
   image:
-    registry: "dockerhub-vip.alutech.local"
+    registry: "nexus-dockerhub.alutech.local"
     repository: "java-micro-service"
     tag: "20200830t005945__master__abcd123"
     pullPolicy: "IfNotPresent"
@@ -97,7 +91,7 @@ ingress:
                      javaMicroservicePipeline.writeFile({file=kubernetes/helm-chart-1-23/java-micro-service/values.yaml, text=name: "java-micro-service"
 deployment:
   image:
-    registry: "dockerhub-vip.alutech.local"
+    registry: "nexus-dockerhub.alutech.local"
     repository: "java-micro-service"
     tag: "20200830t005945__master__abcd123"
     pullPolicy: "IfNotPresent"
@@ -187,7 +181,7 @@ ccc/helm-charts/kub-1.23/java/microservice/* kubernetes/helm-chart-1-23/java-mic
                      javaMicroservicePipeline.writeFile({file=kubernetes/helm-chart/java-micro-service/values.yaml, text=name: "java-micro-service"
 deployment:
   image:
-    registry: "dockerhub-vip.alutech.local"
+    registry: "nexus-dockerhub.alutech.local"
     repository: "java-micro-service"
     tag: "20200830t005945__master__abcd123"
     pullPolicy: "IfNotPresent"
@@ -227,7 +221,7 @@ ingress:
                      javaMicroservicePipeline.writeFile({file=kubernetes/helm-chart-1-23/java-micro-service/values.yaml, text=name: "java-micro-service"
 deployment:
   image:
-    registry: "dockerhub-vip.alutech.local"
+    registry: "nexus-dockerhub.alutech.local"
     repository: "java-micro-service"
     tag: "20200830t005945__master__abcd123"
     pullPolicy: "IfNotPresent"
@@ -317,7 +311,7 @@ ccc/helm-charts/kub-1.23/java/microservice/* kubernetes/helm-chart-1-23/java-mic
                      javaMicroservicePipeline.writeFile({file=kubernetes/helm-chart/java-micro-service/values.yaml, text=name: "java-micro-service"
 deployment:
   image:
-    registry: "dockerhub-vip.alutech.local"
+    registry: "nexus-dockerhub.alutech.local"
     repository: "java-micro-service"
     tag: "20200830t005945__master__abcd123"
     pullPolicy: "IfNotPresent"
@@ -352,7 +346,7 @@ ingress:
                      javaMicroservicePipeline.writeFile({file=kubernetes/helm-chart-1-23/java-micro-service/values.yaml, text=name: "java-micro-service"
 deployment:
   image:
-    registry: "dockerhub-vip.alutech.local"
+    registry: "nexus-dockerhub.alutech.local"
     repository: "java-micro-service"
     tag: "20200830t005945__master__abcd123"
     pullPolicy: "IfNotPresent"

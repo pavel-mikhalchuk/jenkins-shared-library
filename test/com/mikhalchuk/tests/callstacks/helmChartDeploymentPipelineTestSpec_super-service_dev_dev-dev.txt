@@ -23,9 +23,9 @@
                         }
 
                         try {      
-                            log.info("Start fetching tags from 'https://dockerhub-vip.alutech.local/v2/super-service/tags/list'")
+                            log.info("Start fetching tags from 'https://nexus-dockerhub.alutech.local/v2/super-service/tags/list'")
 
-                            Process process = ["curl", "-k", "https://dockerhub-vip.alutech.local/v2/super-service/tags/list"].execute()
+                            Process process = ["curl", "-k", "https://nexus-dockerhub.alutech.local/v2/super-service/tags/list"].execute()
                             
                             def out = new StringBuffer()
                             def err = new StringBuffer()
@@ -88,7 +88,7 @@ super-service:latest
                         helmChartDeploymentPipeline.writeFile({file=kubernetes/helm-chart/super-service/values.yaml, text=replicaCount: 1
 gitBranch: "develop"
 image:
-  repository: "dockerhub-vip.alutech.local"
+  repository: "nexus-dockerhub.alutech.local"
   tag: "super-service:latest"
   pullPolicy: "IfNotPresent"
   additionalProperty: "super-service-image-additional-property"
@@ -111,7 +111,7 @@ resources:
                         helmChartDeploymentPipeline.writeFile({file=kubernetes/helm-chart-1-23/super-service/values.yaml, text=replicaCount: 1
 gitBranch: "develop"
 image:
-  repository: "dockerhub-vip.alutech.local"
+  repository: "nexus-dockerhub.alutech.local"
   tag: "super-service:latest"
   pullPolicy: "IfNotPresent"
   additionalProperty: "super-service-image-additional-property"
