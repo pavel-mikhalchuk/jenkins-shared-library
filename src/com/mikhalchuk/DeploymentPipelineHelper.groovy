@@ -17,6 +17,14 @@ class DeploymentPipelineHelper {
         )
     }
 
+    def defineJavaMsPipelineDeploymentContext(env, namespace, dockerImageTag, ctx) {
+        defineJavaMsDeploymentContext(env, namespace, dockerImageTag, ctx)
+
+        ctx.helmChartFolder = "kubernetes-${ctx.timestamp}/helm-chart/${ctx.service}"
+        // Kube 1.23
+        ctx.helmChartFolderKubeNew = "kubernetes-${ctx.timestamp}/helm-chart-1-23/${ctx.service}"
+    }
+
     def defineJavaMsDeploymentContext(env, namespace, dockerImageTag, ctx) {
         validateInputParameters(dockerImageTag)
 
@@ -26,13 +34,13 @@ class DeploymentPipelineHelper {
         ctx.jenkinsBuildNumber = "${pipeline.JOB_NAME}-${pipeline.BUILD_NUMBER}"
         ctx.currentBranchName = "${pipeline.BRANCH_NAME}"
 
-        def timestamp = pipeline.sh(script: 'echo $(date +"%d-%m-%Y_%H-%M-%S")', returnStdout: true).trim()
+        ctx.timestamp = pipeline.sh(script: 'echo $(date +"%d-%m-%Y_%H-%M-%S")', returnStdout: true).trim()
 
-        ctx.infraFolder = "infra-${timestamp}"
-        ctx.helmChartFolder = "kubernetes-${timestamp}/helm-chart/${ctx.service}"
-        ctx.helmRelease = "${ctx.service}-${ctx.namespace}"
+        ctx.infraFolder = "infra-${ctx.timestamp}"
+        ctx.helmChartFolder = "kubernetes/helm-chart/${ctx.service}"
         // Kube 1.23
-        ctx.helmChartFolderKubeNew = "kubernetes-${timestamp}/helm-chart-1-23/${ctx.service}"
+        ctx.helmChartFolderKubeNew = "kubernetes/helm-chart-1-23/${ctx.service}"
+        ctx.helmRelease = "${ctx.service}-${ctx.namespace}"
 
         //// env-specific (dev VS prod)
         ctx.kubeStateFolder = "${ctx.infraFolder}/kube-${ctx.env}/cluster-state/alutech-services/${ctx.namespace}/${ctx.service}/raw-manifests"
@@ -68,7 +76,7 @@ class DeploymentPipelineHelper {
         pipeline.sh "cp -r ${ctx.infraFolder}/helm-charts/java/microservice/* ${ctx.helmChartFolder}"
         // kube 1.23
         pipeline.sh "mkdir -p ${ctx.helmChartFolderKubeNew}"
-        pipeline.sh "cp -r ${ctx.infraFolder}/helm-charts/kub-1.23/java/microservice/* ${ctx.helmChartFolderKubeNew}" // kube 1.23
+        pipeline.sh "cp -r ${ctx.infraFolder}/helm-charts/kub-1.23/java/microservice/* ${ctx.helmChartFolderKubeNew}"
     }
 
     def copyConfigToHelmChart(ctx) {

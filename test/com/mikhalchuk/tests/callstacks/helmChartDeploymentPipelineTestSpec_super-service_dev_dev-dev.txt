@@ -85,7 +85,7 @@ super-service:latest
                   helmChartDeploymentPipeline.container(helm, groovy.lang.Closure)
                      helmChartDeploymentPipeline.script(groovy.lang.Closure)
                         helmChartDeploymentPipeline.sh({script=$(super-service-get-password-shell-command), returnStdout=true})
-                        helmChartDeploymentPipeline.writeFile({file=kubernetes-06-06-2020_06-06-06/helm-chart/super-service/values.yaml, text=replicaCount: 1
+                        helmChartDeploymentPipeline.writeFile({file=kubernetes/helm-chart/super-service/values.yaml, text=replicaCount: 1
 gitBranch: "develop"
 image:
   repository: "nexus-dockerhub.alutech.local"
@@ -108,7 +108,7 @@ resources:
       memory: "1Gi"
       cpu: "1"})
                         helmChartDeploymentPipeline.sh({script=$(super-service-get-password-shell-command), returnStdout=true})
-                        helmChartDeploymentPipeline.writeFile({file=kubernetes-06-06-2020_06-06-06/helm-chart-1-23/super-service/values.yaml, text=replicaCount: 1
+                        helmChartDeploymentPipeline.writeFile({file=kubernetes/helm-chart-1-23/super-service/values.yaml, text=replicaCount: 1
 gitBranch: "develop"
 image:
   repository: "nexus-dockerhub.alutech.local"
@@ -132,10 +132,10 @@ resources:
       cpu: "1"})
                         helmChartDeploymentPipeline.sh(rm -rf infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/dev-dev/super-service/raw-manifests)
                         helmChartDeploymentPipeline.sh(mkdir -p infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/dev-dev/super-service/raw-manifests)
-                        helmChartDeploymentPipeline.sh(helm template --namespace dev-dev --name super-service-dev-dev kubernetes-06-06-2020_06-06-06/helm-chart/super-service > 'infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/dev-dev/super-service/raw-manifests/kube-state.yaml')
+                        helmChartDeploymentPipeline.sh(helm template --namespace dev-dev --name super-service-dev-dev kubernetes/helm-chart/super-service > 'infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/dev-dev/super-service/raw-manifests/kube-state.yaml')
                         helmChartDeploymentPipeline.sh(rm -rf infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/dev-dev/super-service/raw-manifests-kube-1-23)
                         helmChartDeploymentPipeline.sh(mkdir -p infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/dev-dev/super-service/raw-manifests-kube-1-23)
-                        helmChartDeploymentPipeline.sh(helm template --namespace dev-dev --name super-service-dev-dev kubernetes-06-06-2020_06-06-06/helm-chart-1-23/super-service > 'infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/dev-dev/super-service/raw-manifests-kube-1-23/kube-state.yaml')
+                        helmChartDeploymentPipeline.sh(helm template --namespace dev-dev --name super-service-dev-dev kubernetes/helm-chart-1-23/super-service > 'infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/dev-dev/super-service/raw-manifests-kube-1-23/kube-state.yaml')
             helmChartDeploymentPipeline.stage(push K8S manifests to infra repo, groovy.lang.Closure)
                helmChartDeploymentPipeline.steps(groovy.lang.Closure)
                   helmChartDeploymentPipeline.script(groovy.lang.Closure)

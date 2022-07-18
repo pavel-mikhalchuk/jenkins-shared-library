@@ -88,7 +88,7 @@ def setUpContext(body) {
 
 def deploy(env, namespace, deployer, ctx) {
     script {
-        deployer.defineJavaMsDeploymentContext(env, namespace, ctx.dockerImageTag, ctx)
+        deployer.defineJavaMsPipelineDeploymentContext(env, namespace, ctx.dockerImageTag, ctx)
         deployer.checkoutInfraRepo(ctx)
 
         deployer.getHelmChart(ctx)

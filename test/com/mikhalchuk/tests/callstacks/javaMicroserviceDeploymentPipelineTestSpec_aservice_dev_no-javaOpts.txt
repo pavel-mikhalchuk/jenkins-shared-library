@@ -88,7 +88,7 @@ aservice:latest
                         javaMicroserviceDeploymentPipeline.catchError({buildResult=SUCCESS, stageResult=FAILURE}, groovy.lang.Closure)
                            javaMicroserviceDeploymentPipeline.sh(cp -r configuration/src/main/resources/* kubernetes/helm-chart/aservice/)
                            javaMicroserviceDeploymentPipeline.sh(cp configuration/src/main/resources/env/base.no-javaOpts.properties kubernetes/helm-chart/aservice/base.properties)
-                           javaMicroserviceDeploymentPipeline.writeFile({file=kubernetes-06-06-2020_06-06-06/helm-chart/aservice/values.yaml, text=replicaCount: 1
+                           javaMicroserviceDeploymentPipeline.writeFile({file=kubernetes/helm-chart/aservice/values.yaml, text=replicaCount: 1
 gitBranch: "no-javaOpts"
 image:
   repository: "nexus-dockerhub.alutech.local"
@@ -114,7 +114,7 @@ resources:
       memory: "5Gi"
       cpu: "2"
 javaOpts: null})
-                           javaMicroserviceDeploymentPipeline.writeFile({file=kubernetes-06-06-2020_06-06-06/helm-chart-1-23/aservice/values.yaml, text=replicaCount: 1
+                           javaMicroserviceDeploymentPipeline.writeFile({file=kubernetes/helm-chart-1-23/aservice/values.yaml, text=replicaCount: 1
 gitBranch: "no-javaOpts"
 image:
   repository: "nexus-dockerhub.alutech.local"
@@ -142,10 +142,10 @@ resources:
 javaOpts: null})
                            javaMicroserviceDeploymentPipeline.sh(rm -rf infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/no-javaOpts/aservice/raw-manifests)
                            javaMicroserviceDeploymentPipeline.sh(mkdir -p infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/no-javaOpts/aservice/raw-manifests)
-                           javaMicroserviceDeploymentPipeline.sh(helm template --namespace no-javaOpts --name aservice-no-javaOpts kubernetes-06-06-2020_06-06-06/helm-chart/aservice > 'infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/no-javaOpts/aservice/raw-manifests/kube-state.yaml')
+                           javaMicroserviceDeploymentPipeline.sh(helm template --namespace no-javaOpts --name aservice-no-javaOpts kubernetes/helm-chart/aservice > 'infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/no-javaOpts/aservice/raw-manifests/kube-state.yaml')
                            javaMicroserviceDeploymentPipeline.sh(rm -rf infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/no-javaOpts/aservice/raw-manifests-kube-1-23)
                            javaMicroserviceDeploymentPipeline.sh(mkdir -p infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/no-javaOpts/aservice/raw-manifests-kube-1-23)
-                           javaMicroserviceDeploymentPipeline.sh(helm template --namespace no-javaOpts --name aservice-no-javaOpts kubernetes-06-06-2020_06-06-06/helm-chart-1-23/aservice > 'infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/no-javaOpts/aservice/raw-manifests-kube-1-23/kube-state.yaml')
+                           javaMicroserviceDeploymentPipeline.sh(helm template --namespace no-javaOpts --name aservice-no-javaOpts kubernetes/helm-chart-1-23/aservice > 'infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/no-javaOpts/aservice/raw-manifests-kube-1-23/kube-state.yaml')
             javaMicroserviceDeploymentPipeline.stage(push K8S manifests to infra repo, groovy.lang.Closure)
                javaMicroserviceDeploymentPipeline.steps(groovy.lang.Closure)
                   javaMicroserviceDeploymentPipeline.script(groovy.lang.Closure)
