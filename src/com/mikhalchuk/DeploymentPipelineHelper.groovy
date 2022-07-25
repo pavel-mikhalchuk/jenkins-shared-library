@@ -21,8 +21,6 @@ class DeploymentPipelineHelper {
         defineJavaMsDeploymentContext(env, namespace, dockerImageTag, ctx)
 
         ctx.helmChartFolder = "kubernetes-${ctx.timestamp}/helm-chart/${ctx.service}"
-        // Kube 1.23
-        ctx.helmChartFolderKubeNew = "kubernetes-${ctx.timestamp}/helm-chart-1-23/${ctx.service}"
     }
 
     def defineJavaMsDeploymentContext(env, namespace, dockerImageTag, ctx) {
@@ -38,14 +36,10 @@ class DeploymentPipelineHelper {
 
         ctx.infraFolder = "infra-${ctx.timestamp}"
         ctx.helmChartFolder = "kubernetes/helm-chart/${ctx.service}"
-        // Kube 1.23
-        ctx.helmChartFolderKubeNew = "kubernetes/helm-chart-1-23/${ctx.service}"
         ctx.helmRelease = "${ctx.service}-${ctx.namespace}"
 
         //// env-specific (dev VS prod)
         ctx.kubeStateFolder = "${ctx.infraFolder}/kube-${ctx.env}/cluster-state/alutech-services/${ctx.namespace}/${ctx.service}/raw-manifests"
-        // Kube 1.23
-        ctx.kubeStateFolderKubeNew = "${ctx.infraFolder}/kube-${ctx.env}/cluster-state/alutech-services/${ctx.namespace}/${ctx.service}/raw-manifests-kube-1-23"
         ////  ////  //// //// //// ////////  ////  //// //// //// ////
     }
 
@@ -74,29 +68,19 @@ class DeploymentPipelineHelper {
     def getHelmChart(ctx) {
         pipeline.sh "mkdir -p ${ctx.helmChartFolder}"
         pipeline.sh "cp -r ${ctx.infraFolder}/helm-charts/java/microservice/* ${ctx.helmChartFolder}"
-        // kube 1.23
-        pipeline.sh "mkdir -p ${ctx.helmChartFolderKubeNew}"
-        pipeline.sh "cp -r ${ctx.infraFolder}/helm-charts/kub-1.23/java/microservice/* ${ctx.helmChartFolderKubeNew}"
     }
 
     def copyConfigToHelmChart(ctx) {
         pipeline.sh "cp src/main/resources/application.${ctx.namespace}.properties ${ctx.helmChartFolder}/application.properties"
-        // Kube 1.23
-        pipeline.sh "cp src/main/resources/application.${ctx.namespace}.properties ${ctx.helmChartFolderKubeNew}/application.properties"
     }
 
     def smartCopyConfigToHelmChart(ctx) {
         pipeline.sh "find . -name application.${ctx.namespace}.properties -type f -exec cp {} ${ctx.helmChartFolder}/application.properties \";\""
         pipeline.sh "find . -name application.${ctx.namespace}.yaml -type f -exec cp {} ${ctx.helmChartFolder}/application.yaml \";\""
-        // kube 1.23
-        pipeline.sh "find . -name application.${ctx.namespace}.properties -type f -exec cp {} ${ctx.helmChartFolderKubeNew}/application.properties \";\""
-        pipeline.sh "find . -name application.${ctx.namespace}.yaml -type f -exec cp {} ${ctx.helmChartFolderKubeNew}/application.yaml \";\""
     }
 
     def copyCustomKubeConfigs(ctx) {
         pipeline.sh "cp -r kubernetes/ ${ctx.helmChartFolder}/templates || true"
-        // kube 1.23
-        pipeline.sh "cp -r kubernetes/ ${ctx.helmChartFolderKubeNew}/templates || true"
     }
 
     def writeHelmValuesYaml(ctx) {
@@ -108,8 +92,6 @@ class DeploymentPipelineHelper {
 
     def writeRawHelmValuesYaml(helmValuesMap, ctx) {
         pipeline.writeFile file: "${ctx.helmChartFolder}/values.yaml", text: helmValues(helmValuesMap, ctx)
-        // Kube 1.23 
-        pipeline.writeFile file: "${ctx.helmChartFolderKubeNew}/values.yaml", text: helmValues(helmValuesMap, ctx)
     }
 
     def helmValues(helmValues, ctx) {
@@ -193,10 +175,6 @@ class DeploymentPipelineHelper {
         pipeline.sh "rm -rf ${ctx.kubeStateFolder}"
         pipeline.sh "mkdir -p ${ctx.kubeStateFolder}"
         pipeline.sh "helm template --namespace ${ctx.namespace} --name ${ctx.helmRelease} ${ctx.helmChartFolder} > '${ctx.kubeStateFolder}/kube-state.yaml'"
-        // Kube 1.23
-        pipeline.sh "rm -rf ${ctx.kubeStateFolderKubeNew}"
-        pipeline.sh "mkdir -p ${ctx.kubeStateFolderKubeNew}"
-        pipeline.sh "helm template --namespace ${ctx.namespace} --name ${ctx.helmRelease} ${ctx.helmChartFolderKubeNew} > '${ctx.kubeStateFolderKubeNew}/kube-state.yaml'"
     }
 
     def pushK8SManifests(ctx) {
