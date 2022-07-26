@@ -87,28 +87,7 @@ pricing:latest
                      javaMicroserviceDeploymentPipeline.script(groovy.lang.Closure)
                         javaMicroserviceDeploymentPipeline.catchError({buildResult=SUCCESS, stageResult=FAILURE}, groovy.lang.Closure)
                            javaMicroserviceDeploymentPipeline.sh(cp src/main/resources/application.dev-dev.properties kubernetes/helm-chart/pricing/application.properties)
-                           javaMicroserviceDeploymentPipeline.sh(cp src/main/resources/application.dev-dev.properties kubernetes/helm-chart-1-23/pricing/application.properties)
                            javaMicroserviceDeploymentPipeline.writeFile({file=kubernetes/helm-chart/pricing/values.yaml, text=replicaCount: 1
-gitBranch: "develop"
-image:
-  repository: "nexus-dockerhub.alutech.local"
-  tag: "pricing:latest"
-  pullPolicy: "IfNotPresent"
-service:
-  externalPort: 80
-  internalPort: 8080
-jenkinsBuildNumber: "pricing-deploy-dev-666"
-host: "pricing.dev.dev.in.in.alutech24.com"
-resources:
-  resources:
-    requests:
-      memory: "1500Mi"
-      cpu: "100m"
-    limits:
-      memory: "5Gi"
-      cpu: "2"
-javaOpts: "-Xms500m -Xmx4g -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.port=9011 -Dcom.sun.management.jmxremote.rmi.port=9011 -Djava.rmi.server.hostname=127.0.0.1"})
-                           javaMicroserviceDeploymentPipeline.writeFile({file=kubernetes/helm-chart-1-23/pricing/values.yaml, text=replicaCount: 1
 gitBranch: "develop"
 image:
   repository: "nexus-dockerhub.alutech.local"
@@ -131,9 +110,6 @@ javaOpts: "-Xms500m -Xmx4g -Dcom.sun.management.jmxremote -Dcom.sun.management.j
                            javaMicroserviceDeploymentPipeline.sh(rm -rf infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/dev-dev/pricing/raw-manifests)
                            javaMicroserviceDeploymentPipeline.sh(mkdir -p infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/dev-dev/pricing/raw-manifests)
                            javaMicroserviceDeploymentPipeline.sh(helm template --namespace dev-dev --name pricing-dev-dev kubernetes/helm-chart/pricing > 'infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/dev-dev/pricing/raw-manifests/kube-state.yaml')
-                           javaMicroserviceDeploymentPipeline.sh(rm -rf infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/dev-dev/pricing/raw-manifests-kube-1-23)
-                           javaMicroserviceDeploymentPipeline.sh(mkdir -p infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/dev-dev/pricing/raw-manifests-kube-1-23)
-                           javaMicroserviceDeploymentPipeline.sh(helm template --namespace dev-dev --name pricing-dev-dev kubernetes/helm-chart-1-23/pricing > 'infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/dev-dev/pricing/raw-manifests-kube-1-23/kube-state.yaml')
             javaMicroserviceDeploymentPipeline.stage(push K8S manifests to infra repo, groovy.lang.Closure)
                javaMicroserviceDeploymentPipeline.steps(groovy.lang.Closure)
                   javaMicroserviceDeploymentPipeline.script(groovy.lang.Closure)

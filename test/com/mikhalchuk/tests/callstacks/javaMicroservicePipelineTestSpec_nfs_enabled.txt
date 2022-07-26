@@ -38,58 +38,10 @@
                         javaMicroservicePipeline.git({credentialsId=jenkins, url=http://bb.alutech-mc.com:8080/scm/as/infra.git})
                      javaMicroservicePipeline.sh(mkdir -p kubernetes-06-06-2020_06-06-06/helm-chart/java-micro-service)
                      javaMicroservicePipeline.sh(cp -r infra-06-06-2020_06-06-06/helm-charts/java/microservice/* kubernetes-06-06-2020_06-06-06/helm-chart/java-micro-service)
-                     javaMicroservicePipeline.sh(mkdir -p kubernetes-06-06-2020_06-06-06/helm-chart-1-23/java-micro-service)
-                     javaMicroservicePipeline.sh(cp -r infra-06-06-2020_06-06-06/helm-charts/kub-1.23/java/microservice/* kubernetes-06-06-2020_06-06-06/helm-chart-1-23/java-micro-service)
                      javaMicroservicePipeline.sh(find . -name application.dev-dev.properties -type f -exec cp {} kubernetes-06-06-2020_06-06-06/helm-chart/java-micro-service/application.properties ";")
                      javaMicroservicePipeline.sh(find . -name application.dev-dev.yaml -type f -exec cp {} kubernetes-06-06-2020_06-06-06/helm-chart/java-micro-service/application.yaml ";")
-                     javaMicroservicePipeline.sh(find . -name application.dev-dev.properties -type f -exec cp {} kubernetes-06-06-2020_06-06-06/helm-chart-1-23/java-micro-service/application.properties ";")
-                     javaMicroservicePipeline.sh(find . -name application.dev-dev.yaml -type f -exec cp {} kubernetes-06-06-2020_06-06-06/helm-chart-1-23/java-micro-service/application.yaml ";")
                      javaMicroservicePipeline.sh(cp -r kubernetes/ kubernetes-06-06-2020_06-06-06/helm-chart/java-micro-service/templates || true)
-                     javaMicroservicePipeline.sh(cp -r kubernetes/ kubernetes-06-06-2020_06-06-06/helm-chart-1-23/java-micro-service/templates || true)
                      javaMicroservicePipeline.writeFile({file=kubernetes-06-06-2020_06-06-06/helm-chart/java-micro-service/values.yaml, text=name: "java-micro-service"
-deployment:
-  image:
-    registry: "nexus-dockerhub.alutech.local"
-    repository: "java-micro-service"
-    tag: "20200830t005945__master__abcd123"
-    pullPolicy: "IfNotPresent"
-  replicaCount: 2
-  gitBranch: "master"
-  jenkinsBuildNumber: "java-micro-service-666"
-  nodeSelector:
-    runtime: "java"
-  readinessProbe:
-    httpGet:
-      path: "/actuator/health/readiness"
-      port: 8081
-    initialDelaySeconds: 30
-    periodSeconds: 3
-  livenessProbe:
-    httpGet:
-      path: "/actuator/health/liveness"
-      port: 8081
-    initialDelaySeconds: 30
-    periodSeconds: 3
-  resources:
-    requests:
-      memory: "1Gi"
-      cpu: 1
-    limits:
-      memory: "2Gi"
-      cpu: 2
-service:
-  externalPort: 80
-  internalPort: 8080
-  metricsPort: 8081
-ingress:
-  enabled: true
-  host: "java-micro-service.dev.dev.in.in.alutech24.com"
-  annotations:
-    kubernetes.io/ingress.class: "nginx-dev"
-nfs:
-  enabled: true
-  size: "1Gi"})
-                     javaMicroservicePipeline.writeFile({file=kubernetes-06-06-2020_06-06-06/helm-chart-1-23/java-micro-service/values.yaml, text=name: "java-micro-service"
 deployment:
   image:
     registry: "nexus-dockerhub.alutech.local"
@@ -137,9 +89,6 @@ nfs:
                         javaMicroservicePipeline.sh(rm -rf infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/dev-dev/java-micro-service/raw-manifests)
                         javaMicroservicePipeline.sh(mkdir -p infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/dev-dev/java-micro-service/raw-manifests)
                         javaMicroservicePipeline.sh(helm template --namespace dev-dev --name java-micro-service-dev-dev kubernetes-06-06-2020_06-06-06/helm-chart/java-micro-service > 'infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/dev-dev/java-micro-service/raw-manifests/kube-state.yaml')
-                        javaMicroservicePipeline.sh(rm -rf infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/dev-dev/java-micro-service/raw-manifests-kube-1-23)
-                        javaMicroservicePipeline.sh(mkdir -p infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/dev-dev/java-micro-service/raw-manifests-kube-1-23)
-                        javaMicroservicePipeline.sh(helm template --namespace dev-dev --name java-micro-service-dev-dev kubernetes-06-06-2020_06-06-06/helm-chart-1-23/java-micro-service > 'infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/dev-dev/java-micro-service/raw-manifests-kube-1-23/kube-state.yaml')
                   javaMicroservicePipeline.script(groovy.lang.Closure)
                      javaMicroservicePipeline.dir(infra-06-06-2020_06-06-06, groovy.lang.Closure)
                         javaMicroservicePipeline.usernamePassword({credentialsId=jenkins, passwordVariable=GIT_PASSWORD, usernameVariable=GIT_USERNAME})
@@ -165,58 +114,10 @@ nfs:
                         javaMicroservicePipeline.git({credentialsId=jenkins, url=http://bb.alutech-mc.com:8080/scm/as/infra.git})
                      javaMicroservicePipeline.sh(mkdir -p kubernetes-06-06-2020_06-06-06/helm-chart/java-micro-service)
                      javaMicroservicePipeline.sh(cp -r infra-06-06-2020_06-06-06/helm-charts/java/microservice/* kubernetes-06-06-2020_06-06-06/helm-chart/java-micro-service)
-                     javaMicroservicePipeline.sh(mkdir -p kubernetes-06-06-2020_06-06-06/helm-chart-1-23/java-micro-service)
-                     javaMicroservicePipeline.sh(cp -r infra-06-06-2020_06-06-06/helm-charts/kub-1.23/java/microservice/* kubernetes-06-06-2020_06-06-06/helm-chart-1-23/java-micro-service)
                      javaMicroservicePipeline.sh(find . -name application.tst-test.properties -type f -exec cp {} kubernetes-06-06-2020_06-06-06/helm-chart/java-micro-service/application.properties ";")
                      javaMicroservicePipeline.sh(find . -name application.tst-test.yaml -type f -exec cp {} kubernetes-06-06-2020_06-06-06/helm-chart/java-micro-service/application.yaml ";")
-                     javaMicroservicePipeline.sh(find . -name application.tst-test.properties -type f -exec cp {} kubernetes-06-06-2020_06-06-06/helm-chart-1-23/java-micro-service/application.properties ";")
-                     javaMicroservicePipeline.sh(find . -name application.tst-test.yaml -type f -exec cp {} kubernetes-06-06-2020_06-06-06/helm-chart-1-23/java-micro-service/application.yaml ";")
                      javaMicroservicePipeline.sh(cp -r kubernetes/ kubernetes-06-06-2020_06-06-06/helm-chart/java-micro-service/templates || true)
-                     javaMicroservicePipeline.sh(cp -r kubernetes/ kubernetes-06-06-2020_06-06-06/helm-chart-1-23/java-micro-service/templates || true)
                      javaMicroservicePipeline.writeFile({file=kubernetes-06-06-2020_06-06-06/helm-chart/java-micro-service/values.yaml, text=name: "java-micro-service"
-deployment:
-  image:
-    registry: "nexus-dockerhub.alutech.local"
-    repository: "java-micro-service"
-    tag: "20200830t005945__master__abcd123"
-    pullPolicy: "IfNotPresent"
-  replicaCount: 2
-  gitBranch: "master"
-  jenkinsBuildNumber: "java-micro-service-666"
-  nodeSelector:
-    runtime: "java"
-  readinessProbe:
-    httpGet:
-      path: "/actuator/health/readiness"
-      port: 8081
-    initialDelaySeconds: 30
-    periodSeconds: 3
-  livenessProbe:
-    httpGet:
-      path: "/actuator/health/liveness"
-      port: 8081
-    initialDelaySeconds: 30
-    periodSeconds: 3
-  resources:
-    requests:
-      memory: "1Gi"
-      cpu: 1
-    limits:
-      memory: "2Gi"
-      cpu: 2
-service:
-  externalPort: 80
-  internalPort: 8080
-  metricsPort: 8081
-ingress:
-  enabled: true
-  host: "java-micro-service.test.tst.in.in.alutech24.com"
-  annotations:
-    kubernetes.io/ingress.class: "nginx-dev"
-nfs:
-  enabled: true
-  size: "1Gi"})
-                     javaMicroservicePipeline.writeFile({file=kubernetes-06-06-2020_06-06-06/helm-chart-1-23/java-micro-service/values.yaml, text=name: "java-micro-service"
 deployment:
   image:
     registry: "nexus-dockerhub.alutech.local"
@@ -264,9 +165,6 @@ nfs:
                         javaMicroservicePipeline.sh(rm -rf infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/tst-test/java-micro-service/raw-manifests)
                         javaMicroservicePipeline.sh(mkdir -p infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/tst-test/java-micro-service/raw-manifests)
                         javaMicroservicePipeline.sh(helm template --namespace tst-test --name java-micro-service-tst-test kubernetes-06-06-2020_06-06-06/helm-chart/java-micro-service > 'infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/tst-test/java-micro-service/raw-manifests/kube-state.yaml')
-                        javaMicroservicePipeline.sh(rm -rf infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/tst-test/java-micro-service/raw-manifests-kube-1-23)
-                        javaMicroservicePipeline.sh(mkdir -p infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/tst-test/java-micro-service/raw-manifests-kube-1-23)
-                        javaMicroservicePipeline.sh(helm template --namespace tst-test --name java-micro-service-tst-test kubernetes-06-06-2020_06-06-06/helm-chart-1-23/java-micro-service > 'infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/tst-test/java-micro-service/raw-manifests-kube-1-23/kube-state.yaml')
                   javaMicroservicePipeline.script(groovy.lang.Closure)
                      javaMicroservicePipeline.dir(infra-06-06-2020_06-06-06, groovy.lang.Closure)
                         javaMicroservicePipeline.usernamePassword({credentialsId=jenkins, passwordVariable=GIT_PASSWORD, usernameVariable=GIT_USERNAME})
@@ -292,53 +190,10 @@ nfs:
                         javaMicroservicePipeline.git({credentialsId=jenkins, url=http://bb.alutech-mc.com:8080/scm/as/infra.git})
                      javaMicroservicePipeline.sh(mkdir -p kubernetes-06-06-2020_06-06-06/helm-chart/java-micro-service)
                      javaMicroservicePipeline.sh(cp -r infra-06-06-2020_06-06-06/helm-charts/java/microservice/* kubernetes-06-06-2020_06-06-06/helm-chart/java-micro-service)
-                     javaMicroservicePipeline.sh(mkdir -p kubernetes-06-06-2020_06-06-06/helm-chart-1-23/java-micro-service)
-                     javaMicroservicePipeline.sh(cp -r infra-06-06-2020_06-06-06/helm-charts/kub-1.23/java/microservice/* kubernetes-06-06-2020_06-06-06/helm-chart-1-23/java-micro-service)
                      javaMicroservicePipeline.sh(find . -name application.prod.properties -type f -exec cp {} kubernetes-06-06-2020_06-06-06/helm-chart/java-micro-service/application.properties ";")
                      javaMicroservicePipeline.sh(find . -name application.prod.yaml -type f -exec cp {} kubernetes-06-06-2020_06-06-06/helm-chart/java-micro-service/application.yaml ";")
-                     javaMicroservicePipeline.sh(find . -name application.prod.properties -type f -exec cp {} kubernetes-06-06-2020_06-06-06/helm-chart-1-23/java-micro-service/application.properties ";")
-                     javaMicroservicePipeline.sh(find . -name application.prod.yaml -type f -exec cp {} kubernetes-06-06-2020_06-06-06/helm-chart-1-23/java-micro-service/application.yaml ";")
                      javaMicroservicePipeline.sh(cp -r kubernetes/ kubernetes-06-06-2020_06-06-06/helm-chart/java-micro-service/templates || true)
-                     javaMicroservicePipeline.sh(cp -r kubernetes/ kubernetes-06-06-2020_06-06-06/helm-chart-1-23/java-micro-service/templates || true)
                      javaMicroservicePipeline.writeFile({file=kubernetes-06-06-2020_06-06-06/helm-chart/java-micro-service/values.yaml, text=name: "java-micro-service"
-deployment:
-  image:
-    registry: "nexus-dockerhub.alutech.local"
-    repository: "java-micro-service"
-    tag: "20200830t005945__master__abcd123"
-    pullPolicy: "IfNotPresent"
-  replicaCount: 2
-  gitBranch: "master"
-  jenkinsBuildNumber: "java-micro-service-666"
-  readinessProbe:
-    httpGet:
-      path: "/actuator/health/readiness"
-      port: 8081
-    initialDelaySeconds: 30
-    periodSeconds: 3
-  livenessProbe:
-    httpGet:
-      path: "/actuator/health/liveness"
-      port: 8081
-    initialDelaySeconds: 30
-    periodSeconds: 3
-  resources:
-    requests:
-      memory: "1Gi"
-      cpu: 1
-    limits:
-      memory: "2Gi"
-      cpu: 2
-service:
-  externalPort: 80
-  internalPort: 8080
-  metricsPort: 8081
-ingress:
-  enabled: false
-nfs:
-  enabled: true
-  size: "1Gi"})
-                     javaMicroservicePipeline.writeFile({file=kubernetes-06-06-2020_06-06-06/helm-chart-1-23/java-micro-service/values.yaml, text=name: "java-micro-service"
 deployment:
   image:
     registry: "nexus-dockerhub.alutech.local"
@@ -381,9 +236,6 @@ nfs:
                         javaMicroservicePipeline.sh(rm -rf infra-06-06-2020_06-06-06/kube-prod/cluster-state/alutech-services/prod/java-micro-service/raw-manifests)
                         javaMicroservicePipeline.sh(mkdir -p infra-06-06-2020_06-06-06/kube-prod/cluster-state/alutech-services/prod/java-micro-service/raw-manifests)
                         javaMicroservicePipeline.sh(helm template --namespace prod --name java-micro-service-prod kubernetes-06-06-2020_06-06-06/helm-chart/java-micro-service > 'infra-06-06-2020_06-06-06/kube-prod/cluster-state/alutech-services/prod/java-micro-service/raw-manifests/kube-state.yaml')
-                        javaMicroservicePipeline.sh(rm -rf infra-06-06-2020_06-06-06/kube-prod/cluster-state/alutech-services/prod/java-micro-service/raw-manifests-kube-1-23)
-                        javaMicroservicePipeline.sh(mkdir -p infra-06-06-2020_06-06-06/kube-prod/cluster-state/alutech-services/prod/java-micro-service/raw-manifests-kube-1-23)
-                        javaMicroservicePipeline.sh(helm template --namespace prod --name java-micro-service-prod kubernetes-06-06-2020_06-06-06/helm-chart-1-23/java-micro-service > 'infra-06-06-2020_06-06-06/kube-prod/cluster-state/alutech-services/prod/java-micro-service/raw-manifests-kube-1-23/kube-state.yaml')
                   javaMicroservicePipeline.script(groovy.lang.Closure)
                      javaMicroservicePipeline.dir(infra-06-06-2020_06-06-06, groovy.lang.Closure)
                         javaMicroservicePipeline.usernamePassword({credentialsId=jenkins, passwordVariable=GIT_PASSWORD, usernameVariable=GIT_USERNAME})

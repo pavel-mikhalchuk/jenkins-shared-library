@@ -114,38 +114,9 @@ resources:
       memory: "5Gi"
       cpu: "2"
 javaOpts: null})
-                           javaMicroserviceDeploymentPipeline.writeFile({file=kubernetes/helm-chart-1-23/aservice/values.yaml, text=replicaCount: 1
-gitBranch: "no-javaOpts"
-image:
-  repository: "nexus-dockerhub.alutech.local"
-  tag: "aservice:latest"
-  pullPolicy: "IfNotPresent"
-service:
-  externalPort: 80
-  internalPort: 8080
-jenkinsBuildNumber: "aservice-deploy-dev-666"
-drawingService:
-  serviceName: "drawing"
-  path: "/drawingService"
-  externalPort: "80"
-host: "aservice.javaOpts.no.in.in.alutech24.com"
-hostin: "aservicein.javaOpts.no.in.in.alutech24.com"
-hostGates: "gates.javaOpts.no.in.in.alutech24.com"
-resources:
-  resources:
-    requests:
-      memory: "4Gi"
-      cpu: "100m"
-    limits:
-      memory: "5Gi"
-      cpu: "2"
-javaOpts: null})
                            javaMicroserviceDeploymentPipeline.sh(rm -rf infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/no-javaOpts/aservice/raw-manifests)
                            javaMicroserviceDeploymentPipeline.sh(mkdir -p infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/no-javaOpts/aservice/raw-manifests)
                            javaMicroserviceDeploymentPipeline.sh(helm template --namespace no-javaOpts --name aservice-no-javaOpts kubernetes/helm-chart/aservice > 'infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/no-javaOpts/aservice/raw-manifests/kube-state.yaml')
-                           javaMicroserviceDeploymentPipeline.sh(rm -rf infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/no-javaOpts/aservice/raw-manifests-kube-1-23)
-                           javaMicroserviceDeploymentPipeline.sh(mkdir -p infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/no-javaOpts/aservice/raw-manifests-kube-1-23)
-                           javaMicroserviceDeploymentPipeline.sh(helm template --namespace no-javaOpts --name aservice-no-javaOpts kubernetes/helm-chart-1-23/aservice > 'infra-06-06-2020_06-06-06/kube-dev/cluster-state/alutech-services/no-javaOpts/aservice/raw-manifests-kube-1-23/kube-state.yaml')
             javaMicroserviceDeploymentPipeline.stage(push K8S manifests to infra repo, groovy.lang.Closure)
                javaMicroserviceDeploymentPipeline.steps(groovy.lang.Closure)
                   javaMicroserviceDeploymentPipeline.script(groovy.lang.Closure)
