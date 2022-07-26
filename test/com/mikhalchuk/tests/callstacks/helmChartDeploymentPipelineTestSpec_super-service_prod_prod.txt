@@ -93,28 +93,9 @@ superServiceDatabase:
   password: "alex111"
 host: "super-service.alutech24.com"
 resources: null})
-                        helmChartDeploymentPipeline.writeFile({file=kubernetes/helm-chart-1-23/super-service/values.yaml, text=replicaCount: 1
-gitBranch: "master"
-image:
-  repository: "nexus-dockerhub.alutech.local"
-  tag: "super-service:latest"
-  pullPolicy: "IfNotPresent"
-  additionalProperty: "super-service-image-additional-property"
-service:
-  externalPort: 80
-  internalPort: 8080
-jenkinsBuildNumber: "super-service-deploy-prod-666"
-environment: "prod"
-superServiceDatabase:
-  password: "alex111"
-host: "super-service.alutech24.com"
-resources: null})
                         helmChartDeploymentPipeline.sh(rm -rf infra-06-06-2020_06-06-06/kube-prod/cluster-state/alutech-services/prod/super-service/raw-manifests)
                         helmChartDeploymentPipeline.sh(mkdir -p infra-06-06-2020_06-06-06/kube-prod/cluster-state/alutech-services/prod/super-service/raw-manifests)
                         helmChartDeploymentPipeline.sh(helm template --namespace prod --name super-service-prod kubernetes/helm-chart/super-service > 'infra-06-06-2020_06-06-06/kube-prod/cluster-state/alutech-services/prod/super-service/raw-manifests/kube-state.yaml')
-                        helmChartDeploymentPipeline.sh(rm -rf infra-06-06-2020_06-06-06/kube-prod/cluster-state/alutech-services/prod/super-service/raw-manifests-kube-1-23)
-                        helmChartDeploymentPipeline.sh(mkdir -p infra-06-06-2020_06-06-06/kube-prod/cluster-state/alutech-services/prod/super-service/raw-manifests-kube-1-23)
-                        helmChartDeploymentPipeline.sh(helm template --namespace prod --name super-service-prod kubernetes/helm-chart-1-23/super-service > 'infra-06-06-2020_06-06-06/kube-prod/cluster-state/alutech-services/prod/super-service/raw-manifests-kube-1-23/kube-state.yaml')
             helmChartDeploymentPipeline.stage(push K8S manifests to infra repo, groovy.lang.Closure)
                helmChartDeploymentPipeline.steps(groovy.lang.Closure)
                   helmChartDeploymentPipeline.script(groovy.lang.Closure)
