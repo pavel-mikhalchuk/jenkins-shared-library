@@ -144,7 +144,7 @@ static def devEnvHelmValues(ctx) {
                     path: '/actuator/health/readiness',
                     port: 8081
                 ],
-                initialDelaySeconds: 30,
+                initialDelaySeconds: 50,
                 periodSeconds: 3
             ],
 
@@ -153,7 +153,7 @@ static def devEnvHelmValues(ctx) {
                     path: '/actuator/health/liveness',
                     port: 8081
                 ],
-                initialDelaySeconds: 30,
+                initialDelaySeconds: 50,
                 periodSeconds: 3
             ],
 
@@ -209,7 +209,7 @@ static def prodEnvHelmValues(ctx) {
                     path: '/actuator/health/readiness',
                     port: 8081
                 ],
-                initialDelaySeconds: 30,
+                initialDelaySeconds: 50,
                 periodSeconds: 3
             ],
 
@@ -218,7 +218,7 @@ static def prodEnvHelmValues(ctx) {
                     path: '/actuator/health/liveness',
                     port: 8081
                 ],
-                initialDelaySeconds: 30,
+                initialDelaySeconds: 50,
                 periodSeconds: 3
             ],
 
