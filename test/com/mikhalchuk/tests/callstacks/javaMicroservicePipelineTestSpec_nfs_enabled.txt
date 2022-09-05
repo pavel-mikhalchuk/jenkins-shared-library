@@ -57,13 +57,13 @@ deployment:
     httpGet:
       path: "/actuator/health/readiness"
       port: 8081
-    initialDelaySeconds: 30
+    initialDelaySeconds: 50
     periodSeconds: 3
   livenessProbe:
     httpGet:
       path: "/actuator/health/liveness"
       port: 8081
-    initialDelaySeconds: 30
+    initialDelaySeconds: 50
     periodSeconds: 3
   resources:
     requests:
@@ -133,13 +133,13 @@ deployment:
     httpGet:
       path: "/actuator/health/readiness"
       port: 8081
-    initialDelaySeconds: 30
+    initialDelaySeconds: 50
     periodSeconds: 3
   livenessProbe:
     httpGet:
       path: "/actuator/health/liveness"
       port: 8081
-    initialDelaySeconds: 30
+    initialDelaySeconds: 50
     periodSeconds: 3
   resources:
     requests:
@@ -207,13 +207,13 @@ deployment:
     httpGet:
       path: "/actuator/health/readiness"
       port: 8081
-    initialDelaySeconds: 30
+    initialDelaySeconds: 50
     periodSeconds: 3
   livenessProbe:
     httpGet:
       path: "/actuator/health/liveness"
       port: 8081
-    initialDelaySeconds: 30
+    initialDelaySeconds: 50
     periodSeconds: 3
   resources:
     requests:
