@@ -46,7 +46,7 @@ class Yaml {
         def refMap = [:]
         refMap[''] = map
 
-        lines.eachWithIndex {line, i ->
+        lines.eachWithIndex { line, i ->
             def indent = indentOf(line)
             def keyValue = line.split(':', 2)
 
@@ -83,8 +83,13 @@ class Yaml {
                 result += "${indent}${it.key}: ${it.value}\n"
             } else if (it.value instanceof Boolean) {
                 result += "${indent}${it.key}: ${it.value}\n"
-            } else if(it.value instanceof List) {
-                result += "${indent}${it.key}: [${it.value.collect {quote(it)}.join(', ')}]\n"
+            } else if (it.value instanceof List) {
+                def firstItem = it.value.find()
+                if (firstItem instanceof Map) {
+                    result += "${indent}${it.key}: \n${it.value.collect { ti -> indent + '  -\n' + doWrite(ti, indent + '    ') }.join('')}"
+                } else {
+                    result += "${indent}${it.key}: [${it.value.collect { quote(it) }.join(', ')}]\n"
+                }
             } else {
                 result += "${indent}${it.key}: ${quote(it.value)}\n"
             }

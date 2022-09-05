@@ -166,6 +166,13 @@ static def devEnvHelmValues(ctx) {
                     memory: '2Gi',
                     cpu: 2
                 ]
+            ],
+
+            env: [
+                [
+                    name: 'JAVA_OPTS',
+                    value: '-Xmx1g'
+                ]
             ]
         ],
 
@@ -230,6 +237,13 @@ static def prodEnvHelmValues(ctx) {
                 limits: [
                     memory: '2Gi',
                     cpu: 2
+                ]
+            ],
+
+            env: [
+                [
+                    name: 'JAVA_OPTS',
+                    value: '-Xmx1g'
                 ]
             ]
         ],

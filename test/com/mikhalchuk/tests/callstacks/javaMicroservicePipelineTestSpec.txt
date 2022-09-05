@@ -72,6 +72,10 @@ deployment:
     limits:
       memory: "2Gi"
       cpu: 2
+  env: 
+    -
+      name: "JAVA_OPTS"
+      value: "-Xmx1g"
 service:
   externalPort: 80
   internalPort: 8080
@@ -145,6 +149,10 @@ deployment:
     limits:
       memory: "2Gi"
       cpu: 2
+  env: 
+    -
+      name: "JAVA_OPTS"
+      value: "-Xmx1g"
 service:
   externalPort: 80
   internalPort: 8080
@@ -216,6 +224,10 @@ deployment:
     limits:
       memory: "2Gi"
       cpu: 2
+  env: 
+    -
+      name: "JAVA_OPTS"
+      value: "-Xmx1g"
 service:
   externalPort: 80
   internalPort: 8080
