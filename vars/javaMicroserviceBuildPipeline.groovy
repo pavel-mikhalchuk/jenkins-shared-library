@@ -5,8 +5,10 @@ def call(body) {
 
     initUserDefinedParameters(ctx)
 
+    def agentLabel = agentLabelForJava(ctx.javaVersion)
+
     pipeline {
-        agent { label 'java-build' }
+        agent { label "${agentLabel}"}
         options { 
             buildDiscarder(logRotator(numToKeepStr: '5'))
             timestamps () 
@@ -57,6 +59,12 @@ def initUserDefinedParameters(ctx) {
 
         properties([parameters(interceptor.params)])
     }
+}
+
+def agentLabelForJava(javaVersion){
+    return javaVersion == null
+            ? 'java-build'
+            : 'java-build-16'
 }
 
 def defineMoreContextBasedOnUserInput(ctx) {
