@@ -22,7 +22,7 @@ class JavaMicroserviceBuildPipelineContracts {
     static def resolve(contract) {
         if (is_v_1_0(contract)) return upgrade_v_1_0(contract)
         if (is_v_1_1(contract)) return upgrade_v_1_1(contract)
-        if (is_v_1_2(contract)) return contract
+        if (is_v_1_2(contract)) return upgrade_v_1_2(contract)
 
         throw new IllegalArgumentException("Unsupported contract: ${contract}")
     }
@@ -80,11 +80,23 @@ class JavaMicroserviceBuildPipelineContracts {
         return false;
     }
 
+    static def upgrade_v_1_2(oldContract) {
+        return latestContract(
+                params: null,
+                maven: {
+                    skipTests = oldContract.noUnitTests
+                },
+                containerImages: oldContract.containerImages,
+                javaVersion: oldContract.javaVersion
+        )
+    }
+
     static def latestContract(params) {
         return [
             params: params.params,
             maven: params.maven,
-            containerImages: params.containerImages
+            containerImages: params.containerImages,
+            javaVersion: params.javaVersion
         ]
     }
 }
