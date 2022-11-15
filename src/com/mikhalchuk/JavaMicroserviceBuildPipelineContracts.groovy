@@ -33,7 +33,6 @@ class JavaMicroserviceBuildPipelineContracts {
 
         if (keys.size() == 1 && keys.contains('service')) return true;
         if (keys.size() == 2 && keys.contains('service') && keys.contains('noUnitTests')) return true;
-        if (keys.size() == 3 && keys.contains('service') && keys.contains('noUnitTests')) return true;
 
         return false;
     }
