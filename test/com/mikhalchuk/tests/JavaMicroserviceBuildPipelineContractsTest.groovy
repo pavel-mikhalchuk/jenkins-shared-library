@@ -29,17 +29,6 @@ class JavaMicroserviceBuildPipelineContractsTest extends Specification {
         assertThat(conformsToContract).isEqualTo(true)
     }
 
-    def "test v 1.0 contract - conforms 3"() {
-        given:
-        def contract = [service: 'pricing', noUnitTests: false, javaVersion: 16]
-
-        when:
-        def conformsToContract = JavaMicroserviceBuildPipelineContracts.is_v_1_0(contract)
-
-        then:
-        assertThat(conformsToContract).isEqualTo(true)
-    }
-
     def "test v 1.0 contract - does not conform"() {
         given:
         def contract = [service: 'pricing', skipTests: true]
@@ -126,5 +115,16 @@ class JavaMicroserviceBuildPipelineContractsTest extends Specification {
 
         then:
         assertThat(conformsToContract).isEqualTo(false)
+    }
+
+    def "test v 1.3 contract - conforms 1"() {
+        given:
+        def contract = [service: 'pricing', noUnitTests: false, javaVersion: 16]
+
+        when:
+        def conformsToContract = JavaMicroserviceBuildPipelineContracts.is_v_1_3(contract)
+
+        then:
+        assertThat(conformsToContract).isEqualTo(true)
     }
 }

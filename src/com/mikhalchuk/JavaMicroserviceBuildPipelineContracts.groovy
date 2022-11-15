@@ -23,6 +23,7 @@ class JavaMicroserviceBuildPipelineContracts {
         if (is_v_1_0(contract)) return upgrade_v_1_0(contract)
         if (is_v_1_1(contract)) return upgrade_v_1_1(contract)
         if (is_v_1_2(contract)) return upgrade_v_1_2(contract)
+        if (is_v_1_3(contract)) return upgrade_v_1_3(contract)
 
         throw new IllegalArgumentException("Unsupported contract: ${contract}")
     }
@@ -32,21 +33,20 @@ class JavaMicroserviceBuildPipelineContracts {
 
         if (keys.size() == 1 && keys.contains('service')) return true;
         if (keys.size() == 2 && keys.contains('service') && keys.contains('noUnitTests')) return true;
-        if (keys.size() == 3 && keys.contains('service') && keys.contains('noUnitTests')
-                && keys.contains('javaVersion')) return true;
+        if (keys.size() == 3 && keys.contains('service') && keys.contains('noUnitTests')) return true;
 
         return false;
     }
 
     static def upgrade_v_1_0(oldContract) {
         return latestContract(
-            params:  null,
-            maven: {
-                skipTests = oldContract.noUnitTests
-            },
-            containerImages: [
-                [ source: '.', name: oldContract.service ]
-            ]
+                params: null,
+                maven: {
+                    skipTests = oldContract.noUnitTests
+                },
+                containerImages: [
+                        [source: '.', name: oldContract.service]
+                ]
         )
     }
 
@@ -61,11 +61,11 @@ class JavaMicroserviceBuildPipelineContracts {
 
     static def upgrade_v_1_1(oldContract) {
         return latestContract(
-            params: null,
-            maven: {
-                skipTests = oldContract.noUnitTests
-            },
-            containerImages: oldContract.containerImages
+                params: null,
+                maven: {
+                    skipTests = oldContract.noUnitTests
+                },
+                containerImages: oldContract.containerImages
         )
     }
 
@@ -86,17 +86,38 @@ class JavaMicroserviceBuildPipelineContracts {
                 maven: {
                     skipTests = oldContract.noUnitTests
                 },
-                containerImages: oldContract.containerImages,
+                containerImages: oldContract.containerImages
+        )
+    }
+
+    static boolean is_v_1_3(contract) {
+        def keys = contract.keySet()
+
+        if (keys.size() == 3 && keys.contains('service') && keys.contains('noUnitTests')
+                && keys.contains('javaVersion')) return true
+
+        return false;
+    }
+
+    static def upgrade_v_1_3(oldContract) {
+        return latestContract(
+                params: null,
+                maven: {
+                    skipTests = oldContract.noUnitTests
+                },
+                containerImages: [
+                        [source: '.', name: oldContract.service]
+                ],
                 javaVersion: oldContract.javaVersion
         )
     }
 
     static def latestContract(params) {
         return [
-            params: params.params,
-            maven: params.maven,
-            containerImages: params.containerImages,
-            javaVersion: params.javaVersion
+                params         : params.params,
+                maven          : params.maven,
+                containerImages: params.containerImages,
+                javaVersion    : params.javaVersion
         ]
     }
 }
