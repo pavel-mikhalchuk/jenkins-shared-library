@@ -72,9 +72,9 @@ javaOpts: null, description=Kubernetes POD resources requests and limits + JavaO
                      javaMicroserviceDeploymentPipeline.sh({script=echo $(date +"%d-%m-%Y_%H-%M-%S"), returnStdout=true})
                      javaMicroserviceDeploymentPipeline.script(groovy.lang.Closure)
                         javaMicroserviceDeploymentPipeline.wrap({$class=BuildUser}, groovy.lang.Closure)
-                           javaMicroserviceDeploymentPipeline.slackSend({channel=java_services, color=good, message=*mikhalchuk* накатывает ветку *no-javaOpts* на *aservice no-javaOpts*.
+                           javaMicroserviceDeploymentPipeline.slackSend({channel=java_services, color=good, message=*mikhalchuk* rolls branch *no-javaOpts* on *aservice no-javaOpts*.
 aservice:latest
-Сохраняйте спокойствие 😌})
+Keep calm!})
             javaMicroserviceDeploymentPipeline.stage(checkout infra repo, groovy.lang.Closure)
                javaMicroserviceDeploymentPipeline.steps(groovy.lang.Closure)
                   javaMicroserviceDeploymentPipeline.script(groovy.lang.Closure)
