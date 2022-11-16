@@ -1,4 +1,5 @@
 def call(body) {
+
     def ctx = setUpContext(body)
 
     pipeline {

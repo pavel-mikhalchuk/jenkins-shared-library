@@ -64,9 +64,9 @@
                      helmChartDeploymentPipeline.sh({script=echo $(date +"%d-%m-%Y_%H-%M-%S"), returnStdout=true})
                      helmChartDeploymentPipeline.script(groovy.lang.Closure)
                         helmChartDeploymentPipeline.wrap({$class=BuildUser}, groovy.lang.Closure)
-                           helmChartDeploymentPipeline.slackSend({channel=java_services, color=good, message=*mikhalchuk* накатывает ветку *master* на *super-service prod*.
+                           helmChartDeploymentPipeline.slackSend({channel=java_services, color=good, message=*mikhalchuk* rolls branch *master* on *super-service prod*.
 super-service:latest
-Сохраняйте спокойствие 😌})
+Keep calm!})
             helmChartDeploymentPipeline.stage(checkout infra repo, groovy.lang.Closure)
                helmChartDeploymentPipeline.steps(groovy.lang.Closure)
                   helmChartDeploymentPipeline.script(groovy.lang.Closure)
