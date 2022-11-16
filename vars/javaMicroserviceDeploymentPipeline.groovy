@@ -45,7 +45,7 @@ def call(body) {
                                 if (ctx.preDeploy) {
                                     helper.preDeploy(ctx)
                                 } else {
-                                    helper.copyConfigToHelmChart(ctx)
+                                    helper.smartCopyConfigToHelmChart(ctx)
                                 }
                                 helper.writeHelmValuesYaml(ctx)
                                 helper.generateK8SManifests(ctx)
