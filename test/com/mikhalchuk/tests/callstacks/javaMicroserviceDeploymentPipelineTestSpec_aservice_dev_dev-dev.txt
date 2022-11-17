@@ -72,9 +72,9 @@ javaOpts: "-Xms4g -Xmx4g -Dcom.sun.management.jmxremote -Dcom.sun.management.jmx
                      javaMicroserviceDeploymentPipeline.sh({script=echo $(date +"%d-%m-%Y_%H-%M-%S"), returnStdout=true})
                      javaMicroserviceDeploymentPipeline.script(groovy.lang.Closure)
                         javaMicroserviceDeploymentPipeline.wrap({$class=BuildUser}, groovy.lang.Closure)
-                           javaMicroserviceDeploymentPipeline.slackSend({channel=java_services, color=good, message=*mikhalchuk* накатывает ветку *master* на *aservice dev-dev*.
+                           javaMicroserviceDeploymentPipeline.slackSend({channel=java_services, color=good, message=*mikhalchuk* rolls branch *master* on *aservice dev-dev*.
 aservice:latest
-Сохраняйте спокойствие 😌})
+Keep calm!})
             javaMicroserviceDeploymentPipeline.stage(checkout infra repo, groovy.lang.Closure)
                javaMicroserviceDeploymentPipeline.steps(groovy.lang.Closure)
                   javaMicroserviceDeploymentPipeline.script(groovy.lang.Closure)

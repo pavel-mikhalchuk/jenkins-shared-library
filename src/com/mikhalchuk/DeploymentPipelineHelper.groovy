@@ -52,7 +52,7 @@ class DeploymentPipelineHelper {
     def notifySlack(ctx) {
         pipeline.script {
             pipeline.wrap([$class: 'BuildUser']) {
-                pipeline.slackSend channel: "${ctx.slackChannel}", color: "good", message: "*${pipeline.BUILD_USER}* накатывает ветку *${ctx.currentBranchName}* на *${ctx.service} ${ctx.namespace}*.\n${ctx.dockerImage}\nСохраняйте спокойствие 😌"
+                pipeline.slackSend channel: "${ctx.slackChannel}", color: "good", message: "*${pipeline.BUILD_USER}* rolls branch *${ctx.currentBranchName}* on *${ctx.service} ${ctx.namespace}*.\n${ctx.dockerImage}\nKeep calm!"
             }
         }
     }
