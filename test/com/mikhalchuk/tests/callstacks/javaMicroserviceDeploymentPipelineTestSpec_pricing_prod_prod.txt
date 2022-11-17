@@ -72,9 +72,9 @@ javaOpts: "-Xms500m -Xmx4g -Dcom.sun.management.jmxremote -Dcom.sun.management.j
                      javaMicroserviceDeploymentPipeline.sh({script=echo $(date +"%d-%m-%Y_%H-%M-%S"), returnStdout=true})
                      javaMicroserviceDeploymentPipeline.script(groovy.lang.Closure)
                         javaMicroserviceDeploymentPipeline.wrap({$class=BuildUser}, groovy.lang.Closure)
-                           javaMicroserviceDeploymentPipeline.slackSend({channel=java_services, color=good, message=*mikhalchuk* накатывает ветку *master* на *pricing prod*.
+                           javaMicroserviceDeploymentPipeline.slackSend({channel=java_services, color=good, message=*mikhalchuk* rolls branch *master* on *pricing prod*.
 pricing:latest
-Сохраняйте спокойствие 😌})
+Keep calm!})
             javaMicroserviceDeploymentPipeline.stage(checkout infra repo, groovy.lang.Closure)
                javaMicroserviceDeploymentPipeline.steps(groovy.lang.Closure)
                   javaMicroserviceDeploymentPipeline.script(groovy.lang.Closure)
@@ -86,7 +86,8 @@ pricing:latest
                   javaMicroserviceDeploymentPipeline.container(helm, groovy.lang.Closure)
                      javaMicroserviceDeploymentPipeline.script(groovy.lang.Closure)
                         javaMicroserviceDeploymentPipeline.catchError({buildResult=SUCCESS, stageResult=FAILURE}, groovy.lang.Closure)
-                           javaMicroserviceDeploymentPipeline.sh(cp src/main/resources/application.prod.properties kubernetes/helm-chart/pricing/application.properties)
+                           javaMicroserviceDeploymentPipeline.sh(find . -name application.prod.properties -type f -exec cp {} kubernetes/helm-chart/pricing/application.properties ";")
+                           javaMicroserviceDeploymentPipeline.sh(find . -name application.prod.yaml -type f -exec cp {} kubernetes/helm-chart/pricing/application.yaml ";")
                            javaMicroserviceDeploymentPipeline.writeFile({file=kubernetes/helm-chart/pricing/values.yaml, text=replicaCount: 1
 gitBranch: "master"
 image:
