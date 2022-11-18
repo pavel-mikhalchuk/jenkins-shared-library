@@ -110,15 +110,146 @@ def deploy(env, namespace, deployer, ctx) {
 static def helmValuesForEnvironment(env, ctx) {
     switch (env) {
         case "dev":
-            return devEnvHelmValues(ctx)
+            if (ctx.helmValues != null && ctx.helmValues[ctx.namespace] != null) {
+                return devEnvHelmValues(ctx)
+            }
+            return devEnvHelmValuesDefault(ctx)
         case "prod":
-            return prodEnvHelmValues(ctx)
+            if (ctx.helmValues != null && ctx.helmValues[ctx.namespace] != null) {
+                return prodEnvHelmValues(ctx)
+            }
+            return prodEnvHelmValuesDefault(ctx)
         default:
             return []
     }
 }
 
 static def devEnvHelmValues(ctx) {
+    def helmValues = ctx.helmValues[ctx.namespace]
+    def values = [
+       name: ctx.service,
+
+       deployment: [
+           image: [
+                   registry: 'nexus-dockerhub.alutech.local',
+                   repository: ctx.service,
+                   tag: ctx.dockerImageTag,
+                   pullPolicy: 'IfNotPresent'
+           ],
+
+           replicaCount: helmValues["replicaCount"],
+
+           gitBranch: ctx.currentBranchName,
+           jenkinsBuildNumber: ctx.jenkinsBuildNumber,
+
+           nodeSelector: [
+                   runtime: 'java'
+           ],
+
+           readinessProbe: [
+                   httpGet: [
+                           path: '/actuator/health/readiness',
+                           port: 8081
+                   ],
+                   initialDelaySeconds: 50,
+                   periodSeconds: 3
+           ],
+
+           livenessProbe: [
+                   httpGet: [
+                           path: '/actuator/health/liveness',
+                           port: 8081
+                   ],
+                   initialDelaySeconds: 50,
+                   periodSeconds: 3
+           ],
+
+           resources: helmValues["resources"],
+           env: [
+                   [
+                           name: 'JAVA_OPTS',
+                           value: helmValues["javaOpts"]
+                   ]
+           ]
+       ],
+
+       service: [
+               externalPort: 80,
+               internalPort: 8080,
+               metricsPort: 8081,
+       ],
+
+       ingress: [
+               enabled: true,
+               host: { ingUtils-> "${ingUtils.svc_ns_inin()}" },
+               annotations: [
+                       "kubernetes.io/ingress.class": "nginx-dev"
+               ]
+       ]
+    ]
+    return addStorageHelmValues(ctx, values)
+}
+
+
+static def prodEnvHelmValues(ctx) {
+    def helmValues = ctx.helmValues[ctx.namespace]
+    def values = [
+            name: ctx.service,
+
+            deployment: [
+                    image: [
+                            registry: 'nexus-dockerhub.alutech.local',
+                            repository: ctx.service,
+                            tag: ctx.dockerImageTag,
+                            pullPolicy: 'IfNotPresent'
+                    ],
+
+                    replicaCount: helmValues["replicaCount"],
+
+                    gitBranch: ctx.currentBranchName,
+                    jenkinsBuildNumber: ctx.jenkinsBuildNumber,
+
+                    readinessProbe: [
+                            httpGet: [
+                                    path: '/actuator/health/readiness',
+                                    port: 8081
+                            ],
+                            initialDelaySeconds: 50,
+                            periodSeconds: 3
+                    ],
+
+                    livenessProbe: [
+                            httpGet: [
+                                    path: '/actuator/health/liveness',
+                                    port: 8081
+                            ],
+                            initialDelaySeconds: 50,
+                            periodSeconds: 3
+                    ],
+
+                    resources: helmValues["resources"],
+                    env: [
+                            [
+                                    name: 'JAVA_OPTS',
+                                    value: helmValues["javaOpts"]
+                            ]
+                    ]
+            ],
+
+            service: [
+                    externalPort: 80,
+                    internalPort: 8080,
+                    metricsPort: 8081,
+            ],
+
+            ingress: [
+                    enabled: false,
+            ]
+    ]
+    return addStorageHelmValues(ctx, values)
+}
+
+static def devEnvHelmValuesDefault(ctx) {
     def values = [
         name: ctx.service,
 
@@ -194,7 +325,7 @@ static def devEnvHelmValues(ctx) {
     return addStorageHelmValues(ctx, values)
 }
 
-static def prodEnvHelmValues(ctx) {
+static def prodEnvHelmValuesDefault(ctx) {
     def values = [
         name: ctx.service,
 

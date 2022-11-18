@@ -17,7 +17,72 @@ public class JavaMicroservicePipelineContracts {
     // And we don't need to create tags/branches for specific versions of this pipeline.
     // Try googling Jenkins Shared Library versioning.
     static def resolve(contract) {
-        //currently there is only one version of the contract
-        return contract
+        if (is_v_1_1(contract)) return upgrade_v_1_1(contract)
+        if (is_v_1_2(contract)) return upgrade_v_1_2(contract)
+        if (is_v_1_3(contract)) return upgrade_v_1_3(contract)
+
+        throw new IllegalArgumentException("Unsupported contract: ${contract}")
+    }
+
+    static boolean is_v_1_1(contract) {
+        def keys = contract.keySet()
+        if (keys.size() == 2 &&
+                keys.contains('service') &&
+                keys.contains('containerImages')) return true;
+        return false;
+    }
+
+    static boolean is_v_1_2(contract) {
+        def keys = contract.keySet()
+        if (keys.size() == 3 &&
+                keys.contains('service') &&
+                keys.contains('containerImages') &&
+                keys.contains('storage')) return true;
+        return false;
+    }
+
+    static boolean is_v_1_3(contract) {
+        def keys = contract.keySet()
+        if (keys.size() == 3 &&
+                keys.contains('service') &&
+                keys.contains('containerImages') &&
+                keys.contains('helmValues')) return true;
+        return false;
+    }
+
+    static def upgrade_v_1_1(contract) {
+        return latestContract(
+                service: contract.service,
+                containerImages: contract.containerImages,
+                storage: null,
+                helmValues: null
+        )
+    }
+
+    static def upgrade_v_1_2(contract) {
+        return latestContract(
+                service: contract.service,
+                containerImages: contract.containerImages,
+                storage: contract.storage,
+                helmValues: null
+        )
+    }
+
+    static def upgrade_v_1_3(contract) {
+        return latestContract(
+                service: contract.service,
+                containerImages: contract.containerImages,
+                storage: null,
+                helmValues: contract.helmValues
+        )
+    }
+
+    static def latestContract(params) {
+        return [
+                service: params.service,
+                containerImages: params.containerImages,
+                storage: params.storage,
+                helmValues: params.helmValues
+        ]
     }
 }
