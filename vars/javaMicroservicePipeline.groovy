@@ -152,7 +152,7 @@ static def devEnvHelmValues(ctx) {
                            port: 8081
                    ],
                    initialDelaySeconds: 50,
-                   periodSeconds: 3
+                   periodSeconds: 5
            ],
 
            livenessProbe: [
@@ -161,7 +161,7 @@ static def devEnvHelmValues(ctx) {
                            port: 8081
                    ],
                    initialDelaySeconds: 50,
-                   periodSeconds: 3
+                   periodSeconds: 10
            ],
 
            resources: helmValues["resources"],
@@ -215,7 +215,7 @@ static def prodEnvHelmValues(ctx) {
                                     port: 8081
                             ],
                             initialDelaySeconds: 50,
-                            periodSeconds: 3
+                            periodSeconds: 5
                     ],
 
                     livenessProbe: [
@@ -224,7 +224,7 @@ static def prodEnvHelmValues(ctx) {
                                     port: 8081
                             ],
                             initialDelaySeconds: 50,
-                            periodSeconds: 3
+                            periodSeconds: 10
                     ],
 
                     resources: helmValues["resources"],
@@ -276,7 +276,7 @@ static def devEnvHelmValuesDefault(ctx) {
                     port: 8081
                 ],
                 initialDelaySeconds: 50,
-                periodSeconds: 3
+                periodSeconds: 5
             ],
 
             livenessProbe: [
@@ -285,7 +285,7 @@ static def devEnvHelmValuesDefault(ctx) {
                     port: 8081
                 ],
                 initialDelaySeconds: 50,
-                periodSeconds: 3
+                periodSeconds: 10
             ],
 
             resources: [
@@ -348,7 +348,7 @@ static def prodEnvHelmValuesDefault(ctx) {
                     port: 8081
                 ],
                 initialDelaySeconds: 50,
-                periodSeconds: 3
+                periodSeconds: 5
             ],
 
             livenessProbe: [
@@ -357,7 +357,7 @@ static def prodEnvHelmValuesDefault(ctx) {
                     port: 8081
                 ],
                 initialDelaySeconds: 50,
-                periodSeconds: 3
+                periodSeconds: 10
             ],
 
             resources: [
